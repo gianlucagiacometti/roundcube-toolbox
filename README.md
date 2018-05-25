@@ -3,6 +3,7 @@ Roundcube Toolbox
 This plugin is a set of tools for RoundCube.
 
 
+
 ATTENTION
 ---------
 This plugin works with RC 1.4.x.
@@ -39,5 +40,6 @@ $rcmail_config['toolbox_driver'] = 'sql';
 $rcmail_config['toolbox_sql_dsn'] = value;
 ```
   example value: 'pgsql://username:password@host/database'
+  
   example value: 'mysql://username:password@host/database'
 
