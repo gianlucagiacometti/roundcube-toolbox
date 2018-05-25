@@ -37,10 +37,10 @@ Available options: 'sql'
 ```
 $rcmail_config['toolbox_driver'] = 'sql';
 ```
-**$rcmail_config['toolbox_sql_dsn']**<br />
+**$rcmail_config['toolbox_dsn']**<br />
 Sets the connection to the data source<br />
 Examples:
 ```
-$rcmail_config['toolbox_sql_dsn'] = 'pgsql://username:password@host/database';
-$rcmail_config['toolbox_sql_dsn'] = 'mysql://username:password@host/database';
+$rcmail_config['toolbox_dsn'] = 'pgsql://username:password@host/database';
+$rcmail_config['toolbox_dsn'] = 'mysql://username:password@host/database';
 ```
