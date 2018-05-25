@@ -9,7 +9,7 @@ This plugin works with RC 1.4.x.
 
 Requirements
 ------------
-* [Roundcube jQueryUI plugin]
+* Roundcube jQueryUI plugin [https://github.com/roundcube/roundcubemail/tree/master/plugins/jqueryui]
 
 License
 -------
