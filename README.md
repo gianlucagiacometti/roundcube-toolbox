@@ -39,5 +39,8 @@ so far only sql is available
 ```
 $rcmail_config['toolbox_sql_dsn'] = value;
 ```
-example value: `pgsql://username:password@host/database`
-example value: `mysql://username:password@host/database`
+example values: 
+```
+pgsql://username:password@host/database
+mysql://username:password@host/database
+```
