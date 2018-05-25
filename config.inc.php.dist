@@ -1,0 +1,15 @@
+<?php
+
+/**
+  toolbox configuration file
+**/
+
+// data source name
+$config['toolbox_sql_dsn'] = 'pgsql://username:password@localhost/database';
+
+// table name
+$config['toolbox_sql_table_name'] = 'toolbox';
+
+// name of the username field in the toolbox table
+$config['toolbox_sql_username_field'] = 'username';
+
