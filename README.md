@@ -40,6 +40,5 @@ $rcmail_config['toolbox_driver'] = 'sql';
 $rcmail_config['toolbox_sql_dsn'] = value;
 ```
   example value: 'pgsql://username:password@host/database'
-  
   example value: 'mysql://username:password@host/database'
 
