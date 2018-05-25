@@ -31,16 +31,18 @@ Config
 ------
 The default config file is plugins/toolbox/config.inc.php.dist
 Copy 'config.inc.php.dist' to 'config.inc.php'.
-Edit the plugin configuration file 'config.inc.php' and choose the appropriate options:
+Edit the plugin configuration file 'config.inc.php' and choose the appropriate options.
+
+__$rcmail_config['toolbox_driver']__
+Sets the appropriate driver.
+Available options: 'sql'
 ```
 $rcmail_config['toolbox_driver'] = 'sql';
 ```
-so far only sql is available
+__$rcmail_config['toolbox_sql_dsn']__
+Sets the connection to the data source.
+Examples:
 ```
-$rcmail_config['toolbox_sql_dsn'] = value;
-```
-example values: 
-```
-pgsql://username:password@host/database
-mysql://username:password@host/database
+$rcmail_config['toolbox_sql_dsn'] = 'pgsql://username:password@host/database';
+$rcmail_config['toolbox_sql_dsn'] = 'mysql://username:password@host/database';
 ```
