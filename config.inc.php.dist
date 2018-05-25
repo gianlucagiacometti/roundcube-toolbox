@@ -4,12 +4,11 @@
   toolbox configuration file
 **/
 
-// data source name
-$config['toolbox_sql_dsn'] = 'pgsql://username:password@localhost/database';
+//  Set the connection to the data source
+$rcmail_config['toolbox_dsn'] = 'pgsql://username:password@localhost/database';
 
-// table name
+// Set the table name
 $config['toolbox_sql_table_name'] = 'toolbox';
 
-// name of the username field in the toolbox table
+// Set the name of the username field in the toolbox table
 $config['toolbox_sql_username_field'] = 'username';
-
