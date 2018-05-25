@@ -9,12 +9,11 @@ This plugin works with RC 1.4.x.
 
 Requirements
 ------------
-* [Roundcube jQueryUI plugin][rcjqui]
+* [Roundcube jQueryUI plugin]
 
 License
 -------
-This plugin is released under the [GNU General Public License Version 3+][gpl] exept skins, which are subject to the Creative Commons
-Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/3.0).
+This plugin is released under the GNU General Public License Version 3+ (https://www.gnu.org/licenses/gpl.html) exept skins, which are subject to the Creative Commons Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/3.0).
 
 Install
 -------
