@@ -35,10 +35,10 @@ Edit the plugin configuration file 'config.inc.php' and choose the appropriate o
 ```
 $rcmail_config['toolbox_driver'] = 'sql';
 ```
-  so far only sql is available
+so far only sql is available
 ```
 $rcmail_config['toolbox_sql_dsn'] = value;
 ```
-  example value: 'pgsql://username:password@host/database'
-  example value: 'mysql://username:password@host/database'
+example value: 'pgsql://username:password@host/database'
+example value: 'mysql://username:password@host/database'
 
