@@ -21,26 +21,24 @@ Install
 * Place this plugin folder into plugins directory of Roundcube
 * Add toolbox to $config['plugins'] in your Roundcube config file
 
-**NB:** When downloading the plugin from GitHub you will need to create a
-directory called toolbox and place the files in there, ignoring the root
-directory in the downloaded archive.
+**NB:** When downloading the plugin from GitHub you will need to create a directory called toolbox and place the files in there, ignoring the root directory in the downloaded archive.
 
 Update database using the appropriate file in the SQl folder.
-+
+
 Config
 ------
-The default config file is plugins/toolbox/config.inc.php.dist
-Copy 'config.inc.php.dist' to 'config.inc.php'.
-Edit the plugin configuration file 'config.inc.php' and choose the appropriate options.
+The default config file is plugins/toolbox/config.inc.php.dist<br />
+Copy 'config.inc.php.dist' to 'config.inc.php'<br />
+Edit the plugin configuration file 'config.inc.php' and choose the appropriate options<br />
 
-__$rcmail_config['toolbox_driver']__
-Sets the appropriate driver.
+**$rcmail_config['toolbox_driver']**<br />
+Sets the appropriate driver<br />
 Available options: 'sql'
 ```
 $rcmail_config['toolbox_driver'] = 'sql';
 ```
-__$rcmail_config['toolbox_sql_dsn']__
-Sets the connection to the data source.
+**$rcmail_config['toolbox_sql_dsn']**<br />
+Sets the connection to the data source<br />
 Examples:
 ```
 $rcmail_config['toolbox_sql_dsn'] = 'pgsql://username:password@host/database';
