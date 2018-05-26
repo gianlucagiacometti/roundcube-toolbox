@@ -1,6 +1,7 @@
 Roundcube PostfixAdmin Toolbox
 ==============================
-This plugin is a set of tools for [Roundcube webmail](https://github.com/roundcube/roundcubemail) and [PostfixAdmin](https://github.com/postfixadmin/postfixadmin) / [Postfix with sql backend](http://www.postfix.org/DATABASE_README.html)
+This plugin is a set of tools for [Roundcube webmail](https://github.com/roundcube/roundcubemail).
+Some tools are designed to work with [PostfixAdmin](https://github.com/postfixadmin/postfixadmin) / [Postfix with sql backend](http://www.postfix.org/DATABASE_README.html)
 
 
 
