@@ -1,6 +1,6 @@
-Roundcube Postfix Toolbox
-=========================
-This plugin is a set of tools for Roundcube webmail and Postfix with sql backend 
+Roundcube PostfixAdmin Toolbox
+==============================
+This plugin is a set of tools for Roundcube webmail and PostfixAdmin / Postfix with sql backend 
 
 
 
@@ -19,7 +19,7 @@ This plugin is released under the [GNU General Public License Version 3+](https:
 Install
 -------
 * Place this plugin folder into plugins directory of Roundcube
-* Add toolbox to `$config['plugins']` in your Roundcube config file
+* Add 'toolbox' to `$config['plugins']` in your Roundcube config file
 
 **NB:** When downloading the plugin from GitHub you will need to create a directory called toolbox and place the files in there, ignoring the root directory in the downloaded archive.
 
