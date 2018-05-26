@@ -14,7 +14,7 @@ Requirements
 
 License
 -------
-This plugin is released under the [GNU General Public License Version 3+](https://www.gnu.org/licenses/gpl.html) exept skins, which are subject to the [Creative Commons Attribution-ShareAlike License](http://creativecommons.org/licenses/by-sa/3.0).
+This plugin is released under the [GNU General Public License Version 3+](https://www.gnu.org/licenses/gpl.html) except skins, which are subject to the [Creative Commons Attribution-ShareAlike License](http://creativecommons.org/licenses/by-sa/3.0).
 
 Install
 -------
