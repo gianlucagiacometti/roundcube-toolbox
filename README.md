@@ -1,6 +1,6 @@
 Roundcube Toolbox
 =================
-This plugin is a set of tools for Roundcube webmail
+This plugin is a set of tools for Roundcube webmail and Postfix with sql backend 
 
 
 
