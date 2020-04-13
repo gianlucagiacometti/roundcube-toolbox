@@ -1,0 +1,31 @@
+{
+  "name": "gianlucagiacometti/roundcube-toolbox",
+  "description": "Set of tools for Roundcube webmail",
+  "keywords": ["postfix","roundcube","roundcubemail",,"webmail","toolbox"],
+  "homepage": "http://github.com/gianlucagiacometti/roundcube-toolbox",
+  "license": "GPLv3+",
+  "type": "roundcube-plugin",
+  "version": "1.4.0",
+  "authors": [
+    {
+      "name": "Gianluca Giacometti",
+      "email": "php@gianlucagiacometti.it",
+      "role": "Developer"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "http://github.com/gianlucagiacometti/roundcube-toolbox"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "roundcube/plugin-installer": "~0.1.6"
+  },
+  "extra": {
+    "roundcube": {
+      "min-version": "1.4-git"
+    }
+  }
+}
