@@ -3,7 +3,7 @@
   "description": "Set of tools for Roundcube webmail",
   "keywords": ["postfix","roundcube","roundcubemail","webmail","toolbox"],
   "homepage": "http://github.com/gianlucagiacometti/roundcube-toolbox",
-  "license": "GPLv3+",
+  "license": "GPL-3.0-or-later",
   "type": "roundcube-plugin",
   "version": "1.4.0",
   "authors": [
