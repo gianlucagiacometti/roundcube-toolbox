@@ -1,0 +1,15 @@
+/**
+ * toolbox plugin styles (tab styles)
+ */
+
+#settings-sections #settingstabplugintoolbox a
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px 1px;
+}
+
+#settings-sections #settingstabplugintoolbox.selected a
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -23px;
+}

@@ -1,0 +1,6 @@
+/**
+ * toolbox plugin styles (tab styles)
+ */
+.listing.iconized li.toolbox > a::before {
+  content: "\f0b1";
+}

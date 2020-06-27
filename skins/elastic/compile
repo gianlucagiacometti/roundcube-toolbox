@@ -1,0 +1,9 @@
+#!/bin/bash
+
+list="tabstyles.less toolbox.less"
+
+for file in $list
+do
+    lessc $file > "${file%.less}.css"
+    echo "$file > ${file%.less}.css"
+done

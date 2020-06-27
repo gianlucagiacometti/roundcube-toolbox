@@ -1,0 +1,364 @@
+/**
+ * toolbox plugin styles
+ */
+table.sortable-table > thead > tr > th > a::after,
+table.records-table tr > .status > a::before,
+table.records-table tr > .control > a::before,
+#listcontrols > a:not(.select)::before,
+span.helpicon::after {
+  font-size: 1.25em;
+  display: block;
+  float: left;
+  margin: 0 .25rem 0 0;
+  width: 1.18em;
+  height: 1em;
+  font-family: 'Icons';
+  font-style: normal;
+  font-weight: 900;
+  text-decoration: inherit;
+  text-align: center;
+  speak: none;
+  font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+input[type=radio] {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+input[type=radio] + label:before {
+  font-family: 'Icons';
+  display: inline-block;
+  content: "\f111";
+  letter-spacing: 10px;
+  font-size: 1.2em;
+  color: #37beff;
+}
+input[type=radio]:checked + label:before {
+  content: "\f058";
+  letter-spacing: 10px;
+  font-size: 1.2em;
+  color: #37beff;
+}
+.listing.iconized tr.customise > td.section::before {
+  content: "\f044";
+}
+.listing.iconized tr.aliases > td.section::before {
+  content: "\f500";
+}
+.listing.iconized tr.forward > td.section::before {
+  content: "\f064";
+}
+.listing.iconized tr.vacation > td.section::before {
+  content: "\f52b";
+}
+.listing.iconized tr.purge > td.section::before {
+  content: "\f2ed";
+}
+.listing.iconized tr.tags > td.section::before {
+  content: "\f02c";
+}
+.listing.iconized tr.cloud > td.section::before {
+  content: "\f0c2";
+}
+.listing.iconized tr.safelogin > td.section::before {
+  content: "\f023";
+}
+.listing.iconized tr.folders > td.section::before {
+  content: "\f07c";
+}
+.tool-title {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: 0 0 2rem 0;
+}
+.tool-subtitle {
+  font-size: 1.15em;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+}
+.tool-skin {
+  display: block;
+  margin: 0;
+  padding: .7rem .3rem .3rem .7rem;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+}
+.tool-skin span {
+  display: inline-block;
+  vertical-align: top;
+  padding-right: 1em;
+}
+.tool-skin .skinname {
+  font-weight: bold;
+}
+.tool-skin .skinauthor {
+  font-weight: normal;
+  font-size: .9em;
+  color: #999;
+}
+.tool-skin .skinauthor a {
+  text-decoration: none;
+}
+.tool-skin .skinauthor a:hover {
+  text-decoration: underline;
+}
+.tool-skin img.skinthumb {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  margin-bottom: .3rem;
+}
+table.toolbox-customisetable {
+  margin: 0;
+}
+table.toolbox-customisetable label {
+  padding-left: 0.5rem;
+}
+table.toolbox-customisetable label.customise-blankpage-label,
+table.toolbox-customisetable label.customise-additional-css-label {
+  margin-top: 0.5rem;
+}
+.customise-blankpage-type-table td {
+  border: 0;
+  padding: 0;
+}
+.customise-blankpage-type-table td.blankpage-type-content {
+  padding-left: 3rem !important;
+}
+.tool-skin-additional-css {
+  box-sizing: border-box;
+  width: 100%;
+}
+fieldset.blankpage {
+  margin: 0 1rem 0 1rem !important;
+}
+fieldset.blankpage legend {
+  font-size: .9em;
+  font-weight: bold;
+  margin: .5rem 0 0 0;
+}
+fieldset.additionalcss {
+  margin: 0 1rem 2rem 1rem !important;
+}
+fieldset.additionalcss legend {
+  font-size: .9em;
+  font-weight: bold;
+  margin: 0;
+}
+fieldset.purge legend {
+  font-size: 1.15em;
+  font-weight: bold;
+  margin: .3rem 0 0 0;
+}
+.blankpage-item-image {
+  display: inline-block;
+  float: left;
+  vertical-align: top;
+  padding: 0 !important;
+  margin-right: 1rem !important;
+  cursor: pointer;
+}
+.blankpage-item-image div.custom-file {
+  display: none;
+}
+input[type="file"].blankpage-image-upload {
+  position: absolute;
+  top: -1000px;
+}
+.blankpage-image {
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+}
+.blankpage-image-delete-button {
+  display: inline-block;
+  position: relative;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+.blankpage-image-delete-button::before {
+  font-size: 1.25em;
+  display: block;
+  float: left;
+  margin: 0 .25rem 0 0;
+  width: 1.18em;
+  height: 1em;
+  font-family: 'Icons';
+  font-style: normal;
+  font-weight: 900;
+  text-decoration: inherit;
+  text-align: center;
+  speak: none;
+  font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  content: "\f1f8";
+}
+.blankpage-image-delete-button:hover {
+  text-decoration: none;
+}
+.customise-blankpage-label,
+.customise-additional-css-label {
+  vertical-align: middle;
+}
+.CodeMirror {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  resize: vertical;
+  overflow-y: auto !important;
+}
+table.addressprefstable tr > .scroller {
+  width: 100%;
+}
+table.addressprefstable tr > .scroller .icon-checkbox + label::before {
+  float: right;
+}
+#alias-addresses-cont,
+#forward-addresses-cont {
+  height: 40rem;
+  overflow: auto;
+  width: 100%;
+}
+table.sortable-table > thead > tr > th > a {
+  text-decoration: none;
+  color: #2c363a;
+  white-space: nowrap;
+}
+table.sortable-table > thead > tr > th > a::after {
+  display: inline-block;
+  float: none;
+}
+table.sortable-table > thead > tr > th.sorted-asc > a::after {
+  content: "\f309";
+}
+table.sortable-table > thead > tr > th.sorted-desc > a::after {
+  content: "\f30c";
+}
+table.alias-addresses-table {
+  margin-bottom: 0;
+  overflow: hidden;
+}
+table.alias-addresses-table > thead > tr > th.email {
+  width: 90%;
+}
+table.alias-addresses-table > thead > tr > th.status {
+  width: 10%;
+  text-align: right;
+}
+table.alias-addresses-table > tbody > tr > td.status,
+table.alias-addresses-table > tbody > tr > td.email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 1px;
+}
+table.forward-addresses-table {
+  margin-bottom: 0;
+  overflow: hidden;
+}
+table.forward-addresses-table > thead > tr > th.email {
+  width: 100%;
+}
+table.forward-addresses-table > tbody > tr > td.email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 1px;
+}
+table.records-table tr > .status > a::before,
+table.records-table tr > .control > a::before {
+  display: inline-block;
+  float: none;
+  text-decoration: none;
+}
+table.records-table tr > .status > a.delete::before,
+table.records-table tr > .control > a.delete::before {
+  content: "\f2ed";
+  color: #2c363a;
+}
+#listcontrols {
+  display: block;
+  text-align: right;
+  width: 100%;
+  font-size: .9em;
+  margin-bottom: -7px;
+}
+#listcontrols > a:not(.select) {
+  margin-right: .5rem;
+}
+#listcontrols > a:not(.select):last-child {
+  margin-right: 0;
+}
+#listcontrols > a:not(.select)::before {
+  display: inline;
+  float: none;
+}
+#listcontrols > a:not(.select).delete-all::before {
+  content: "\f2ed";
+}
+span.helpicon::after {
+  float: none;
+  display: inline-block;
+  content: "\f05a";
+  margin-left: 5px;
+}
+div.address-input {
+  margin-bottom: 15px;
+}
+table.alias-addresses-table tr > .enabled {
+  color: #28a745;
+}
+table.alias-addresses-table tr > .disabled {
+  font-style: italic;
+  color: #dc3545;
+}
+.input-group-prepend:first-child > select:last-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#rcmfd_aliasaddress,
+#rcmfd_forwardaddress {
+  min-width: 100px;
+}
+html.layout-small #address-rules-cont,
+html.layout-phone #address-rules-cont,
+html.layout-small #spam-langs-cont,
+html.layout-phone #spam-langs-cont {
+  height: auto;
+}
+html.layout-phone .address-input.input-group {
+  display: block;
+}
+html.layout-phone .address-input.input-group input {
+  width: 100%;
+}
+html.layout-phone .address-input.input-group .input-group-prepend:first-child {
+  margin-right: 0;
+  margin-bottom: -1px;
+}
+html.layout-phone .address-input.input-group .input-group-prepend:first-child > :first-child {
+  border-radius: 0;
+  border-top-left-radius: 0.25em;
+  border-top-right-radius: 0.25em;
+}
+html.layout-phone .address-input.input-group .input-group-append:last-child {
+  margin-left: 0;
+  margin-top: -1px;
+}
+html.layout-phone .address-input.input-group .input-group-append:last-child > :last-child {
+  border-radius: 0;
+  border-bottom-left-radius: 0.25em;
+  border-bottom-right-radius: 0.25em;
+}

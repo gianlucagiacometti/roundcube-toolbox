@@ -1,0 +1,327 @@
+/**
+ * toolbox plugin styles
+ */
+
+input.error
+{
+  background-color: #FFFF88;
+}
+
+.tool-title
+{
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0 0 20px 3px;
+}
+
+.tool-subtitle
+{
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0 0 10px 3px;
+}
+
+.tool-skin
+{
+  display: block;
+  margin: 0 2px 0 2px;
+  padding: 7px 3px 5px 7px;
+  border: 1px solid #999;
+  background: #fff;
+}
+
+.tool-skin span
+{
+  display: inline-block;
+  vertical-align: top;
+  padding-right: 1em;
+}
+
+.tool-skin .skinname
+{
+  font-weight: bold;
+}
+
+.tool-skin .skinauthor,
+.tool-skin .skinauthor a
+{
+  font-weight: normal;
+  text-decoration: none;
+}
+
+.tool-skin .skinauthor a:hover
+{
+  text-decoration: underline;
+}
+
+.tool-skin img.skinthumb
+{
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+input.tool-skin-blankpage-url,
+.tool-skin-additional-css
+{
+  box-sizing: border-box;
+  width: 680px;;
+  border: 1px solid #ccc;
+}
+
+fieldset.blankpage {
+  margin-top: 3px !important;
+  margin-bottom: 3px !important;
+}
+
+.blankpage-item-image
+{
+  display: inline-block;
+  vertical-align: top;
+  padding-right: 1em;
+  cursor: pointer;
+}
+
+input[type="file"].blankpage-image-upload {
+    position: absolute;
+    top: -1000px;
+}
+
+.blankpage-type-content
+{
+  width: 680px;
+}
+
+.blankpage-image
+{
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.blankpage-image-delete-button
+{
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 10px;
+  width: 32px;
+  height: 32px;
+  background: url(/skins/classic/images/mail_toolbar.png) no-repeat -192px 0;
+  cursor: pointer;
+}
+
+.blankpage-image-delete-button:hover
+{
+  background-position: -192px -32px;
+}
+
+.CodeMirror {
+  width: 680px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  overflow-y: auto !important;
+}
+
+#alias-addresses-cont
+{
+  border: 1px solid #999999;
+  background-color: #F9F9F9;
+  height: 300px;
+  overflow: auto;
+  width: 700px;
+}
+
+#forward-addresses-cont
+{
+  border: 1px solid #999999;
+  background-color: #F9F9F9;
+  height: 200px;
+  overflow: auto;
+  width: 510px;
+}
+
+table.records-table
+{
+  margin: 0px;
+  background-color: #F9F9F9;
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-spacing: 0px;
+}
+
+table.alias-addresses-table thead th.email,
+table.forward-addresses-table thead th.email
+{
+  width: 90%;
+}
+
+table.alias-addresses-table thead th.status
+{
+  width: 9%;
+}
+
+table.alias-addresses-table thead th.control,
+table.forward-addresses-table thead th.control
+{
+  width: 20px;
+}
+
+table.sortable-table thead th a
+{
+  display: block;
+  text-decoration: none;
+}
+
+table.sortable-table thead th.sorted-asc
+{
+  background-position: 0px -26px;
+}
+
+table.sortable-table thead tr th.sorted-asc a
+{
+  background: url(images/sort.gif) no-repeat right -14px;
+}
+
+table.sortable-table thead tr th.sorted-desc a
+{
+  background: url(images/sort.gif) no-repeat right 0;
+}
+
+table.alias-addresses-table tr > .email,
+table.forward-addresses-table tr > .email
+{
+  text-align: left;
+  vertical-align: middle;
+}
+
+table.alias-addresses-table tr > .control,
+table.forward-addresses-table tr > .control
+{
+  text-align: right;
+  vertical-align: middle;
+}
+
+table.alias-addresses-table tbody td.status a
+{
+  display: inline-block;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+  background-image: url(images/icons.png);
+  cursor: pointer;
+}
+
+table.alias-addresses-table tr > .control a,
+table.forward-addresses-table tr > .control a
+{
+  display: block;
+  float: right;
+  width: 16px;
+  height: 16px;
+  background-image: url(images/icons.png);
+}
+
+table.alias-addresses-table tr > .control a.delete,
+table.forward-addresses-table tr > .control a.delete
+{
+  background-position: 0 0;
+}
+
+table.alias-addresses-table tr > .status a.enabled
+{
+  background-position: 0 -17px;
+}
+
+table.alias-addresses-table tr > .status a.disabled
+{
+  background-position: 0 -35px;
+}
+
+#listcontrols
+{
+  font-size: 11px;
+  text-align: left;
+}
+
+#listcontrols a,
+#listcontrols a:active,
+#listcontrols a:visited
+{
+  color: #CC0000;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+#listcontrols a:hover
+{
+  text-decoration: underline;
+}
+
+table.addressprefstable
+{
+  width: 100%;
+}
+
+table.addressprefstable tr > .title
+{
+  width: 510px;
+}
+
+table.propform tr > .help
+{
+  text-align: right;
+}
+
+div.address-input {
+  margin-bottom: 10px;
+}
+
+div.address-input > input  {
+  margin-left: 10px;
+}
+
+table.addressprefstable tr > .email
+{
+  width: 470px;
+  padding-bottom: 10px;
+}
+
+table.addressprefstable tr > .action
+{
+  width: 40px;
+  text-align: right;
+  padding-bottom: 10px;
+}
+
+table.records-table tr > .scroller
+{
+  padding: 0;
+}
+
+#rcmfd_newaliasaddress
+{
+  width: 280px;
+}
+
+#rcmfd_newaliasactive
+{
+  width: 110px;
+}
+
+#rcmfd_forwardaddress
+{
+  width: 450px;
+}
+
+table.alias-addresses-table tr > .disabled
+{
+  font-style: italic;
+  color: #666666;
+}
+
+table.alias-addresses-table tr > .enabled
+{
+  color: #000000;
+}

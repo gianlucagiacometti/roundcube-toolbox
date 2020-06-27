@@ -24,7 +24,7 @@ Install
 
 **NB:** When downloading the plugin from GitHub you will need to create a directory called toolbox and place the files in there, ignoring the root directory in the downloaded archive.
 
-Update database using the appropriate file in the SQl folder.
+Update database using the appropriate file in the SQL folder.
 
 Config
 ------

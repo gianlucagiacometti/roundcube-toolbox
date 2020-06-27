@@ -1,0 +1,11 @@
+Roundcube Webmail Toolbox
+=========================
+
+Version 1.4.6-0 (2020-06-27, rc-1.4.6)
+======================================
+
+- Added tool Aliases
+- Added tool Forward
+- Added tool Purge
+- Added tool Vacation
+- Added tool Customise

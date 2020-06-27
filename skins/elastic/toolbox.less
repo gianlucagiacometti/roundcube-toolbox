@@ -1,0 +1,450 @@
+/**
+ * toolbox plugin styles
+ */
+
+@import (reference) "../../../../skins/elastic/styles/variables";
+@import (reference) "../../../../skins/elastic/styles/mixins";
+@import (reference) "../../../../skins/elastic/styles/_variables";
+
+@grid-gutter-height: 15px;
+@color-enabled: #28a745;
+@color-disabled: #dc3545;
+
+input[type=radio] {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+input[type=radio] + label:before {
+    font-family: 'Icons';
+    display: inline-block;
+    content: @fa-var-circle;
+    letter-spacing: 10px;
+    font-size: 1.2em;
+    color: @color-checkbox;
+}
+
+input[type=radio]:checked + label:before {
+    content: @fa-var-check-circle;
+    letter-spacing: 10px;
+    font-size: 1.2em;
+    color: @color-checkbox;
+}
+
+.listing.iconized tr {
+  &.customise > td.section::before {
+    content: @fa-var-edit;
+  }
+
+  &.aliases > td.section::before {
+    content: @fa-var-user-friends;
+  }
+
+  &.forward > td.section::before {
+    content: @fa-var-share;
+  }
+
+  &.vacation > td.section::before {
+    content: @fa-var-door-open;
+  }
+
+  &.purge > td.section::before {
+    content: @fa-var-trash-alt;
+  }
+
+  &.tags > td.section::before {
+    content: @fa-var-tags;
+  }
+
+  &.cloud > td.section::before {
+    content: @fa-var-cloud;
+  }
+
+  &.safelogin > td.section::before {
+    content: @fa-var-lock;
+  }
+
+  &.folders > td.section::before {
+    content: @fa-var-folder-open;
+  }
+}
+
+.tool-title {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: 0 0 2rem 0;
+}
+
+.tool-subtitle {
+  font-size: 1.15em;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+}
+
+.tool-skin {
+  display: block;
+  margin: 0;
+  padding: .7rem .3rem .3rem .7rem;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+
+  span {
+    display: inline-block;
+    vertical-align: top;
+    padding-right: 1em;
+  }
+
+  .skinname {
+    font-weight: bold;
+  }
+
+  .skinauthor {
+     font-weight: normal;
+     font-size: .9em;
+     color: #999;
+
+    & a {
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+    }
+  }
+
+  img.skinthumb {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 4px;
+    margin-bottom: .3rem;
+  }
+}
+
+table.toolbox-customisetable {
+  margin: 0;
+
+  & label {
+    padding-left: 0.5rem;
+
+    &.customise-blankpage-label,
+    &.customise-additional-css-label {
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+.customise-blankpage-type-table td {
+  border: 0;
+  padding: 0;
+
+  &.blankpage-type-content {
+    padding-left: 3rem !important;
+  }
+}
+
+.tool-skin-additional-css {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+fieldset {
+  &.blankpage {
+    margin: 0 1rem 0 1rem !important;
+
+    & legend {
+      font-size: .9em;
+      font-weight: bold;
+      margin: .5rem 0 0 0;
+    }
+  }
+
+  &.additionalcss {
+    margin: 0 1rem 2rem 1rem !important;
+
+    & legend {
+      font-size: .9em;
+      font-weight: bold;
+      margin: 0;
+    }
+  }
+
+  &.purge legend {
+    font-size: 1.15em;
+    font-weight: bold;
+    margin: .3rem 0 0 0;
+  }
+}
+
+.blankpage-item-image {
+  display: inline-block;
+  float: left;
+  vertical-align: top;
+  padding: 0 !important;
+  margin-right: 1rem !important;
+  cursor: pointer;
+
+  div.custom-file {
+    display: none;
+  }
+}
+
+input[type="file"].blankpage-image-upload {
+  position: absolute;
+  top: -1000px;
+}
+
+.blankpage-image {
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.blankpage-image-delete-button {
+  display: inline-block;
+  position: relative;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+
+  &::before {
+    font-size: 1.25em;
+    display: block;
+    float: left;
+    margin: 0 .25rem 0 0;
+    width: 1.18em;
+    height: 1em;
+    font-family: 'Icons';
+    font-style: normal;
+    font-weight: 900;
+    text-decoration: inherit;
+    text-align: center;
+    speak: none;
+    font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    content: @fa-var-trash;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.customise-blankpage-label,
+.customise-additional-css-label {
+  vertical-align: middle;
+}
+
+.CodeMirror {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  resize: vertical;
+  overflow-y: auto !important;
+}
+
+table.addressprefstable tr > .scroller {
+  width: 100%;
+
+  .icon-checkbox + label::before {
+    float: right;
+  }
+}
+
+#alias-addresses-cont,
+#forward-addresses-cont {
+  height: 40rem;
+  overflow: auto;
+  width: 100%;
+}
+
+table.sortable-table > thead > tr > th {
+  > a {
+    text-decoration: none;
+    color: @color-font;
+    white-space: nowrap;
+  }
+
+  > a::after {
+    &:extend(.font-icon-class);
+    display: inline-block;
+    float: none;
+  }
+
+  &.sorted-asc > a::after {
+    content: @fa-var-long-arrow-alt-down;
+  }
+
+  &.sorted-desc > a::after {
+    content: @fa-var-long-arrow-alt-up;
+  }
+}
+
+table.alias-addresses-table {
+  margin-bottom: 0;
+  overflow: hidden;
+
+  > thead > tr {
+   > th.email {
+      width: 90%;
+    }
+   > th.status {
+      width: 10%;
+      text-align: right;
+    }
+  }
+
+  > tbody > tr {
+    > td.status,
+    > td.email {
+      .overflow-ellipsis;
+      white-space: nowrap;
+      max-width: 1px;
+    }
+  }
+}
+
+table.forward-addresses-table {
+  margin-bottom: 0;
+  overflow: hidden;
+
+  > thead > tr {
+   > th.email {
+      width: 100%;
+    }
+  }
+
+  > tbody > tr {
+    > td.email {
+      .overflow-ellipsis;
+      white-space: nowrap;
+      max-width: 1px;
+    }
+  }
+}
+
+table.records-table tr > .status,
+table.records-table tr > .control {
+  > a::before {
+    &:extend(.font-icon-class);
+    display: inline-block;
+    float: none;
+    text-decoration: none;
+  }
+
+  > a.delete::before {
+    content: @fa-var-trash-alt;
+    color: @color-font;
+  }
+}
+
+#listcontrols {
+  display: block;
+  text-align: right;
+  width: 100%;
+  font-size: .9em;
+  margin-bottom: (ceil((@grid-gutter-height / 2) * -1));
+
+  > a:not(.select) {
+    margin-right: .5rem;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &::before {
+      &:extend(.font-icon-class);
+      display: inline;
+      float: none;
+    }
+
+    &.delete-all::before {
+      content: @fa-var-trash-alt;
+    }
+  }
+}
+
+span.helpicon::after {
+  &:extend(.font-icon-class);
+  float: none;
+  display: inline-block;
+  content: @fa-var-info-circle;
+  margin-left: 5px;
+}
+
+div.address-input {
+  margin-bottom: @grid-gutter-height;
+}
+
+table.alias-addresses-table tr > .enabled {
+  color: @color-enabled;
+}
+
+table.alias-addresses-table tr > .disabled {
+  font-style: italic;
+  color: @color-disabled;
+}
+
+// Bootstrap 4.0.0 does not expect form-control elements in input-group-prepend but it makes layout easier so fix the border
+.input-group-prepend:first-child {
+  > select:last-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+#rcmfd_aliasaddress,
+#rcmfd_forwardaddress {
+  min-width: 100px;
+}
+
+html.layout-small,
+html.layout-phone {
+  #address-rules-cont,
+  #spam-langs-cont {
+    height: auto;
+  }
+}
+
+html.layout-phone {
+  // stack the input-group on small screens and fix the borders
+  .address-input.input-group {
+    display: block;
+
+    input {
+      width: 100%;
+    }
+
+    .input-group-prepend:first-child {
+      margin-right: 0;
+      margin-bottom: -1px;
+
+      > :first-child {
+        border-radius: 0;
+        border-top-left-radius: 0.25em;
+        border-top-right-radius: 0.25em;
+      }
+    }
+
+    .input-group-append:last-child {
+      margin-left: 0;
+      margin-top: -1px;
+
+      > :last-child {
+        border-radius: 0;
+        border-bottom-left-radius: 0.25em;
+        border-bottom-right-radius: 0.25em;
+      }
+    }
+  }
+}

@@ -1,0 +1,519 @@
+/**
+ * toolbox plugin styles
+ */
+
+input.error {
+  background-color: #FFFF88;
+}
+
+span.helpicon
+{
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  float: right;
+  background-image: url(images/icons.png);
+  background-position: 0 -55px;
+}
+
+#sections-table #rcmrowforward td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -46px;
+}
+
+#sections-table #rcmrowforward.selected td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -69px;
+}
+
+#sections-table #rcmrowpurge td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -94px;
+}
+
+#sections-table #rcmrowvacation td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -146px;
+}
+
+#sections-table #rcmrowpurge.selected td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -119px;
+}
+
+#sections-table #rcmrowvacation.selected td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -172px;
+}
+
+#sections-table #rcmrowsafelogin td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -199px;
+}
+
+#sections-table #rcmrowsafelogin.selected td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -226px;
+}
+
+#sections-table #rcmrowaliases td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -250px;
+}
+
+#sections-table #rcmrowaliases.selected td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -273px;
+}
+
+#sections-table #rcmrowcloud td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -295px;
+}
+
+#sections-table #rcmrowcloud.selected td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -317px;
+}
+
+#sections-table #rcmrowtags td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -396px;
+}
+
+#sections-table #rcmrowtags.selected td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -424px;
+}
+
+#sections-table #rcmrowfolders td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -452px;
+}
+
+#sections-table #rcmrowfolders.selected td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -476px;
+}
+
+#sections-table #rcmrowcustomise td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -502px;
+}
+
+#sections-table #rcmrowcustomise.selected td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -529px;
+}
+
+.tool-title
+{
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0 0 20px 3px;
+}
+
+.tool-subtitle
+{
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0 0 10px 3px;
+}
+
+.tool-skin
+{
+  display: block;
+  margin: 0 0 3px 3px;
+  padding: 7px 3px 3px 7px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.tool-skin span
+{
+  display: inline-block;
+  vertical-align: top;
+  padding-right: 1em;
+}
+
+.tool-skin .skinname
+{
+  font-weight: bold;
+}
+
+.tool-skin .skinauthor,
+.tool-skin .skinauthor a
+{
+  font-weight: normal;
+  text-decoration: none;
+}
+
+.tool-skin .skinauthor a:hover
+{
+  text-decoration: underline;
+}
+
+.tool-skin img.skinthumb
+{
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.tool-skin-blankpage-url,
+.tool-skin-additional-css
+{
+  box-sizing: border-box;
+  width: 100%;
+}
+
+fieldset.blankpage {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+fieldset.additionalcss {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+fieldset.purge legend
+{
+  font-size: 14px;
+  font-weight: bold;
+  margin: 3px 0 0 0;
+}
+
+fieldset.blankpage legend,
+fieldset.additionalcss legend
+{
+  font-size: 12px;
+  font-weight: bold;
+  margin: 3px 0 0 12px;
+}
+
+.blankpage-type-check
+{
+  width: 1% !important;
+}
+
+.blankpage-type-description
+{
+  width: 99%;
+}
+
+.blankpage-type-description label
+{
+  padding: 0 !important;
+}
+
+.blankpage-item-image
+{
+  display: inline-block;
+  floating: left;
+  vertical-align: top;
+  padding: 0 !important;
+  cursor: pointer;
+}
+
+.blankpage-image
+{
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+}
+
+input[type="file"].blankpage-image-upload {
+  position: absolute;
+  top: -1000px;
+}
+
+.blankpage-image-delete-button
+{
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 5px;
+  width: 24px;
+  height: 24px;
+  background: url(images/trash.png) no-repeat 0 0;
+  cursor: pointer;
+}
+
+.blankpage-image-delete-button:hover
+{
+  opacity: 0.5;
+}
+
+.CodeMirror
+{
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  resize: vertical;
+  overflow-y: auto !important;
+}
+
+#forward-addresses-cont
+{
+  height: 200px;
+  overflow: auto;
+  width: 100%;
+}
+
+table.records-table
+{
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+  border: 0;
+  margin: 0px;
+}
+
+table.records-table thead th
+{
+  background: none;
+  background-color: #CCC;
+  font-weight: bold;
+  color: #000;
+}
+
+table.records-table thead th a
+{
+  color: #000;
+  padding: 0;
+}
+
+table.records-table thead th a:focus
+{
+  color: #000;
+  font-weight: normal;
+  background-color: transparent;
+  text-shadow: none;
+}
+
+table.propform
+{
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+table.propform td
+{
+  width: 80%;
+  padding: 4px 10px;
+  background: #eee;
+  border-bottom: 2px solid #fff;
+}
+
+table.addressprefstable td
+{
+  width: auto;
+}
+
+table.propform td label
+{
+  width: 20%;
+  color: #333;
+  font-weight: bold;
+  padding: 0 20px 0 20px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+table.propform tr > .title
+{
+  width: 20%;
+  color: #333;
+  padding-right: 20px;
+  white-space: nowrap;
+}
+
+div.address-input
+{
+  margin-bottom: 10px;
+}
+
+div.address-input > input,
+div.address-input > select
+{
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+table.propform tr > .action
+{
+  width: 100%;
+  text-align: right;
+}
+
+table.propform tr > .scroller
+{
+  padding: 0;
+}
+
+table.propform td.title
+{
+  font-weight: bold;
+}
+
+table.sortable-table thead th.sorted-asc a
+{
+  text-decoration: underline;
+  background: url(images/listicons.png) no-repeat right -345px;
+}
+
+table.sortable-table thead th.sorted-desc a
+{
+  text-decoration: underline;
+  background: url(images/listicons.png) no-repeat right -377px;
+}
+
+table.alias-addresses-table thead th.email,
+table.forward-addresses-table thead th.email
+{
+  width: 90%;
+}
+
+table.alias-addresses-table thead th.status
+{
+  width: 9%;
+}
+
+table.alias-addresses-table thead th.control,
+table.forward-addresses-table thead th.control
+{
+  width: 20px;
+}
+
+table.alias-addresses-table tr > .email,
+table.forward-addresses-table tr > .email
+{
+  text-align: left;
+  vertical-align: middle;
+  border-left: 0;
+  border-right: 0;
+}
+
+table.alias-addresses-table tr > .status
+{
+  text-align: center;
+  vertical-align: middle;
+  border-left: 0;
+  border-right: 0;
+}
+
+table.alias-addresses-table tr > .control,
+table.forward-addresses-table tr > .control
+{
+  text-align: right;
+  vertical-align: middle;
+  border-left: 0;
+  border-right: 0;
+}
+
+table.alias-addresses-table tbody td.status a
+{
+  display: inline-block;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+  background-image: url(images/icons.png);
+  cursor: pointer;
+}
+
+table.alias-addresses-table tbody td.control a,
+table.forward-addresses-table tbody td.control a
+{
+  display: block;
+  float: right;
+  width: 16px;
+  height: 16px;
+  background-image: url(images/icons.png);
+  cursor: pointer;
+}
+
+table.alias-addresses-table tr > .control a.delete,
+table.forward-addresses-table tr > .control a.delete
+{
+  background-position: 0 -2px;
+}
+
+table.alias-addresses-table tr > .status a.enabled
+{
+  background-position: 0 -17px;
+}
+
+table.alias-addresses-table tr > .status a.disabled
+{
+  background-position: 0 -35px;
+}
+
+#listcontrols
+{
+  font-size: 11px;
+  text-align: right;
+}
+
+#listcontrols a,
+#listcontrols a:active,
+#listcontrols a:visited
+{
+  color: #2D5986;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+#listcontrols a:hover
+{
+  text-decoration: underline;
+}
+
+table.alias-addresses-table tr > .disabled
+{
+  font-style: italic;
+  color: #666666;
+}
+
+table.alias-addresses-table tr > .enabled
+{
+  color: #000000;
+}
+
+select {
+  margin: 0; /* Safari by default adds a margin */
+  padding: 4px;
+  border: 1px solid #b2b2b2;
+  border-radius: 4px;
+}
+
+select:focus {
+  border-color: #4787b1;
+  box-shadow: 0 0 5px 2px rgba(71,135,177, 0.9);
+  outline: none;
+}
+
+select:required {
+  border-color: #4787b1;
+}

@@ -1,14 +1,329 @@
 <?php
 
 /**
-  toolbox configuration file
+    postfixadmin toolbox configuration file
 **/
 
-//  Set the connection to the data source
-$rcmail_config['toolbox_dsn'] = 'pgsql://username:password@localhost/database';
+// TOOL LIST
 
-// Set the table name
-$config['toolbox_sql_table_name'] = 'toolbox';
+// available tools:
+// 'aliases' [tool to manage aliases in postfixadmin]
+// 'forward' [tool to manage forward addresses in postfixadmin]
+// 'vacation' [tool to manage postfixadmin vacation]
+// 'purge' [tool to periodically purge Trash and Junk folders]
+// 'customise' [tool to customise Blank Page and CSS per domain]
 
-// Set the name of the username field in the toolbox table
-$config['toolbox_sql_username_field'] = 'username';
+$config['toolbox_tools'] = array(
+    'aliases',
+    'forward',
+    'vacation',
+    'purge',
+    'customise',
+    );
+
+
+// POSTFIX/POSTFIXADMIN DATA SOURCE SETTINGS
+
+// postfix/postfixadmin database connection string (DSN) for read+write operations
+// Format (compatible with PEAR MDB2): db_provider://user:password@host/database
+// Currently supported db_providers: mysql, pgsql, sqlite
+// dsnw = connection with write permissions, dsnr = connection with read permission (if blank dsnw will be used)
+$config['toolbox_postfix_dsnw'] = 'pgsql://postfix:password@localhost/postfix';
+$config['toolbox_postfix_dsnr'] = '';
+
+// use persistent db-connections
+// beware this will not "always" work as expected
+// see: http://www.php.net/manual/en/features.persistent-connections.php
+$config['toolbox_postfix_db_persistent'] = false;
+
+// TABLE ALIAS
+
+// postfix/postfixadmin table that contains alias settings
+// default value: 'alias'
+$config['toolbox_postfix_sql_alias_table_name'] = 'alias';
+
+// name of the address field in the postfix/postfixadmin alias table
+// default value: 'address'
+$config['toolbox_postfix_sql_address_field_in_alias'] = 'address';
+
+// name of the domain field in the postfix/postfixadmin alias table
+// default value: 'domain'
+$config['toolbox_postfix_sql_domain_field_in_alias'] = 'domain';
+
+// name of the goto field in the postfix/postfixadmin alias table
+// default value: 'goto'
+$config['toolbox_postfix_sql_goto_field_in_alias'] = 'goto';
+
+// name of the created field in the postfix/postfixadmin alias table
+// default value: 'created'
+$config['toolbox_postfix_sql_created_field_in_alias'] = 'created';
+
+// name of the modified field in the postfix/postfixadmin alias table
+// default value: 'modified'
+$config['toolbox_postfix_sql_modified_field_in_alias'] = 'modified';
+
+// name of the active field in the postfix/postfixadmin alias table
+// default value: 'active'
+$config['toolbox_postfix_sql_active_field_in_alias'] = 'active';
+
+// TABLE VACATION
+
+// postfix/postfixadmin table that contains vacation settings
+// default value: 'vacation'
+$config['toolbox_postfix_sql_vacation_table_name'] = 'vacation';
+
+// name of the email field in the postfix/postfixadmin vacation table
+// default value: 'email'
+$config['toolbox_postfix_sql_email_field_in_vacation'] = 'email';
+
+// name of the domain field in the postfix/postfixadmin vacation table
+// default value: 'domain'
+$config['toolbox_postfix_sql_domain_field_in_vacation'] = 'domain';
+
+// name of the subject field in the postfix/postfixadmin vacation table
+// default value: 'subject'
+$config['toolbox_postfix_sql_subject_field_in_vacation'] = 'subject';
+
+// name of the body field in the postfix/postfixadmin vacation table
+// default value: 'body'
+$config['toolbox_postfix_sql_body_field_in_vacation'] = 'body';
+
+// name of the active field in the postfix/postfixadmin vacation table
+// default value: 'active'
+$config['toolbox_postfix_sql_active_field_in_vacation'] = 'active';
+
+// name of the activefrom field in the postfix/postfixadmin vacation table
+// default value: 'activefrom'
+$config['toolbox_postfix_sql_activefrom_field_in_vacation'] = 'activefrom';
+
+// name of the activeuntil field in the postfix/postfixadmin vacation table
+// default value: 'activeuntil'
+$config['toolbox_postfix_sql_activeuntil_field_in_vacation'] = 'activeuntil';
+
+// name of the interval_time field in the postfix/postfixadmin vacation table
+// default value: 'interval_time'
+$config['toolbox_postfix_sql_interval_time_field_in_vacation'] = 'interval_time';
+
+// name of the modified field in the postfix/postfixadmin vacation table
+// default value: 'modified'
+$config['toolbox_postfix_sql_modified_field_in_vacation'] = 'modified';
+
+// TABLE VACATION_NOTIFICATION
+
+// postfix/postfixadmin table that contains vacation notification settings
+// default value: 'vacation_notification'
+$config['toolbox_postfix_sql_vacation_notification_table_name'] = 'vacation_notification';
+
+// name of the on_vacation field in the postfix/postfixadmin vacation_notification table
+// default value: 'on_vacation'
+$config['toolbox_postfix_sql_on_vacation_field_in_vacation_notification'] = 'on_vacation';
+
+// TABLE MAILBOX
+
+// postfix/postfixadmin table that contains mailboxes
+// default value: 'mailbox'
+$config['toolbox_postfix_sql_mailbox_table_name'] = 'mailbox';
+
+// name of the username field in the postfix/postfixadmin mailbox table
+// default value: 'username'
+$config['toolbox_postfix_sql_username_field_in_mailbox'] = 'username';
+
+// name of the domain field in the postfix/postfixadmin mailbox table
+// default value: 'domain'
+$config['toolbox_postfix_sql_domain_field_in_mailbox'] = 'domain';
+
+// name of the local_part field in the postfix/postfixadmin mailbox table
+// default value: 'local_part'
+$config['toolbox_postfix_sql_local_part_field_in_mailbox'] = 'local_part';
+
+// name of the maildir field in the postfix/postfixadmin mailbox table
+// default value: 'maildir'
+$config['toolbox_postfix_sql_maildir_field_in_mailbox'] = 'maildir';
+
+// TABLE DOMAIN
+
+// postfix/postfixadmin table that contains domains
+// default value: 'domain'
+$config['toolbox_postfix_sql_domain_table_name'] = 'domain';
+
+// name of the domain field in the postfix/postfixadmin domain table
+// default value: 'domain'
+$config['toolbox_postfix_sql_domain_field_in_domain'] = 'domain';
+
+// TABLE DOMAIN ADMINS
+
+// postfix/postfixadmin table that contains domain admins
+// default value: 'domain_admins'
+$config['toolbox_postfix_sql_domain_admins_table_name'] = 'domain_admins';
+
+// name of the username field in the postfix/postfixadmin domain admins table
+// default value: 'username'
+$config['toolbox_postfix_sql_username_field_in_domain_admins'] = 'username';
+
+// name of the domain field in the postfix/postfixadmin domain admins table
+// default value: 'domain'
+$config['toolbox_postfix_sql_domain_field_in_domain_admins'] = 'domain';
+
+// AUTOREPLY
+
+// name of postfix autoreply domain
+// default value: 'autoreply.domainname'
+$config['toolbox_postfixadmin_vacation_domain'] = 'autoreply.mydomain.tld';
+
+
+// DOMAIN ADMINS
+
+// Static
+
+// list of domains for each admin email address
+// used in 'purge' and 'customise' tools
+// Format:
+// all domains: 'ALL'
+// some domains: string containing csv list of domains
+// Example:
+// array(
+//   'admin1' => 'domain1, domain2',
+//   'admin2' => 'domain3',
+//   'admin3' => 'ALL',
+//   )
+// the admins will be added to the domain admins from postfixadmin database if available
+// default value: array()
+$config['toolbox_domain_admins'] = array();
+
+// Postfixadmin
+
+// use postfixadmin domain admins
+// note: if false only static domain admins will be used if any
+// default value: true
+$config['toolbox_use_postfixadmin_domain_admins'] = true
+
+
+// ROUNDCUBE DATA SOURCE SETTINGS
+
+// roundcube database connection string (DSN) for read+write operations
+// Format (compatible with PEAR MDB2): db_provider://user:password@host/database
+// Currently supported db_providers: mysql, pgsql, sqlite
+// dsnw = connection with write permissions (if blank postfix/postfixadmin dsnw will be used), dsnr = connection with read permission (if blank dsnw will be used)
+$config['toolbox_roundcube_dsnw'] = 'pgsql://roundcube:password@localhost/roundcubemail';
+$config['toolbox_roundcube_dsnr'] = '';
+
+// use persistent db-connections
+// beware this will not "always" work as expected
+// see: http://www.php.net/manual/en/features.persistent-connections.php
+$config['toolbox_roundcube_db_persistent'] = false;
+
+
+// CUSTOMISE
+
+// IMPORTANT: tool available only for domain admins
+// global default values for all domains
+// Format: associative array per skin
+// BLANK PAGE
+// blankpage_type can be either url or image and the corresponding field (blankpage_url or blankpage_image) must be specified
+// blankpage_type = 'url': the blank page will be taken from the specified url
+// blankpage_type = 'image': the blank page will contain only a cenral image
+// NOTE: if blankpage_type is not specified either blankpage_url or blankpage_image will be ignored
+// blankpage_url: url of the blank page (local or remote)
+// blankpage_image: image of the blank pagee
+// CSS
+// and additional css can be specified per domain
+// additional_css: the href of the additional css
+// Example:
+// array(
+//   'classic' => array('blankpage_type' => 'url', 'blankpage_url' => 'https://mypage.com', 'additional_css' => './myfolder/mycss.css'),
+//   'larry' => array('additional_css' => 'skins/larry/mycss.css'),
+//   'elastic' => array('blankpage_type' => 'image', 'blankpage_image' => 'images/myimage.png'),
+//   'default' => array('blankpage_type' => 'image', 'blankpage_image' => 'images/defaultimage.png', 'additional_css' => 'skins/elastic/defaultcss.css'),
+//   )
+// IMPORTANT: per domain settings specified within the gui will override this configuration
+// 'default', if set, is used for all skins not specified
+// empty array or empty array elements mean roundcube default settings
+// default value: array()
+$config['toolbox_customise_skins'] = array();
+
+
+// ALIASES TOOL OPTIONS
+
+
+// FORWARD TOOL OPTIONS
+
+
+// PURGE TOOL OPTIONS
+
+// IMPORTANT: domain admins can set global parameters in customise tool
+
+// path to maildirs
+$config['toolbox_purge_maildir_path'] = '/web/vmail';
+
+// Purge script debug
+$config['toolbox_purge_script_debug'] = true;
+
+
+// VACATION TOOL OPTIONS
+
+// default vacation subject
+$config['toolbox_vacation_subject'] = 'Out of office / Assente';
+
+// default vacation message
+$config['toolbox_vacation_message'] = 'I\'m currently out of office until...<br /><br />Sarò assente fino al...';
+
+// vacation start/end date formats
+// all formats must be consistent
+$config['toolbox_vacation_dateformat'] = array(
+    'php' => 'd/m/Y',
+    'pgsql' => 'DD/MM/YYYY',
+    'mysql' => '%d/%m/%Y',
+    'sqlite' => '%d/%m/%Y',
+    'oracle' => 'DD/MM/YYYY',
+    'mssql' => 'dd/mm/yyyy'
+    );
+
+// jquery calendar (jqueryui plugin must be enabled)
+$config['toolbox_vacation_jquery_calendar'] = true;
+$config['toolbox_vacation_jquery_dateformat'] = 'dd/mm/yy';
+
+// add MIME header before the message
+$config['toolbox_vacation_message_mime'] = '';
+
+// vacation reply type
+$config['toolbox_vacation_interval_time'] = array(
+    'replyonce' => 0, // Reply one time to each address
+    'replytoeverymail' => 1, // Reply to every message (considered annoying)
+    'replyonceperday' => 60*60 * 24, // Reply once per day to each address
+    'replyonceperweek' => 60*60 * 24*7 // Reply once per week to each address
+    );
+
+
+// PLUGIN LOG/DEBUG OPTIONS
+
+// Log file
+// default value: toolbox.log
+$config['toolbox_logfile'] = 'toolbox.log';
+
+// Log level
+// values:
+//    0 = no logs
+//    1 = log errors [ERROR]
+//    2 = log errors [ERROR] and sql queries [SQL]
+//    3 = log errors [ERROR], sql queries [SQL] and program steps [STEP]
+// default value: 1
+$config['toolbox_loglevel'] = 1;
+
+
+// SCRIPTS LOG/DEBUG OPTIONS
+
+// Script log file
+// default value: toolbox.log
+$config['toolbox_script_logfile'] = 'toolbox.script.log';
+
+// Log level
+// values:
+//    0 = no logs
+//    1 = log info [NO LABEL] and warning [WARNING]
+//    2 = log info [NO LABEL], warning [WARNING] and errors [ERROR]
+//    3 = log info [NO LABEL], warning [WARNING], errors [ERROR] and sql queries [SQL]
+//    4 = log info [NO LABEL], warning [WARNING], errors [ERROR], sql queries [SQL] and program steps [STEP]
+// default value: 2
+$config['toolbox_script_loglevel'] = 2;
+
+// END OF FILE

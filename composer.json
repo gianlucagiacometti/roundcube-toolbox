@@ -1,11 +1,11 @@
 {
-  "name": "gianlucagiacometti/roundcube-toolbox",
+  "name": "gianlucagiacometti/toolbox",
   "description": "Set of tools for Roundcube webmail",
-  "keywords": ["postfix","roundcube","roundcubemail","webmail","toolbox"],
-  "homepage": "http://github.com/gianlucagiacometti/roundcube-toolbox",
-  "license": "GPL-3.0-or-later",
+  "keywords": ["roundcubemail","postfixadmin","postfix","roundcube","purge","vacation","login","customize", "cloud", "google","onedrive","dropbox","cloud","database","sql","tools","out-of-office", "forward"],
+  "homepage": "https://github.com/gianlucagiacometti/roundcube-toolbox/",
+  "license": "GPL-3.0",
   "type": "roundcube-plugin",
-  "version": "1.4.0",
+  "version": "1.4.6.0",
   "authors": [
     {
       "name": "Gianluca Giacometti",
@@ -16,16 +16,19 @@
   "repositories": [
     {
       "type": "composer",
-      "url": "http://github.com/gianlucagiacometti/roundcube-toolbox"
+      "url": "https://plugins.roundcube.net"
     }
   ],
   "require": {
-    "php": ">=7.2",
+    "php": ">=5.4.0",
     "roundcube/plugin-installer": "~0.1.6"
+  },
+  "suggest": {
+    "piwik/device-detector": ">=3.10.2 required for tool SafeLogin"
   },
   "extra": {
     "roundcube": {
-      "min-version": "1.4-git"
+      "min-version": "1.4"
     }
   }
 }
