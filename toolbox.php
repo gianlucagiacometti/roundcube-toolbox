@@ -92,8 +92,9 @@ class toolbox extends rcube_plugin
                         if ($config['blankpage_image'] != '') {
                             $image = $config['blankpage_image'];
                             // we read the content of the file 'watermark.html' in the skin folder and change the url content with our cutomised image
-                            if ($blankpage = RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'skins' . DIRECTORY_SEPARATOR . $this->skin . DIRECTORY_SEPARATOR . 'watermark.html') {
-                                $this->rcube->output->set_env('blankpage', "data:text/html;base64," . base64_encode(preg_replace('!url\(.*?\)!U', "url(" . $config['blankpage_image'] . ")", file_get_contents($blankpage))));
+                            if (file_exists(RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'skins' . DIRECTORY_SEPARATOR . $this->skin . DIRECTORY_SEPARATOR . 'watermark.html')) {
+                                $blankpage = file_get_contents(RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'skins' . DIRECTORY_SEPARATOR . $this->skin . DIRECTORY_SEPARATOR . 'watermark.html');
+                                $this->rcube->output->set_env('blankpage', "data:text/html;base64," . base64_encode(preg_replace('!url\(.*?\)!U', "url(" . $config['blankpage_image'] . ")", $blankpage)));
                             }
                         }
                         break;
@@ -515,11 +516,13 @@ class toolbox extends rcube_plugin
 
                 $settings = $this->storage->load_tool_data($this->rcube->user->get_username());
                 $aliases = array();
-                foreach ($settings['aliases'] as $alias) {
-                    $active = $alias['active'];
-                    $elements = explode("@", trim($alias['address']));
-                    if ($elements[0] != "") {
-                        $aliases[] = array("name" => $elements[0], "domain" => $elements[1], "active" => $active);
+                if (!empty($settings['aliases'])) {
+                    foreach ($settings['aliases'] as $alias) {
+                        $active = $alias['active'];
+                        $elements = explode("@", trim($alias['address']));
+                        if ($elements[0] != "") {
+                            $aliases[] = array("name" => $elements[0], "domain" => $elements[1], "active" => $active);
+                        }
                     }
                 }
                 sort($aliases);

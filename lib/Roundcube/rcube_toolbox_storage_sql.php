@@ -347,7 +347,6 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 
                 }
 
-                $settings['aliases'] = array();
                 if ($this->db->affected_rows() > 0) {
                     while ($sql_result && ($sql_arr = $this->db->fetch_assoc($sql_result))) {
                         $settings['aliases'][] = $sql_arr;
