@@ -94,13 +94,25 @@ class toolbox extends rcube_plugin
                             // we read the content of the file 'watermark.html' in the skin folder and change the url content with our cutomised image
                             if (file_exists(RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'skins' . DIRECTORY_SEPARATOR . $this->skin . DIRECTORY_SEPARATOR . 'watermark.html')) {
                                 $blankpage = file_get_contents(RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'skins' . DIRECTORY_SEPARATOR . $this->skin . DIRECTORY_SEPARATOR . 'watermark.html');
-                                $this->rcube->output->set_env('blankpage', "data:text/html;base64," . base64_encode(preg_replace('!url\(.*?\)!U', "url(" . $config['blankpage_image'] . ")", $blankpage)));
+                                if ($blankpage != '') {
+                                    // we need a file in a folder named 'tmp' in plugin/toolbox (temp cannot be used for .htaccess limitations)
+                                    // filename must contain a dot for .htaccess limitations
+                                    // a file is needed since the 'blankpage' env variable needs a real file (loaded in apps.js)
+                                    $tmp = RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'blankpage.' . $parts[1] . '.html';
+                                    file_put_contents($tmp, preg_replace('!url\(.*?\)!U', "url(" . $config['blankpage_image'] . ")", $blankpage));
+                                    $this->rcube->output->set_env('blankpage', '.' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
+                                }
                             }
                         }
                         break;
                     case "custom":
                         if ($config['blankpage_custom'] != '') {
-                            $this->rcube->output->set_env('blankpage', "data:text/html;base64," . base64_encode($config['blankpage_custom']));
+                            // we need a file in a folder named 'tmp' in plugin/toolbox (temp cannot be used for .htaccess limitations)
+                            // filename must contain a dot for .htaccess limitations
+                            // a file is needed since the 'blankpage' env variable needs a real file (loaded in apps.js)
+                            $tmp = RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'blankpage.' . $parts[1] . '.html';
+                            file_put_contents($tmp, $config['blankpage_custom']);
+                            $this->rcube->output->set_env('blankpage', '.' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
                         }
                         break;
                 }
@@ -1216,7 +1228,7 @@ class toolbox extends rcube_plugin
         if ($dir) {
 
             while (($file = readdir($dir)) !== false) {
-                $filename = $path.'/'.$file;
+                $filename = $path . DIRECTORY_SEPARATOR . $file;
                 if (!preg_match('/^\./', $file) && is_dir($filename) && is_readable($filename)) {
                     $skins[] = $file;
                 }
@@ -1227,7 +1239,7 @@ class toolbox extends rcube_plugin
             foreach ($skins as $skin) {
                 if (in_array($skin, $this->skins_allowed)) {
                     $name = ucfirst($skin);
-                    $meta = @json_decode(@file_get_contents(INSTALL_PATH . "skins/$skin/meta.json"), true);
+                    $meta = @json_decode(@file_get_contents(INSTALL_PATH . "skins" . DIRECTORY_SEPARATOR . "$skin" . DIRECTORY_SEPARATOR . "meta.json"), true);
                     if (is_array($meta) && $meta['name']) {
                         $name    = $meta['name'];
                         $author  = $meta['url'] ? html::a(array('href' => $meta['url'], 'target' => '_blank'), rcube::Q($meta['author'])) : rcube::Q($meta['author']);
@@ -1258,7 +1270,7 @@ class toolbox extends rcube_plugin
         if (!$this->storage) {
 
             // Add include path for internal classes
-            $include_path = $this->home . '/lib' . PATH_SEPARATOR;
+            $include_path = $this->home . DIRECTORY_SEPARATOR . 'lib' . PATH_SEPARATOR;
             $include_path .= ini_get('include_path');
             set_include_path($include_path);
 
