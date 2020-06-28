@@ -252,7 +252,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                     $settings['junk'] = 0;
                 }
 
-               if ($this->loglevel > 1) {
+                if ($this->loglevel > 1) {
                     rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: execute query [SELECT domain_name`, `skin`, `customise_blankpage`, `blankpage_type`, `blankpage_image` `blankpage_url`, `blankpage_custom`, `customise_css`, `additional_css` FROM `toolbox_customise_skins_view` WHERE `domain_name` = '{$parts[1]}';]");
                 }
                 $sql_result = $this->db->query(

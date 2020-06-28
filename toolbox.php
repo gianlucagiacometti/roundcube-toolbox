@@ -32,6 +32,8 @@ class toolbox extends rcube_plugin
         $this->skin = $this->rcube->config->get('skin');
         $this->skins_allowed = $this->rcube->config->get('skins_allowed');
 
+        $this->cur_section = rcube_utils::get_input_value('_section', rcube_utils::INPUT_GPC);
+
         if (in_array('customise', $this->tools)) {
 
             // load user's preferences
@@ -155,7 +157,6 @@ class toolbox extends rcube_plugin
                 }
                 $this->sections[$tool] = array('id' => $tool, 'class' => $tool, 'section' => rcmail::Q($this->gettext($tool)));
             }
-            $this->cur_section = rcube_utils::get_input_value('_section', rcube_utils::INPUT_GPC);
 
             // if not domain admin deactivate tool customise
             $this->_init_storage();
