@@ -41,6 +41,8 @@ CREATE TABLE public.toolbox_customise_skins
     additional_css text COLLATE pg_catalog."default",
     customise_favicon boolean NOT NULL DEFAULT false,
     favicon text COLLATE pg_catalog."default",
+    customise_logo boolean NOT NULL DEFAULT false,
+    customise_logo text COLLATE pg_catalog."default",
     modified timestamp with time zone NOT NULL DEFAULT now(),
     modified_by character varying(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT toolbox_customise_skins_pkey PRIMARY KEY (id),
@@ -64,32 +66,11 @@ CREATE OR REPLACE VIEW public.toolbox_customise_skins_view AS
     toolbox_customise_skins.blankpage_url,
     toolbox_customise_skins.blankpage_custom,
     toolbox_customise_skins.customise_css,
-    toolbox_customise_skins.additional_css
+    toolbox_customise_skins.additional_css,
+    toolbox_customise_skins.customise_logo,
+    toolbox_customise_skins.customised_logo
   FROM toolbox_customise_skins
     LEFT JOIN toolbox_customise_domains ON toolbox_customise_domains.id = toolbox_customise_skins.toolbox_customise_domain_id;
 
 ALTER TABLE public.toolbox_customise_skins_view
     OWNER TO roundcube;
-
-CREATE SEQUENCE public.toolbox_login_history_seq;
-
-ALTER SEQUENCE public.toolbox_login_history_seq
-    OWNER TO roundcube;
-
-CREATE TABLE public.toolbox_login_history
-(
-    id integer NOT NULL DEFAULT nextval(('toolbox_login_history_seq'::text)::regclass),
-    user_id integer DEFAULT NULL,
-    geoname_id integer DEFAULT NULL,
-    registered_country_geoname_id integer DEFAULT NULL,
-    device character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    created timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT toolbox_login_history_pkey PRIMARY KEY (id)
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.toolbox_login_history
-    OWNER to roundcube;

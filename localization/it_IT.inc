@@ -119,3 +119,63 @@ $labels['customise-blankpage-skin-custom'] = 'Pagina personalizzata';
 $labels['customise-blankpage-image'] = 'Immagine';
 $labels['customise-blankpage-url'] = 'Indirizzo';
 $labels['customise-additional-css'] = 'CSS personalizzato';
+$labels['customise-logo'] = 'Logo personalizzato';
+$labels['customise-logo-template'] = 'Modello';
+$labels['customise-logo-template-new'] = 'Nuovo logo personalizzato';
+$labels['customise-logo-template-all'] = 'Tutti';
+$labels['customise-logo-type'] = 'Tipo';
+$labels['customise-logo-type-all'] = 'Tutti i tipi';
+$labels['customise-logo-type-favicon'] = 'Favicon';
+$labels['customise-logo-type-print'] = 'Print';
+$labels['customise-logo-type-small'] = 'Small';
+$labels['customise-logo-add-template'] = 'Aggiungi';
+$labels['customise-logo-image'] = 'Immagine';
+
+$messages['customise-logo-customisedlogoexists'] = 'Logo personalizzato già esistemte';
+$messages['customise-logo-deletecustomisedlogo'] = 'Vuoi veramente cancellare questo logo personalizzato?';
+$messages['customise-logo-deleteallcustomisedlogos'] = 'Vuoi veramente cancellare tutti i loghi personalizzati di questo tema?';
+$messages['customise-logo-emptycustomisedlogotemplate'] = 'Il modello del logo non può essere vuoto';
+$messages['customise-logo-emptycustomisedlogoimage'] = 'L\'immagine del logo non può essere vuota';
+$messages['customise-logo-invalidcustomisedlogoimage'] = 'L\'immagine del logo non è valida';
+$messages['customise-logo-nocustomisedlogo'] = 'Nessun logo personalizzato trovato';
+
+
+/* Tags */
+/* Author: Gianluca Giacometti */
+
+$labels['tags'] = 'Tags';
+$labels['tags-label'] = 'Etichetta';
+$labels['tags-labels'] = 'Etichette';
+
+
+/* Cloud */
+/* Author: Gianluca Giacometti */
+
+$labels['cloud'] = 'Cloud';
+$labels['cloud-googledrive'] = 'Google Drive';
+$labels['cloud-dropbox'] = 'Dropbox';
+$labels['cloud-onedrive'] = 'Microsoft OneDrive';
+$labels['cloud-insertlink'] = 'Inserisci un collegamento al file';
+$labels['cloud-insertfile'] = 'Allega un file';
+
+
+/* Safe login */
+/* Author: Gianluca Giacometti */
+
+$labels['safelogin'] = 'Accesso sicuro';
+$labels['safelogin-continent'] = 'Continente';
+$labels['safelogin-countryisocode'] = 'Codice Nazione';
+$labels['safelogin-countryname'] = 'Nazione';
+$labels['safelogin-cityname'] = 'Città';
+$labels['safelogin-location'] = 'Indirizzo';
+$labels['safelogin-lastlogin'] = 'Ultimo accesso';
+$labels['safelogin-history'] = 'Storico Accessi';
+$labels['safelogin-browser'] = 'Programma di navigazione';
+$labels['safelogin-os'] = 'Sistema operativo';
+
+
+/* Folders */
+/* Author: Gianluca Giacometti */
+
+$labels['folders'] = 'Riepilogo cartelle';
+$labels['folders-numberoffiles'] = 'Numero file';

@@ -117,3 +117,63 @@ $labels['customise-blankpage-skin-custom'] = 'Page vierge personnalisée';
 $labels['customise-blankpage-image'] = 'Image';
 $labels['customise-blankpage-url'] = 'Adresse';
 $labels['customise-additional-css'] = 'CSS personnalisé';
+$labels['customise-logo'] = 'Logo personnalisé';
+$labels['customise-logo-template'] = 'Template';
+$labels['customise-logo-template-new'] = 'Nouveau logo personnalisé';
+$labels['customise-logo-template-all'] = 'Tous les modèles';
+$labels['customise-logo-type'] = 'Type';
+$labels['customise-logo-type-all-types'] = 'Tous les types';
+$labels['customise-logo-type-favicon'] = 'Favicon';
+$labels['customise-logo-type-print'] = 'Imprimer';
+$labels['customise-logo-type-small'] = 'Petit';
+$labels['customise-logo-add-template'] = 'Ajouter un modèle';
+$labels['customise-logo-image'] = 'Image';
+
+$messages['customise-logo-customisedlogoexists'] = 'Le logo personnalisé existe déjà';
+$messages['customise-logo-deletecustomisedlogo'] = 'Do you really want to delete this customised logo?';
+$messages['customise-logo-deleteallcustomisedlogos'] = 'Do you really want to delete all customised logos for this skin?';
+$messages['customise-logo-emptycustomisedlogotemplate'] = 'The logo template cannot be empty';
+$messages['customise-logo-emptycustomisedlogoimage'] = 'The logo image cannot be empty';
+$messages['customise-logo-invalidcustomisedlogoimage'] = 'The logo image is invalid';
+$messages['customise-logo-nocustomisedlogo'] = 'No customised logo found';
+
+
+/* Tags */
+/* Author: Helena Branch */
+
+$labels['tags'] = 'Tags';
+$labels['tags-label'] = 'Tag';
+$labels['tags-labels'] = 'Tags';
+
+
+/* Cloud */
+/* Author: Helena Branch */
+
+$labels['cloud'] = 'Cloud';
+$labels['cloud-googledrive'] = 'Google Drive';
+$labels['cloud-dropbox'] = 'Dropbox';
+$labels['cloud-onedrive'] = 'Microsoft OneDrive';
+$labels['cloud-insertlink'] = 'Insérez un lien au fichier';
+$labels['cloud-insertfile'] = 'Insérez un fichier';
+
+
+/* Safe login */
+/* Author: Helena Branch */
+
+$labels['safelogin'] = 'Ouvrir une session en sécurité';
+$labels['safelogin-continent'] = 'Continent';
+$labels['safelogin-countryisocode'] = 'Code Nation';
+$labels['safelogin-countryname'] = 'Nation';
+$labels['safelogin-cityname'] = 'Ville';
+$labels['safelogin-location'] = 'Adresse';
+$labels['safelogin-lastlogin'] = 'Dernière connexion';
+$labels['safelogin-history'] = 'Accéder à Historique';
+$labels['safelogin-browser'] = 'Navigateur';
+$labels['safelogin-os'] = 'Systeme d’exploitation’;
+
+
+/* Folders */
+/* Author: Helena Branch */
+
+$labels['folders'] = 'Riepilogo cartelle';
+$labels['folders-numberoffiles'] = 'Numero file';

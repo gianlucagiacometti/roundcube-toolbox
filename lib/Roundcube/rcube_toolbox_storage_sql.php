@@ -1,5 +1,30 @@
 <?php
 
+/**
+ * Toolbox storage class
+ *
+ * @author Gianluca Giacometti
+ *
+ * Copyright (C) Gianluca Giacometti
+ *
+ * This program is a Roundcube (https://roundcube.net) plugin.
+ * For more information see README.md.
+ * For configuration see config.inc.php.dist.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Roundcube. If not, see https://www.gnu.org/licenses/.
+ */
+
 class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 {
     private $db;
@@ -161,7 +186,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
         $this->_db_connect('roundcube', 'r');
 
         if ($this->loglevel > 1) {
-            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_customised_config]: execute query [SELECT domain_name`, `skin`, `customise_blankpage`, `blankpage_type`, `blankpage_image` `blankpage_url`, `blankpage_custom`, `customise_css`, `additional_css` FROM `toolbox_customise_skins_view` WHERE `domain_name` = '{$parts[1]}' AND `skin` = '{$skin}';]");
+            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_customised_config]: execute query [SELECT domain_name`, `skin`, `customise_blankpage`, `blankpage_type`, `blankpage_image` `blankpage_url`, `blankpage_custom`, `customise_css`, `additional_css`, `customise_logo`, `customised_logo` FROM `toolbox_customise_skins_view` WHERE `domain_name` = '{$parts[1]}' AND `skin` = '{$skin}';]");
         }
         $sql_result = $this->db->query(
             "SELECT
@@ -173,7 +198,9 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 `blankpage_url`,
                 `blankpage_custom`,
                 `customise_css`,
-                `additional_css`
+                `additional_css`,
+                `customise_logo`,
+                `customised_logo`
             FROM `toolbox_customise_skins_view`
             WHERE `domain_name` = ?
             AND `skin` = ?;",
@@ -198,6 +225,8 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 $config['blankpage_custom'] = $sql_arr['blankpage_custom'];
                 $config['customise_css'] = $sql_arr['customise_css'];
                 $config['additional_css'] = $sql_arr['additional_css'];
+                $config['customise_logo'] = $sql_arr['customise_logo'];
+                $config['customised_logo'] = $sql_arr['customised_logo'];
             }
         }
 
@@ -213,87 +242,6 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
             rcube::write_log($this->logfile, "STEP in [storage].[sql].[function load_tool_data]: enter {$this->tool} section");
         }
         switch ($this->tool) {
-
-            case 'customise':
-
-                if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function load_tool_data]: connecting to roundcube database in read mode");
-                }
-                $this->_db_connect('roundcube', 'r');
-
-                if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: execute query [SELECT `id`, `purge_trash`, `purge_junk` FROM `toolbox_customise_domains` WHERE `domain_name` = '{$parts[1]}';]");
-                }
-                $sql_result = $this->db->query(
-                    "SELECT
-                        `id`,
-                        `purge_trash`,
-                        `purge_junk`
-                    FROM `toolbox_customise_domains`
-                    WHERE `domain_name` = ?;",
-                    $parts[1]);
-                if ($this->loglevel > 0) {
-                    if ($err_str = $this->db->is_error()) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_tool_data]: cannot read customise donains from database: " . $err_str);
-                    }
-                    elseif ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: {$this->db->affected_rows()} rows matching");
-                    }
-                }
-
-                if ($this->db->affected_rows() > 0) {
-                    while ($sql_result && ($sql_arr = $this->db->fetch_assoc($sql_result))) {
-                        $settings['trash'] = $sql_arr['purge_trash'];
-                        $settings['junk'] = $sql_arr['purge_junk'];
-                    }
-                }
-                else {
-                    $settings['trash'] = 0;
-                    $settings['junk'] = 0;
-                }
-
-                if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: execute query [SELECT domain_name`, `skin`, `customise_blankpage`, `blankpage_type`, `blankpage_image` `blankpage_url`, `blankpage_custom`, `customise_css`, `additional_css` FROM `toolbox_customise_skins_view` WHERE `domain_name` = '{$parts[1]}';]");
-                }
-                $sql_result = $this->db->query(
-                    "SELECT
-                        `domain_name`,
-                        `skin`,
-                        `customise_blankpage`,
-                        `blankpage_type`,
-                        `blankpage_image`,
-                        `blankpage_url`,
-                        `blankpage_custom`,
-                        `customise_css`,
-                        `additional_css`
-                    FROM `toolbox_customise_skins_view`
-                    WHERE `domain_name` = ?;",
-                    $parts[1]);
-                if ($this->loglevel > 0) {
-                    if ($err_str = $this->db->is_error()) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_tool_data]: cannot read customise skins from database: " . $err_str);
-                    }
-                    elseif ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: {$this->db->affected_rows()} rows matching");
-                    }
-                }
-
-                $settings['skins'] = array();
-                if ($this->db->affected_rows() > 0) {
-                    while ($sql_result && ($sql_arr = $this->db->fetch_assoc($sql_result))) {
-                        $settings['skins'][$sql_arr['skin']] = array(
-                            'customise_blankpage' => $sql_arr['customise_blankpage'],
-                            'blankpage_type' => $sql_arr['blankpage_type'],
-                            'blankpage_image' => $sql_arr['blankpage_image'],
-                            'blankpage_url' => $sql_arr['blankpage_url'],
-                            'blankpage_custom' => $sql_arr['blankpage_custom'],
-                            'customise_css' => $sql_arr['customise_css'],
-                            'additional_css' => $sql_arr['additional_css'],
-                            );
-                    }
-                }
-
-                break;
 
             case 'aliases':
 
@@ -426,6 +374,91 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 
                 break;
 
+            case 'customise':
+
+                if ($this->loglevel > 2) {
+                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function load_tool_data]: connecting to roundcube database in read mode");
+                }
+                $this->_db_connect('roundcube', 'r');
+
+                if ($this->loglevel > 1) {
+                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: execute query [SELECT `id`, `purge_trash`, `purge_junk` FROM `toolbox_customise_domains` WHERE `domain_name` = '{$parts[1]}';]");
+                }
+                $sql_result = $this->db->query(
+                    "SELECT
+                        `id`,
+                        `purge_trash`,
+                        `purge_junk`
+                    FROM `toolbox_customise_domains`
+                    WHERE `domain_name` = ?;",
+                    $parts[1]);
+                if ($this->loglevel > 0) {
+                    if ($err_str = $this->db->is_error()) {
+                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_tool_data]: cannot read customise donains from database: " . $err_str);
+                    }
+                    elseif ($this->loglevel > 1) {
+                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: {$this->db->affected_rows()} rows matching");
+                    }
+                }
+
+                if ($this->db->affected_rows() > 0) {
+                    while ($sql_result && ($sql_arr = $this->db->fetch_assoc($sql_result))) {
+                        $settings['trash'] = $sql_arr['purge_trash'];
+                        $settings['junk'] = $sql_arr['purge_junk'];
+                    }
+                }
+                else {
+                    $settings['trash'] = 0;
+                    $settings['junk'] = 0;
+                }
+
+                if ($this->loglevel > 1) {
+                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: execute query [SELECT `domain_name`, `skin`, `customise_blankpage`, `blankpage_type`, `blankpage_image` `blankpage_url`, `blankpage_custom`, `customise_css`, `additional_css`, `customise_logo`, `customised_logo` FROM `toolbox_customise_skins_view` WHERE `domain_name` = '{$parts[1]}';]");
+                }
+                $sql_result = $this->db->query(
+                    "SELECT
+                        `domain_name`,
+                        `skin`,
+                        `customise_blankpage`,
+                        `blankpage_type`,
+                        `blankpage_image`,
+                        `blankpage_url`,
+                        `blankpage_custom`,
+                        `customise_css`,
+                        `additional_css`,
+                        `customise_logo`,
+                        `customised_logo`
+                    FROM `toolbox_customise_skins_view`
+                    WHERE `domain_name` = ?;",
+                    $parts[1]);
+                if ($this->loglevel > 0) {
+                    if ($err_str = $this->db->is_error()) {
+                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_tool_data]: cannot read customise skins from database: " . $err_str);
+                    }
+                    elseif ($this->loglevel > 1) {
+                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: {$this->db->affected_rows()} rows matching");
+                    }
+                }
+
+                $settings['skins'] = array();
+                if ($this->db->affected_rows() > 0) {
+                    while ($sql_result && ($sql_arr = $this->db->fetch_assoc($sql_result))) {
+                        $settings['skins'][$sql_arr['skin']] = array(
+                            'customise_blankpage' => $sql_arr['customise_blankpage'],
+                            'blankpage_type' => $sql_arr['blankpage_type'],
+                            'blankpage_image' => $sql_arr['blankpage_image'],
+                            'blankpage_url' => $sql_arr['blankpage_url'],
+                            'blankpage_custom' => $sql_arr['blankpage_custom'],
+                            'customise_css' => $sql_arr['customise_css'],
+                            'additional_css' => $sql_arr['additional_css'],
+                            'customise_logo' => $sql_arr['customise_logo'],
+                            'customised_logo' => $sql_arr['customised_logo']
+                            );
+                    }
+                }
+
+                break;
+
         }
 
         return $settings;
@@ -551,202 +584,6 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
             rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: enter {$data['section']} section");
         }
         switch ($data['section']) {
-
-            case 'customise':
-
-                if ($this->is_domain_admin($user) && isset($settings['domain']) && is_array($settings['domain'])) {
-
-                    if ($this->loglevel > 2) {
-                        rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: connecting to roundcube database in write mode");
-                    }
-                    $this->_db_connect('roundcube', 'w');
-
-                    // check if domain record exists
-                    if ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [SELECT `id`, `domain_name` FROM `toolbox_customise_domains` WHERE `domain_name` = '{$parts[1]}';]");
-                    }
-                    $sql_result = $this->db->query(
-                        "SELECT `id`, `domain_name` FROM `toolbox_customise_domains` WHERE `domain_name` = ?;",
-                        $parts[1]);
-                    if ($this->loglevel > 0) {
-                        if ($err_str = $this->db->is_error()) {
-                            rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot read domain settings from database: " . $err_str);
-                            $result = false;
-                            break;
-                        }
-                        elseif ($this->loglevel > 1) {
-                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows matching");
-                        }
-                    }
-                    if ($this->db->affected_rows() == 0) {
-                        if ($this->loglevel > 1) {
-                            if ($this->loglevel > 2) {
-                                rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: no record found for domain {$parts[1]}");
-                            }
-                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [INSERT INTO `toolbox_customise_domains` (`domain_name`, `purge_trash`, `purge_junk`, `modified`, `modified_by`) VALUES ('{$parts[1]}', '{$settings['domain']['purge_trash']}', '{$settings['domain']['purge_junk']}', '{$this->db->now()}', '{$user}');]");
-                        }
-                        $this->db->query(
-                            "INSERT INTO `toolbox_customise_domains` (`domain_name`, `purge_trash`, `purge_junk`, `modified`, `modified_by`) VALUES (?, ?, ?, ?, ?);",
-                            $parts[1],
-                            $settings['domain']['purge_trash'],
-                            $settings['domain']['purge_junk'],
-                            $this->db->now(),
-                            $user);
-                        if ($this->loglevel > 0) {
-                            if ($err_str = $this->db->is_error()) {
-                                rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot insert into domain settings: " . $err_str);
-                                $result = false;
-                                break;
-                            }
-                            $sql_rows = $this->db->affected_rows();
-                            if (!$sql_rows) {
-                                rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: record not inserted in domain settings [values: domain_name = '{$parts[1]}', purge_trash = '{$settings['domain']['purge_junk']}', purge_junk = '{$settings['domain']['purge_junk']}', modified = '{$this->db->now()}', modified_by = '{$user}']");
-                                $result = false;
-                                break;
-                            }
-                            elseif ($this->loglevel > 1) {
-                                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows inserted");
-                            }
-                        }
-                        $domain_id = $this->db->insert_id('toolbox_customise_domains');
-                        if ($this->loglevel > 1) {
-                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: domain insert id: {$domain_id}");
-                        }
-                    }
-                    else {
-                        while ($sql_result && ($sql_arr = $this->db->fetch_assoc($sql_result))) {
-                            $domain_id = $sql_arr['id'];
-                        }
-                        if ($this->loglevel > 1) {
-                            if ($this->loglevel > 2) {
-                                rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: record found for domain {$parts[1]}");
-                            }
-                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: domain existing id: {$domain_id}");
-                        }
-                        $settings['domain']['modified'] = $this->db->now();
-                        $settings['domain']['modified_by'] = $user;
-                        foreach ($settings['domain'] as $field => $value) {
-                            if ($this->loglevel > 1) {
-                                if ($this->loglevel > 2) {
-                                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: record found for domain {$parts[1]}");
-                                }
-                                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [UPDATE `toolbox_customise_domains` SET `{$field}` = '{$value}' WHERE `domain_name` = '{$parts[1]}';]");
-                            }
-                            $this->db->query(
-                                "UPDATE `toolbox_customise_domains` SET `{$field}` = ? WHERE `domain_name` = ?;",
-                                $value,
-                                $parts[1]);
-                            if ($this->loglevel > 0) {
-                                if ($err_str = $this->db->is_error()) {
-                                    rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot update domain settings: " . $err_str);
-                                    break;
-                                }
-                                $sql_rows = $this->db->affected_rows();
-                                if (!$sql_rows) {
-                                    rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: record not updated in domain settings for domain {$parts[1]} [values: `{$field}` = '{$value}']");
-                                    $result = false;
-                                    break;
-                                }
-                                elseif ($this->loglevel > 1) {
-                                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows updated");
-                                }
-                            }
-                        }
-                    }
-
-                    foreach($settings['skins'] as $skin => $values) {
-
-                        $values['customise_blankpage'] = $values['customise_blankpage'] == 1 ? 'true' : 'false';
-                        $values['customise_css'] = $values['customise_css'] == 1 ? 'true' : 'false';
-
-                        // check if skin record exists
-                        if ($this->loglevel > 1) {
-                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [SELECT `toolbox_customise_domain_id`, `skin` FROM `toolbox_customise_skins` WHERE `toolbox_customise_domain_id` = '{$domain_id}' AND `skin` = '{$skin}';]");
-                        }
-                        $sql_result = $this->db->query(
-                            "SELECT `toolbox_customise_domain_id`, `skin` FROM `toolbox_customise_skins` WHERE `toolbox_customise_domain_id` = ? AND `skin` = ?;",
-                            $domain_id,
-                            $skin);
-                        if ($this->loglevel > 0) {
-                            if ($err_str = $this->db->is_error()) {
-                                rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot read domain skins from database: " . $err_str);
-                                $result = false;
-                                break;
-                            }
-                            elseif ($this->loglevel > 1) {
-                                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows matching");
-                            }
-                        }
-                        if ($this->db->affected_rows() == 0) {
-                            if ($this->loglevel > 1) {
-                                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [INSERT INTO `toolbox_customise_skins` (`toolbox_customise_domain_id`, `skin`, `blankpage_type`, `blankpage_image`, `blankpage_url`, `blankpage_custom`, `additional_css`, `modified`, `modified_by`) VALUES ('{$domain_id}', '{$skin}', '{$values['blankpage_type']}', '{$values['blankpage_image']}', '{$values['blankpage_url']}', '{$values['blankpage_custom']}', '{$values['additional_css']}', '{$this->db->now()}', '{$user}');]");
-                            }
-                            $this->db->query(
-                                "INSERT INTO `toolbox_customise_skins` (`toolbox_customise_domain_id`, `skin`, `customise_blankpage`, `blankpage_type`, `blankpage_image`, `blankpage_url`, `blankpage_custom`, `customise_css`, `additional_css`, `modified`, `modified_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                                $domain_id,
-                                $skin,
-                                $values['customise_blankpage'],
-                                $values['blankpage_type'],
-                                $values['blankpage_image'],
-                                $values['blankpage_url'],
-                                $values['blankpage_custom'],
-                                $values['customise_css'],
-                                $values['additional_css'],
-                                $this->db->now(),
-                                $user);
-                            if ($this->loglevel > 0) {
-                                if ($err_str = $this->db->is_error()) {
-                                    rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot insert into skin settings: " . $err_str);
-                                    $result = false;
-                                    break;
-                                }
-                                $sql_rows = $this->db->affected_rows();
-                                if (!$sql_rows) {
-                                    rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: record not inserted in skin settings [values: toolbox_customise_domain_id = '{$domain_id}', skin = '{$skin}', blankpage_type = '{$values['blankpage_type']}', blankpage_image = '{$values['blankpage_image']}', blankpage_url = '{$values['blankpage_url']}', additional_css = '{$values['additional_css']}', modified = '{$this->db->now()}', modified_by = '{$user}']");
-                                    $result = false;
-                                    break;
-                                }
-                                elseif ($this->loglevel > 1) {
-                                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows inserted");
-                                }
-                            }
-                        }
-                        else {
-                            foreach ($values as $field => $value) {
-                                if (($field == 'blankpage_image_control') || ($field == 'blankpage_image' && $values['blankpage_image_control'] == '1'))
-                                    break;
-                                if ($this->loglevel > 1) {
-                                    if ($this->loglevel > 2) {
-                                        rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: record found for skin {$skin}");
-                                    }
-                                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [UPDATE `toolbox_customise_skins` SET `{$field}` = '{$value}' WHERE `toolbox_customise_domain_id` = '{$domain_id}' AND `skin` = '{$skin}';]");
-                                }
-                                $this->db->query(
-                                    "UPDATE `toolbox_customise_skins` SET `{$field}` = ? WHERE `toolbox_customise_domain_id` = ? AND `skin` = ?;",
-                                    $value,
-                                    $domain_id,
-                                    $skin);
-                                if ($this->loglevel > 0) {
-                                    if ($err_str = $this->db->is_error()) {
-                                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot update skin settings: " . $err_str);
-                                        break;
-                                    }
-                                    $sql_rows = $this->db->affected_rows();
-                                    if (!$sql_rows) {
-                                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: record not updated in skin settings of domain {$parts[1]} for skin {$skin} [values: `{$field}` = '{$value}']");
-                                        $result = false;
-                                        break;
-                                    }
-                                    elseif ($this->loglevel > 1) {
-                                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows updated");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                break;
 
             case 'aliases':
 
@@ -985,6 +822,205 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                         }
                     }
 
+                }
+
+                break;
+
+            case 'customise':
+
+                if ($this->is_domain_admin($user) && isset($settings['domain']) && is_array($settings['domain'])) {
+
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: connecting to roundcube database in write mode");
+                    }
+                    $this->_db_connect('roundcube', 'w');
+
+                    // check if domain record exists
+                    if ($this->loglevel > 1) {
+                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [SELECT `id`, `domain_name` FROM `toolbox_customise_domains` WHERE `domain_name` = '{$parts[1]}';]");
+                    }
+                    $sql_result = $this->db->query(
+                        "SELECT `id`, `domain_name` FROM `toolbox_customise_domains` WHERE `domain_name` = ?;",
+                        $parts[1]);
+                    if ($this->loglevel > 0) {
+                        if ($err_str = $this->db->is_error()) {
+                            rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot read domain settings from database: " . $err_str);
+                            $result = false;
+                            break;
+                        }
+                        elseif ($this->loglevel > 1) {
+                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows matching");
+                        }
+                    }
+                    if ($this->db->affected_rows() == 0) {
+                        if ($this->loglevel > 1) {
+                            if ($this->loglevel > 2) {
+                                rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: no record found for domain {$parts[1]}");
+                            }
+                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [INSERT INTO `toolbox_customise_domains` (`domain_name`, `purge_trash`, `purge_junk`, `modified`, `modified_by`) VALUES ('{$parts[1]}', '{$settings['domain']['purge_trash']}', '{$settings['domain']['purge_junk']}', '{$this->db->now()}', '{$user}');]");
+                        }
+                        $this->db->query(
+                            "INSERT INTO `toolbox_customise_domains` (`domain_name`, `purge_trash`, `purge_junk`, `modified`, `modified_by`) VALUES (?, ?, ?, ?, ?);",
+                            $parts[1],
+                            $settings['domain']['purge_trash'],
+                            $settings['domain']['purge_junk'],
+                            $this->db->now(),
+                            $user);
+                        if ($this->loglevel > 0) {
+                            if ($err_str = $this->db->is_error()) {
+                                rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot insert into domain settings: " . $err_str);
+                                $result = false;
+                                break;
+                            }
+                            $sql_rows = $this->db->affected_rows();
+                            if (!$sql_rows) {
+                                rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: record not inserted in domain settings [values: domain_name = '{$parts[1]}', purge_trash = '{$settings['domain']['purge_junk']}', purge_junk = '{$settings['domain']['purge_junk']}', modified = '{$this->db->now()}', modified_by = '{$user}']");
+                                $result = false;
+                                break;
+                            }
+                            elseif ($this->loglevel > 1) {
+                                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows inserted");
+                            }
+                        }
+                        $domain_id = $this->db->insert_id('toolbox_customise_domains');
+                        if ($this->loglevel > 1) {
+                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: domain insert id: {$domain_id}");
+                        }
+                    }
+                    else {
+                        while ($sql_result && ($sql_arr = $this->db->fetch_assoc($sql_result))) {
+                            $domain_id = $sql_arr['id'];
+                        }
+                        if ($this->loglevel > 1) {
+                            if ($this->loglevel > 2) {
+                                rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: record found for domain {$parts[1]}");
+                            }
+                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: domain existing id: {$domain_id}");
+                        }
+                        $settings['domain']['modified'] = $this->db->now();
+                        $settings['domain']['modified_by'] = $user;
+                        foreach ($settings['domain'] as $field => $value) {
+                            if ($this->loglevel > 1) {
+                                if ($this->loglevel > 2) {
+                                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: record found for domain {$parts[1]}");
+                                }
+                                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [UPDATE `toolbox_customise_domains` SET `{$field}` = '{$value}' WHERE `domain_name` = '{$parts[1]}';]");
+                            }
+                            $this->db->query(
+                                "UPDATE `toolbox_customise_domains` SET `{$field}` = ? WHERE `domain_name` = ?;",
+                                $value,
+                                $parts[1]);
+                            if ($this->loglevel > 0) {
+                                if ($err_str = $this->db->is_error()) {
+                                    rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot update domain settings: " . $err_str);
+                                    break;
+                                }
+                                $sql_rows = $this->db->affected_rows();
+                                if (!$sql_rows) {
+                                    rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: record not updated in domain settings for domain {$parts[1]} [values: `{$field}` = '{$value}']");
+                                    $result = false;
+                                    break;
+                                }
+                                elseif ($this->loglevel > 1) {
+                                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows updated");
+                                }
+                            }
+                        }
+                    }
+
+                    foreach($settings['skins'] as $skin => $values) {
+
+                        $values['customise_blankpage'] = $values['customise_blankpage'] == 1 ? 'true' : 'false';
+                        $values['customise_css'] = $values['customise_css'] == 1 ? 'true' : 'false';
+                        $values['customise_logo'] = $values['customise_logo'] == 1 ? 'true' : 'false';
+
+                        // check if skin record exists
+                        if ($this->loglevel > 1) {
+                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [SELECT `toolbox_customise_domain_id`, `skin` FROM `toolbox_customise_skins` WHERE `toolbox_customise_domain_id` = '{$domain_id}' AND `skin` = '{$skin}';]");
+                        }
+                        $sql_result = $this->db->query(
+                            "SELECT `toolbox_customise_domain_id`, `skin` FROM `toolbox_customise_skins` WHERE `toolbox_customise_domain_id` = ? AND `skin` = ?;",
+                            $domain_id,
+                            $skin);
+                        if ($this->loglevel > 0) {
+                            if ($err_str = $this->db->is_error()) {
+                                rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot read domain skins from database: " . $err_str);
+                                $result = false;
+                                break;
+                            }
+                            elseif ($this->loglevel > 1) {
+                                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows matching");
+                            }
+                        }
+                        if ($this->db->affected_rows() == 0) {
+                            if ($this->loglevel > 1) {
+                                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [INSERT INTO `toolbox_customise_skins` (`toolbox_customise_domain_id`, `skin`, `blankpage_type`, `blankpage_image`, `blankpage_url`, `blankpage_custom`, `additional_css`, `modified`, `modified_by`) VALUES ('{$domain_id}', '{$skin}', '{$values['blankpage_type']}', '{$values['blankpage_image']}', '{$values['blankpage_url']}', '{$values['blankpage_custom']}', '{$values['additional_css']}', '{$this->db->now()}', '{$user}');]");
+                            }
+                            $this->db->query(
+                                "INSERT INTO `toolbox_customise_skins` (`toolbox_customise_domain_id`, `skin`, `customise_blankpage`, `blankpage_type`, `blankpage_image`, `blankpage_url`, `blankpage_custom`, `customise_css`, `additional_css`, `customise_logo`, `customised_logo`, `modified`, `modified_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                                $domain_id,
+                                $skin,
+                                $values['customise_blankpage'],
+                                $values['blankpage_type'],
+                                $values['blankpage_image'],
+                                $values['blankpage_url'],
+                                $values['blankpage_custom'],
+                                $values['customise_css'],
+                                $values['additional_css'],
+                                $values['customise_logo'],
+                                $values['customised_logo'],
+                                $this->db->now(),
+                                $user);
+                            if ($this->loglevel > 0) {
+                                if ($err_str = $this->db->is_error()) {
+                                    rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot insert into skin settings: " . $err_str);
+                                    $result = false;
+                                    break;
+                                }
+                                $sql_rows = $this->db->affected_rows();
+                                if (!$sql_rows) {
+                                    rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: record not inserted in skin settings [values: toolbox_customise_domain_id = '{$domain_id}', skin = '{$skin}', blankpage_type = '{$values['blankpage_type']}', blankpage_image = '{$values['blankpage_image']}', blankpage_url = '{$values['blankpage_url']}', additional_css = '{$values['additional_css']}', modified = '{$this->db->now()}', modified_by = '{$user}']");
+                                    $result = false;
+                                    break;
+                                }
+                                elseif ($this->loglevel > 1) {
+                                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows inserted");
+                                }
+                            }
+                        }
+                        else {
+                            foreach ($values as $field => $value) {
+                                if (($field == 'blankpage_image_control') || ($field == 'blankpage_image' && $values['blankpage_image_control'] == '1'))
+                                    continue;
+                                if ($this->loglevel > 1) {
+                                    if ($this->loglevel > 2) {
+                                        rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: record found for skin {$skin}");
+                                    }
+                                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [UPDATE `toolbox_customise_skins` SET `{$field}` = '{$value}' WHERE `toolbox_customise_domain_id` = '{$domain_id}' AND `skin` = '{$skin}';]");
+                                }
+                                $this->db->query(
+                                    "UPDATE `toolbox_customise_skins` SET `{$field}` = ? WHERE `toolbox_customise_domain_id` = ? AND `skin` = ?;",
+                                    $value,
+                                    $domain_id,
+                                    $skin);
+                                if ($this->loglevel > 0) {
+                                    if ($err_str = $this->db->is_error()) {
+                                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot update skin settings: " . $err_str);
+                                        break;
+                                    }
+                                    $sql_rows = $this->db->affected_rows();
+                                    if (!$sql_rows) {
+                                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: record not updated in skin settings of domain {$parts[1]} for skin {$skin} [values: `{$field}` = '{$value}']");
+                                        $result = false;
+                                        break;
+                                    }
+                                    elseif ($this->loglevel > 1) {
+                                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows updated");
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 break;

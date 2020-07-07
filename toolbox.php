@@ -1,5 +1,34 @@
 <?php
 
+/**
+ * Toolbox
+ *
+ * Plugin providing a set of tools for Roundcube
+ *
+ * @requires jQueryUI plugin
+ *
+ * @author Gianluca Giacometti
+ *
+ * Copyright (C) Gianluca Giacometti
+ *
+ * This program is a Roundcube (https://roundcube.net) plugin.
+ * For more information see README.md.
+ * For configuration see config.inc.php.dist.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Roundcube. If not, see https://www.gnu.org/licenses/.
+ */
+
 class toolbox extends rcube_plugin
 {
     public $task = 'mail|settings|tasks|addressbook';
@@ -15,6 +44,12 @@ class toolbox extends rcube_plugin
     private $skins_allowed = array();
     private $loglevel;
     private $logfile;
+    private $logo_types = array(
+        'customise-logo-type-all' => "",
+        'customise-logo-type-favicon' => "[favicon]",
+        'customise-logo-type-print' => "[print]",
+        'customise-logo-type-small' => "[small]"
+        );
 
     public function init()
     {
@@ -143,6 +178,23 @@ class toolbox extends rcube_plugin
                 elseif ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]: customised additional css file not found, empty or not defined: {$config['additional_css']}");
                 }
+            }
+
+            // customise logo
+            if (($customise['customise_logo'] !== false) && ($customise['customised_logo'] != '')) {
+                if ($this->loglevel > 2) {
+                    rcube::write_log($this->logfile, "STEP in [function init]: 'customise logo' database option selected: override config");
+                }
+                $logo = json_decode($customise['customised_logo'], true) ?: array();
+                if ((json_last_error() !== JSON_ERROR_NONE) && ($this->loglevel > 0)) {
+                    rcube::write_log($this->logfile, "ERROR in [function init]: 'customised logo' database value has not a proper json format");
+                }
+                $logo = array_map('base64_decode', $logo);
+//                $this->rcube->config->set('skin_logo', array_merge($this->rcube->config->get('skin_logo'), $logo));
+                $this->rcube->config->set('skin_logo', $logo);
+            }
+            elseif ($this->loglevel > 2) {
+                rcube::write_log($this->logfile, "STEP in [function init]: 'customise logo' database option not selected: loading from config");
             }
 
         } // end if customise
@@ -332,183 +384,6 @@ class toolbox extends rcube_plugin
         }
         switch ($this->cur_section) {
 
-            case 'customise':
-
-                if ($this->storage->is_domain_admin($this->rcube->user->get_username())) {
-
-                    if ($this->loglevel > 2) {
-                        rcube::write_log($this->logfile, "STEP in [function tool_render_form]: user is domain admin");
-                    }
-
-                    // load data
-                    $selected = $this->storage->load_tool_data($this->rcube->user->get_username());
-
-                    $form_content .= html::div(array('class' => 'tool-title'), rcmail::Q($this->gettext('customise-manage')) . ' ' . $parts[1]);
-
-                    // purge trash and junk folders
-                    $folders = array("trash", "junk");
-
-                    $tooldata = array('name' => rcmail::Q($this->gettext('customise-purge')), 'class' => 'toolbox-purgetable', 'cols' => 2);
-
-                    foreach ($folders as $folder) {
-
-                        $field_name = '_domain' . $folder;
-                        $field_id = 'rcmfd' . $field_name;
-
-                        $select = new html_select(array('name' => $field_name, 'id' => $field_id));
-                        $select->add(rcmail::Q($this->gettext('purge-always')), 0);
-                        $select->add(rcmail::Q('1 ' . $this->gettext('purge-day')), 1);
-                        $options = array('3', '7', '15', '30', '45', '60', '90', '120', '150', '180', '270', '360');
-                        foreach($options as $option) {
-                            $select->add(rcmail::Q($option . ' ' . $this->gettext('purge-days')), intval($option));
-                        }
-
-                        $tooldata['rows'][$folder] = array(
-                            'title' => html::label($field_id, rcmail::Q($this->gettext('purge-'.$folder))),
-                            'content' => $select->show($selected[$folder])
-                        );
-
-                    }
-
-                    $form_content .= $this->_tool_render_fieldset($tooldata, 'purge');
-
-                    // blank page settings
-                    $form_content .= html::div(array('class' => 'tool-subtitle'), rcmail::Q($this->gettext('skin')));
-
-                    // set settings for each skin
-                    foreach ($this->_get_skins() as $skin => $header) {
-
-                        // set field visibility
-                        $row_attribs = array(
-                            'blankpage' => array('style' => 'display: none;'),
-                            'url' => array('style' => 'display: none;'),
-                            'image' => array('style' => 'display: none;'),
-                            'custom' => array('style' => 'display: none;'),
-                            'css' => array('style' => 'display: none;')
-                        );
-                        if (isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin])) {
-                            if ($selected['skins'][$skin]['customise_blankpage'] !== false) {
-                                $row_attribs['blankpage'] = array();
-                            }
-                            if (isset($selected['skins'][$skin]['blankpage_type']) && in_array($selected['skins'][$skin]['blankpage_type'], array('url', 'image', 'custom'))) {
-                                $row_attribs[$selected['skins'][$skin]['blankpage_type']] = array();
-                            }
-                            if ($selected['skins'][$skin]['customise_css'] !== false) {
-                                $row_attribs['css'] = array();
-                            }
-                        }
-
-                        // skin header
-                        $form_content .= $header;
-
-                        // blank page
-                        $tooldata = array('name' => rcmail::Q($this->gettext('customise-blankpage-skin')), 'class' => 'toolbox-customisetable', 'cols' => 1);
-
-                        $button_id = 'rcmfd_blankpageskin_selector_' . $skin;
-                        $input_blankpageselector = new html_checkbox(array('name' => '_blankpageselector_' . $skin, 'id' => $button_id, 'value' => '1', 'class' => 'customise-blankpage-selector', 'title' => rcmail::Q($this->gettext('customise-blankpage'))));
-
-                        $tooldata['rows']['skinblankpage'] = array(
-                            'content' => $input_blankpageselector->show($selected['skins'][$skin]['customise_blankpage']) . html::label(array('for' => $button_id, 'class' => 'customise-blankpage-label'), rcmail::Q($this->gettext('customise-blankpage')))
-                        );
-
-                        // blank page type table
-                        $blankpagetype_table = new html_table(array('id' => 'customise_blankpage_type_table_' . $skin, 'class' => 'customise-blankpage-type-table', 'cols' => 1));
-
-                        // Roundcube default blank page
-                        $button_id = 'rcmrb_blankpageskindefault_' . $skin;
-                        $input_skindefault = new html_radiobutton(array('name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => '', 'class' => 'customise-blankpage-skin-selector'));
-
-                        $blankpagetype_table->add(array('class' => 'blankpage-type-check'), $input_skindefault->show($selected['skins'][$skin]['blankpage_type']) . html::label($button_id, rcmail::Q($this->gettext('customise-blankpage-skin-default'))));
-
-                        // blank page as url
-                        $button_id = 'rcmrb_blankpageskinurl_' . $skin;
-                        $input_skinurl = new html_radiobutton(array('name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => 'url', 'class' => 'customise-blankpage-skin-selector'));
-
-                        $blankpagetype_table->add(array('class' => 'blankpage-type-check'), $input_skinurl->show($selected['skins'][$skin]['blankpage_type']) . html::label($button_id, rcmail::Q($this->gettext('customise-blankpage-skin-url'))));
-
-                        $field_id = 'rcmfd_blankpageurl_' . $skin;
-                        $input_blankpageurl = new html_inputfield(array('name' => '_blankpageurl_' . $skin, 'class' => 'tool-skin-blankpage-url', 'type' => 'url', 'id' => $field_id, 'title' => rcmail::Q($this->gettext('customise-blankpage-url')), 'placeholder' => rcmail::Q($this->gettext('customise-blankpage-url'))));
-
-                        $blankpagetype_table->set_row_attribs($row_attribs['url']);
-                        $blankpagetype_table->add(array('class' => 'blankpage-type-content'), $input_blankpageurl->show($selected['skins'][$skin]['blankpage_url']) . html::span(array('id' => $button_id . '_content'), ''));
-
-                        // blank page with custom image
-                        $button_id = 'rcmrb_blankpageskinimage_' . $skin;
-                        $input_skinimage = new html_radiobutton(array('name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => 'image', 'class' => 'customise-blankpage-skin-selector'));
-
-                        $blankpagetype_table->add(array('class' => 'blankpage-type-check'), $input_skinimage->show($selected['skins'][$skin]['blankpage_type']) . html::label($button_id, rcmail::Q($this->gettext('customise-blankpage-skin-image'))));
-
-                        $image_id = 'rcmbtn_modifyblankpageimage_' . $skin;
-                        $blankpageimage = html::img(array(
-                            'id'  => $image_id,
-                            'src'     => (isset($selected['skins'][$skin]['blankpage_image']) && ($selected['skins'][$skin]['blankpage_image'] != '') ? $selected['skins'][$skin]['blankpage_image'] : 'program/resources/blank.gif'),
-                            'class'   => 'blankpage-image',
-                            'width'   => 256,
-                            'onerror' => "this.src = rcmail.assets_path('program/resources/blank.gif'); this.onerror = null",
-                        ));
-
-                        $input_blankpageimage = new html_inputfield(array('id' => '_blankpageimage_' . $skin, 'type' => 'file', 'name' => '_blankpageimage_' . $skin, 'class' => 'blankpage-image-upload', 'data-image' => $image_id));
-                        $hidden_blankpageimagecontrol = new html_hiddenfield(array('id' => '_blankpageimage_' . $skin . '_control', 'name' => '_blankpageimage_' . $skin . '_control', 'value' => (isset($selected['skins'][$skin]['blankpage_image']) && ($selected['skins'][$skin]['blankpage_image'] != '') ? '1' : '0')));
-
-                        $field_id = 'rcmbtn_deleteblankpageimage_' . $skin;
-                        $button_deleteblankpageimage = $this->rcube->output->button(array('id' => $field_id, 'command' => 'plugin.toolbox.reset_image', 'prop' => '#'.$image_id, 'type' => 'link', 'class' => 'blankpage-image-delete-button', 'title' => 'delete', 'label' => 'delete', 'content' => ' ', 'data-image' => '_blankpageimage_' . $skin . '_control'));
-
-                        $blankpagewrapper =
-                            html::label(array('class' => 'blankpage-item-image blankpage-drop-target'),
-                                $blankpageimage .
-                                $input_blankpageimage->show()
-                            ) .
-                            html::span(array('class' => 'blankpage-image-delete', 'title' => rcmail::Q($this->gettext('delete'))), $button_deleteblankpageimage);
-
-                        $blankpagetype_table->set_row_attribs($row_attribs['image']);
-                        $blankpagetype_table->add(array('class' => 'blankpage-type-content'), $blankpagewrapper . html::span(array('id' => $button_id . '_content'), '') . $hidden_blankpageimagecontrol->show());
-
-                        // custom blank page
-                        $button_id = 'rcmrb_blankpageskincustom_' . $skin;
-                        $input_skincustom = new html_radiobutton(array('name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => 'custom', 'class' => 'customise-blankpage-skin-selector'));
-
-                        $blankpagetype_table->add(array('class' => 'blankpage-type-check'), $input_skincustom->show($selected['skins'][$skin]['blankpage_type']) . html::label($button_id, rcmail::Q($this->gettext('customise-blankpage-skin-custom'))));
-
-                        $field_id = 'rcmfd_blankpagecustom_' . $skin;
-                        $input_blankpagecustom = new html_textarea(array('name' => '_blankpagecustom_' . $skin, 'id' => $field_id, 'spellcheck' => 1, 'rows' => 12, 'cols' => 92, 'class' => 'mce_editor'));
-
-                        $blankpagetype_table->set_row_attribs($row_attribs['custom']);
-                        $blankpagetype_table->add(array('class' => 'blankpage-type-content'), $input_blankpagecustom->show($selected['skins'][$skin]['blankpage_custom']) . html::span(array('id' => $button_id . '_content'), ''));
-
-                        // show blank page type table
-                        $tooldata['rows']['blankpage'] = array(
-                            'content' => $blankpagetype_table->show(),
-                            'row_attribs' => $row_attribs['blankpage']
-                        );
-
-                        $form_content .= $this->_tool_render_fieldset($tooldata, 'blankpage');
-
-                        // css
-                        $tooldata = array('name' => 'CSS', 'class' => 'toolbox-customisetable', 'cols' => 1);
-
-                        $button_id = 'rcmfd_additionalcss_selector_' . $skin;
-                        $input_additionalcssselector = new html_checkbox(array('name' => '_additionalcssselector_' . $skin, 'id' => $button_id, 'value' => '1', 'class' => 'customise-additional-css-selector', 'title' => rcmail::Q($this->gettext('customise-additional-css'))));
-
-                        $tooldata['rows']['skinadditionalcss'] = array(
-                            'content' => $input_additionalcssselector->show($selected['skins'][$skin]['customise_css']) . html::label(array('for' => $button_id, 'class' => 'customise-additional-css-label'), rcmail::Q($this->gettext('customise-additional-css')))
-                        );
-
-                        $field_id = 'rcmfd_additionalcss_' . $skin;
-                        $input_additionalcss = new html_textarea(array('name' => '_additionalcss_' . $skin, 'id' => $field_id, 'spellcheck' => 1, 'rows' => 12, 'cols' => 92, 'class' => 'tool-skin-additional-css'));
-
-                        $tooldata['rows']['additionalcss'] = array(
-                            'content' => $input_additionalcss->show($selected['skins'][$skin]['additional_css']) . html::span(array('id' => $button_id . '_content'), ''),
-                            'row_attribs' => $row_attribs['css']
-                        );
-
-                        $form_content .= $this->_tool_render_fieldset($tooldata, 'additionalcss');
-
-                    }
-
-                }
-
-                break;
-
             case 'aliases':
 
                 // Add JS labels if needed
@@ -565,7 +440,7 @@ class toolbox extends rcube_plugin
                     }
                 }
 
-                // add no address and new address rows at the end
+                // add no address and new address row at the end
                 if (!empty($aliases)) {
                     $noaddresses = 'display: none;';
                 }
@@ -645,7 +520,7 @@ class toolbox extends rcube_plugin
                     }
                 }
 
-                // add no address and new address rows at the end
+                // add no address and new address row at the end
                 if (!empty($addresses)) {
                     $noaddresses = 'display: none;';
                 }
@@ -789,6 +664,275 @@ class toolbox extends rcube_plugin
                 }
 
                 $form_content .= $this->_tool_render_fieldset($tooldata, 'main');
+
+                break;
+
+            case 'customise':
+
+                if ($this->storage->is_domain_admin($this->rcube->user->get_username())) {
+
+                    // Add JS labels if needed
+                    $this->rcube->output->add_label(
+                        'toolbox.customise-logo-invalidaddress',
+                        'toolbox.customise-logo-emptycustomisedlogotemplate',
+                        'toolbox.customise-logo-emptycustomisedlogotype',
+                        'toolbox.customise-logo-emptycustomisedlogoimage',
+                        'toolbox.customise-logo-deletecustomisedlogo',
+                        'toolbox.customise-logo-deleteallcustomisedlogos',
+                        'toolbox.customise-logo-customisedlogoexists'
+                        );
+
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function tool_render_form]: user is domain admin");
+                    }
+
+                    // load data
+                    $selected = $this->storage->load_tool_data($this->rcube->user->get_username());
+
+                    $form_content .= html::div(array('class' => 'tool-title'), rcmail::Q($this->gettext('customise-manage')) . ' ' . $parts[1]);
+
+                    // purge trash and junk folders
+                    $folders = array("trash", "junk");
+
+                    $tooldata = array('name' => rcmail::Q($this->gettext('customise-purge')), 'class' => 'toolbox-purgetable', 'cols' => 2);
+
+                    foreach ($folders as $folder) {
+
+                        $field_name = '_domain' . $folder;
+                        $field_id = 'rcmfd' . $field_name;
+
+                        $select = new html_select(array('name' => $field_name, 'id' => $field_id));
+                        $select->add(rcmail::Q($this->gettext('purge-always')), 0);
+                        $select->add(rcmail::Q('1 ' . $this->gettext('purge-day')), 1);
+                        $options = array('3', '7', '15', '30', '45', '60', '90', '120', '150', '180', '270', '360');
+                        foreach($options as $option) {
+                            $select->add(rcmail::Q($option . ' ' . $this->gettext('purge-days')), intval($option));
+                        }
+
+                        $tooldata['rows'][$folder] = array(
+                            'title' => html::label($field_id, rcmail::Q($this->gettext('purge-'.$folder))),
+                            'content' => $select->show($selected[$folder])
+                        );
+
+                    }
+
+                    $form_content .= $this->_tool_render_fieldset($tooldata, 'purge');
+
+                    // blank page settings
+                    $form_content .= html::div(array('class' => 'tool-subtitle'), rcmail::Q($this->gettext('skin')));
+
+                    // set settings for each skin
+                    foreach ($this->_get_skins() as $skin => $header) {
+
+                        // set field visibility
+                        $row_attribs = array(
+                            'blankpage' => array('style' => 'display: none;'),
+                            'url' => array('style' => 'display: none;'),
+                            'image' => array('style' => 'display: none;'),
+                            'custom' => array('style' => 'display: none;'),
+                            'css' => array('style' => 'display: none;'),
+                            'logo' => array('style' => 'display: none;')
+                        );
+                        if (isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin])) {
+                            if ($selected['skins'][$skin]['customise_blankpage'] !== false) {
+                                $row_attribs['blankpage'] = array();
+                            }
+                            if (isset($selected['skins'][$skin]['blankpage_type']) && in_array($selected['skins'][$skin]['blankpage_type'], array('url', 'image', 'custom'))) {
+                                $row_attribs[$selected['skins'][$skin]['blankpage_type']] = array();
+                            }
+                            if ($selected['skins'][$skin]['customise_css'] !== false) {
+                                $row_attribs['css'] = array();
+                            }
+                            if ($selected['skins'][$skin]['customise_logo'] !== false) {
+                                $row_attribs['logo'] = array();
+                            }
+                        }
+
+                        // skin header
+                        $form_content .= $header;
+
+                        // blank page
+                        $tooldata = array('name' => rcmail::Q($this->gettext('customise-blankpage-skin')), 'class' => 'toolbox-customisetable', 'cols' => 1);
+
+                        $button_id = 'rcmfd_blankpageskin_selector_' . $skin;
+                        $input_blankpageselector = new html_checkbox(array('name' => '_blankpageselector_' . $skin, 'id' => $button_id, 'value' => '1', 'class' => 'customise-blankpage-selector', 'title' => rcmail::Q($this->gettext('customise-blankpage'))));
+
+                        $tooldata['rows']['skinblankpage'] = array(
+                            'content' => $input_blankpageselector->show($selected['skins'][$skin]['customise_blankpage']) . html::label(array('for' => $button_id, 'class' => 'customise-blankpage-label'), rcmail::Q($this->gettext('customise-blankpage')))
+                        );
+
+                        // blank page type table
+                        $blankpagetype_table = new html_table(array('id' => 'customise_blankpage_type_table_' . $skin, 'class' => 'customise-blankpage-type-table', 'cols' => 1));
+
+                        // Roundcube default blank page
+                        $button_id = 'rcmrb_blankpageskindefault_' . $skin;
+                        $input_skindefault = new html_radiobutton(array('name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => '', 'class' => 'customise-blankpage-skin-selector'));
+
+                        $blankpagetype_table->add(array('class' => 'blankpage-type-check'), $input_skindefault->show($selected['skins'][$skin]['blankpage_type']) . html::label($button_id, rcmail::Q($this->gettext('customise-blankpage-skin-default'))));
+
+                        // blank page as url
+                        $button_id = 'rcmrb_blankpageskinurl_' . $skin;
+                        $input_skinurl = new html_radiobutton(array('name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => 'url', 'class' => 'customise-blankpage-skin-selector'));
+
+                        $blankpagetype_table->add(array('class' => 'blankpage-type-check'), $input_skinurl->show($selected['skins'][$skin]['blankpage_type']) . html::label($button_id, rcmail::Q($this->gettext('customise-blankpage-skin-url'))));
+
+                        $field_id = 'rcmfd_blankpageurl_' . $skin;
+                        $input_blankpageurl = new html_inputfield(array('name' => '_blankpageurl_' . $skin, 'class' => 'tool-skin-blankpage-url', 'type' => 'url', 'id' => $field_id, 'title' => rcmail::Q($this->gettext('customise-blankpage-url')), 'placeholder' => rcmail::Q($this->gettext('customise-blankpage-url'))));
+
+                        $blankpagetype_table->set_row_attribs($row_attribs['url']);
+                        $blankpagetype_table->add(array('class' => 'blankpage-type-content'), $input_blankpageurl->show($selected['skins'][$skin]['blankpage_url']) . html::span(array('id' => $button_id . '_content'), ''));
+
+                        // blank page with custom image
+                        $button_id = 'rcmrb_blankpageskinimage_' . $skin;
+                        $input_skinimage = new html_radiobutton(array('name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => 'image', 'class' => 'customise-blankpage-skin-selector'));
+
+                        $blankpagetype_table->add(array('class' => 'blankpage-type-check'), $input_skinimage->show($selected['skins'][$skin]['blankpage_type']) . html::label($button_id, rcmail::Q($this->gettext('customise-blankpage-skin-image'))));
+
+                        $image_id = 'rcmbtn_modifyblankpageimage_' . $skin;
+                        $blankpageimage = html::img(array(
+                            'id'      => $image_id,
+                            'src'     => (isset($selected['skins'][$skin]['blankpage_image']) && ($selected['skins'][$skin]['blankpage_image'] != '') ? $selected['skins'][$skin]['blankpage_image'] : 'program/resources/blank.gif'),
+                            'class'   => 'blankpage-image',
+                            'width'   => 256,
+                            'onerror' => "this.src = rcmail.assets_path('program/resources/blank.gif'); this.onerror = null",
+                        ));
+
+                        $input_blankpageimage = new html_inputfield(array('id' => '_blankpageimage_' . $skin, 'type' => 'file', 'name' => '_blankpageimage_' . $skin, 'class' => 'blankpage-image-upload', 'data-image' => $image_id));
+                        $hidden_blankpageimagecontrol = new html_hiddenfield(array('id' => '_blankpageimage_' . $skin . '_control', 'name' => '_blankpageimage_' . $skin . '_control', 'value' => (isset($selected['skins'][$skin]['blankpage_image']) && ($selected['skins'][$skin]['blankpage_image'] != '') ? '1' : '0')));
+
+                        $field_id = 'rcmbtn_deleteblankpageimage_' . $skin;
+                        $button_deleteblankpageimage = $this->rcube->output->button(array('id' => $field_id, 'command' => 'plugin.toolbox.reset_image', 'prop' => '#'.$image_id, 'type' => 'link', 'class' => 'blankpage-image-delete-button', 'title' => 'delete', 'label' => 'delete', 'content' => ' ', 'data-image' => '_blankpageimage_' . $skin . '_control'));
+
+                        $blankpagewrapper =
+                            html::label(array('class' => 'blankpage-item-image blankpage-drop-target'),
+                                $blankpageimage .
+                                $input_blankpageimage->show()
+                            ) .
+                            html::span(array('class' => 'blankpage-image-delete', 'title' => rcmail::Q($this->gettext('delete'))), $button_deleteblankpageimage);
+
+                        $blankpagetype_table->set_row_attribs($row_attribs['image']);
+                        $blankpagetype_table->add(array('class' => 'blankpage-type-content'), $blankpagewrapper . html::span(array('id' => $button_id . '_content'), '') . $hidden_blankpageimagecontrol->show());
+
+                        // custom blank page
+                        $button_id = 'rcmrb_blankpageskincustom_' . $skin;
+                        $input_skincustom = new html_radiobutton(array('name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => 'custom', 'class' => 'customise-blankpage-skin-selector'));
+
+                        $blankpagetype_table->add(array('class' => 'blankpage-type-check'), $input_skincustom->show($selected['skins'][$skin]['blankpage_type']) . html::label($button_id, rcmail::Q($this->gettext('customise-blankpage-skin-custom'))));
+
+                        $field_id = 'rcmfd_blankpagecustom_' . $skin;
+                        $input_blankpagecustom = new html_textarea(array('name' => '_blankpagecustom_' . $skin, 'id' => $field_id, 'spellcheck' => 1, 'rows' => 12, 'cols' => 92, 'class' => 'mce_editor'));
+
+                        $blankpagetype_table->set_row_attribs($row_attribs['custom']);
+                        $blankpagetype_table->add(array('class' => 'blankpage-type-content'), $input_blankpagecustom->show($selected['skins'][$skin]['blankpage_custom']) . html::span(array('id' => $button_id . '_content'), ''));
+
+                        // show blank page type table
+                        $tooldata['rows']['blankpage'] = array(
+                            'content' => $blankpagetype_table->show(),
+                            'row_attribs' => $row_attribs['blankpage']
+                        );
+
+                        $form_content .= $this->_tool_render_fieldset($tooldata, 'blankpage');
+
+                        // css
+                        $tooldata = array('name' => 'CSS', 'class' => 'toolbox-customisetable', 'cols' => 1);
+
+                        $button_id = 'rcmfd_additionalcss_selector_' . $skin;
+                        $input_additionalcssselector = new html_checkbox(array('name' => '_additionalcssselector_' . $skin, 'id' => $button_id, 'value' => '1', 'class' => 'customise-additional-css-selector', 'title' => rcmail::Q($this->gettext('customise-additional-css'))));
+
+                        $tooldata['rows']['skinadditionalcss'] = array(
+                            'content' => $input_additionalcssselector->show($selected['skins'][$skin]['customise_css']) . html::label(array('for' => $button_id, 'class' => 'customise-additional-css-label'), rcmail::Q($this->gettext('customise-additional-css')))
+                        );
+
+                        $field_id = 'rcmfd_additionalcss_' . $skin;
+                        $input_additionalcss = new html_textarea(array('name' => '_additionalcss_' . $skin, 'id' => $field_id, 'spellcheck' => 1, 'rows' => 12, 'cols' => 92, 'class' => 'tool-skin-additional-css'));
+
+                        $tooldata['rows']['additionalcss'] = array(
+                            'content' => $input_additionalcss->show($selected['skins'][$skin]['additional_css']) . html::span(array('id' => $button_id . '_content'), ''),
+                            'row_attribs' => $row_attribs['css']
+                        );
+
+                        $form_content .= $this->_tool_render_fieldset($tooldata, 'additionalcss');
+
+                        // logo
+                        $tooldata = array('name' => 'Logo', 'class' => 'toolbox-customisetable', 'cols' => 1);
+
+                        $button_id = 'rcmfd_customiselogo_selector_' . $skin;
+                        $input_customiselogoselector = new html_checkbox(array('name' => '_customiselogoselector_' . $skin, 'id' => $button_id, 'value' => '1', 'class' => 'customise-logo-selector', 'title' => rcmail::Q($this->gettext('customise-logo'))));
+
+                        $tooldata['rows']['skincustomiselogo'] = array(
+                            'content' => $input_customiselogoselector->show($selected['skins'][$skin]['customise_logo']) . html::label(array('for' => $button_id, 'class' => 'customise-logo-label'), rcmail::Q($this->gettext('customise-logo')))
+                        );
+
+                        $form_content .= $this->_tool_render_fieldset($tooldata, 'customiselogo');
+
+                        $tooldata = array('name' => rcmail::Q($this->gettext('customise-logo-template-new')), 'class' => 'toolbox-customiselogotable', 'cols' => 3);
+
+                        $field_id = 'rcmfd_newcustomisedlogotemplate_' . $skin;
+                        $input_newtemplate = new html_select(array('name' => '_newcustomisedlogotemplate_' . $skin, 'id' => $field_id));
+                        $input_newtemplate->add(array_merge(array(rcmail::Q($this->gettext('customise-logo-template-all'))), $this->_get_templates($skin)), array_merge(array('*'), $this->_get_templates($skin)));
+                        $field_id = 'rcmfd_newcustomisedlogotype_' . $skin;
+                        $input_newlogotype = new html_select(array('name' => '_newcustomisedlogotype_' . $skin, 'id' => $field_id));
+                        $input_newlogotype->add(array_map(function($key) { return(rcmail::Q($this->gettext($key))); }, array_keys($this->logo_types)), array_values($this->logo_types));
+                        $field_id = 'rcmfd_newcustomisedlogoimage_' . $skin;
+                        $input_newlogoimage = new html_inputfield(array('name' => '_newcustomisedlogoimage_' . $skin, 'id' => $field_id, 'type' => 'file'));
+
+                        $field_id = 'rcmbtn_addcustomisedlogo_' . $skin;
+                        $button_addcustomisedlogo = $this->rcube->output->button(array('id' => $field_id, 'command' => 'plugin.toolbox.add_customised_logo', 'type' => 'input', 'class' => 'button', 'label' => 'toolbox.customise-logo-add-template', 'data-skin' => $skin));
+
+                        $tooldata['intro'] = html::div('customise-template-input grouped input-group', $input_newtemplate->show() . $input_newlogotype->show('') . $input_newlogoimage->show('') . $button_addcustomisedlogo);
+
+                        $delete_all = $this->rcube->output->button(array('class' => 'delete-all', 'command' => 'plugin.toolbox.delete_all_customisedlogos', 'type' => 'link', 'label' => 'toolbox.toolbox-deleteall', 'title' => 'toolbox.cunstomise-logo-deleteallcustomisedlogos', 'data-skin' => $skin));
+
+                        $table = new html_table(array('class' => 'toolbox-customiselogotable propform', 'cols' => 2));
+                        $table->add(array('colspan' => 2, 'id' => 'listcontrols'), $delete_all);
+
+                        $logo_table = new html_table(array('id' => 'customised-logo-table-' . $skin, 'class' => 'records-table sortable-table toolbox-customisedlogotable fixedheader', 'cellspacing' => '0', 'cols' => 4));
+                        $logo_table->add_header('logotemplate', rcmail::Q($this->gettext('customise-logo-template')));
+                        $logo_table->add_header('logotype', rcmail::Q($this->gettext('customise-logo-type')));
+                        $logo_table->add_header('logoimage', rcmail::Q($this->gettext('customise-logo-image')));
+                        $logo_table->add_header('control', '&nbsp;');
+
+                        $images = json_decode($selected['skins'][$skin]['customised_logo'], true) ?: array();
+
+                        $this->rcube->output->set_env('customised_logo_count_' . $skin, !empty($images) ? count($images) : 0);
+                        if (!empty($images)) {
+                            $images = array_map('base64_decode', $images);
+                            foreach ($images as $key => $image) {
+                                $keyparts = explode(":", $key);
+                                $model = explode("[", $keyparts[1]);
+                                $logo = array(
+                                    'skin' => $keyparts[0],
+                                    'template' => $model[0],
+                                    'type' => (isset($model[1]) ? '[' . $model[1] : ''),
+                                    'image' => $image
+                                    );
+                                $this->_customised_logo_row($logo_table, 'logo', $logo, $attrib);
+                            }
+                            $nocustomisedlogo = 'display: none;';
+                        }
+
+                        // add new logo row at the end
+                        $logo_table->set_row_attribs(array('class' => 'nologo', 'style' => $nocustomisedlogo));
+                        $logo_table->add(array('colspan' => '4'), rcube_utils::rep_specialchars_output(rcmail::Q($this->gettext('customise-logo-nocustomisedlogo'))));
+
+                        $newlogo = array(
+                            'id' => 0,
+                            'skin' => $skin,
+                            'template' => '',
+                            'type' => '',
+                            'image' => ''
+                        );
+                        $this->_customised_logo_row($logo_table, null, $newlogo, $attrib, array('class' => 'newlogo'));
+
+                        $table->add(array('colspan' => 3, 'class' => 'scroller'), html::div(array('id' => 'customise-logo-customised-logo-cont-' . $skin), $logo_table->show()));
+
+                        $tooldata['content'] = $table->show();
+
+                        $form_content .= $this->_tool_render_fieldset($tooldata, array_merge(array('class' => 'customiselogo-wrapper', 'id' => $button_id . '_content'), $row_attribs['logo']));
+
+                    }
+
+                }
 
                 break;
 
@@ -947,58 +1091,6 @@ class toolbox extends rcube_plugin
         }
         switch ($this->cur_section) {
 
-            case 'customise':
-
-                if ($this->storage->is_domain_admin($this->rcube->user->get_username())) {
-
-                    if ($this->loglevel > 2) {
-                        rcube::write_log($this->logfile, "STEP in [function save]: prepare domain settings");
-                    }
-                    $new_settings['domain']['purge_trash'] = rcube_utils::get_input_value('_domaintrash', rcube_utils::INPUT_POST) ?: 0;
-                    $new_settings['domain']['purge_junk'] = rcube_utils::get_input_value('_domainjunk', rcube_utils::INPUT_POST) ?: 0;
-
-                    if ($this->loglevel > 2) {
-                        rcube::write_log($this->logfile, "STEP in [function save]: prepare skin settings");
-                    }
-                    foreach ($this->_get_skins() as $skin => $header) {
-                        $new_settings['skins'][$skin]['customise_blankpage'] = rcube_utils::get_input_value('_blankpageselector_'.$skin, rcube_utils::INPUT_POST) ?: false;
-                        $new_settings['skins'][$skin]['blankpage_type'] = rcube_utils::get_input_value('_blankpagetype_'.$skin, rcube_utils::INPUT_POST) ?: null;
-                        $new_settings['skins'][$skin]['blankpage_url'] = rcube_utils::get_input_value('_blankpageurl_' . $skin, rcube_utils::INPUT_POST) ?: null;
-                        $allowed_types = array(
-                            'image/jpeg',
-                            'image/jpg',
-                            'image/jp2',
-                            'image/tiff',
-                            'image/tif',
-                            'image/bmp',
-                            'image/eps',
-                            'image/gif',
-                            'image/png',
-                            'image/png8',
-                            'image/png24',
-                            'image/png32',
-                            'image/svg',
-                            'image/ico'
-                            );
-                        $base64 = null;
-                        if ($filepath = $_FILES['_blankpageimage_' . $skin]['tmp_name']) {
-                            $filetype = $_FILES['_blankpageimage_' . $skin]['type'];
-                            if (in_array($filetype, $allowed_types)) {
-                                $filecont = file_get_contents($filepath);
-                                $base64 = 'data:' . $filetype . ';base64,' . base64_encode($filecont);
-                            }
-                        }
-                        $new_settings['skins'][$skin]['blankpage_image'] = $base64 ?: null;
-                        $new_settings['skins'][$skin]['blankpage_image_control'] = rcube_utils::get_input_value('_blankpageimage_' . $skin . '_control', rcube_utils::INPUT_POST);
-                        $new_settings['skins'][$skin]['blankpage_custom'] = $_POST['_blankpagecustom_' . $skin] ?: null;
-                        $new_settings['skins'][$skin]['customise_css'] = rcube_utils::get_input_value('_additionalcssselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
-                        $new_settings['skins'][$skin]['additional_css'] = rcube_utils::get_input_value('_additionalcss_' . $skin, rcube_utils::INPUT_POST) ?: null;
-                    }
-
-                }
-
-                break;
-
             case 'aliases':
 
                 // save alias
@@ -1071,6 +1163,94 @@ class toolbox extends rcube_plugin
                 $new_settings['main']['interval_time'] = rcube_utils::get_input_value('_vacationintervaltime', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_interval_time')['replyonce'];
                 $new_settings['main']['subject'] = rcube_utils::get_input_value('_vacationsubject', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_subject');
                 $new_settings['main']['body'] = rcube_utils::get_input_value('_vacationbody', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_body');
+
+                break;
+
+            case 'customise':
+
+                if ($this->storage->is_domain_admin($this->rcube->user->get_username())) {
+
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function save]: prepare domain settings");
+                    }
+                    $new_settings['domain']['purge_trash'] = rcube_utils::get_input_value('_domaintrash', rcube_utils::INPUT_POST) ?: 0;
+                    $new_settings['domain']['purge_junk'] = rcube_utils::get_input_value('_domainjunk', rcube_utils::INPUT_POST) ?: 0;
+
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function save]: prepare skin settings");
+                    }
+                    foreach ($this->_get_skins() as $skin => $header) {
+                        if ($this->loglevel > 2) {
+                            rcube::write_log($this->logfile, "STEP in [function save]: processing skin " . $skin);
+                        }
+                        $new_settings['skins'][$skin]['customise_blankpage'] = rcube_utils::get_input_value('_blankpageselector_'.$skin, rcube_utils::INPUT_POST) ?: false;
+                        $new_settings['skins'][$skin]['blankpage_type'] = rcube_utils::get_input_value('_blankpagetype_'.$skin, rcube_utils::INPUT_POST) ?: null;
+                        $new_settings['skins'][$skin]['blankpage_url'] = rcube_utils::get_input_value('_blankpageurl_' . $skin, rcube_utils::INPUT_POST) ?: null;
+                        $allowed_types = array(
+                            'image/jpeg',
+                            'image/jpg',
+                            'image/jp2',
+                            'image/tiff',
+                            'image/tif',
+                            'image/bmp',
+                            'image/eps',
+                            'image/gif',
+                            'image/png',
+                            'image/png8',
+                            'image/png24',
+                            'image/png32',
+                            'image/svg',
+                            'image/ico'
+                            );
+                        $base64 = null;
+                        if ($filepath = $_FILES['_blankpageimage_' . $skin]['tmp_name']) {
+                            $filetype = $_FILES['_blankpageimage_' . $skin]['type'];
+                            if (in_array($filetype, $allowed_types)) {
+                                $filecont = file_get_contents($filepath);
+                                $base64 = 'data:' . $filetype . ';base64,' . base64_encode($filecont);
+                            }
+                        }
+                        $new_settings['skins'][$skin]['blankpage_image'] = $base64 ?: null;
+                        $new_settings['skins'][$skin]['blankpage_image_control'] = rcube_utils::get_input_value('_blankpageimage_' . $skin . '_control', rcube_utils::INPUT_POST);
+                        $new_settings['skins'][$skin]['blankpage_custom'] = $_POST['_blankpagecustom_' . $skin] ?: null;
+                        $new_settings['skins'][$skin]['customise_css'] = rcube_utils::get_input_value('_additionalcssselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
+                        $new_settings['skins'][$skin]['additional_css'] = rcube_utils::get_input_value('_additionalcss_' . $skin, rcube_utils::INPUT_POST) ?: null;
+                        $new_settings['skins'][$skin]['customise_logo'] = rcube_utils::get_input_value('_logoselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
+
+                        if ($this->loglevel > 2) {
+                            rcube::write_log($this->logfile, "STEP in [function save]: process customised logos");
+                        }
+                        $customised_logotemplates = array();
+                        $input_logotemplate = rcube_utils::get_input_value('_customisedlogotemplate_' . $skin, rcube_utils::INPUT_POST) ?: array();
+                        foreach($input_logotemplate as $template) {
+                            $customised_logotemplates[] = $template;
+                        }
+                        if ($this->loglevel > 2) {
+                            rcube::write_log($this->logfile, "STEP in [function save]: " . count($customised_templates) . " customised logos found for skin " . $skin);
+                        }
+                        $customised_logotypes = array();
+                        $input_logotype = rcube_utils::get_input_value('_customisedlogotype_' . $skin, rcube_utils::INPUT_POST) ?: array();
+                        foreach($input_logotype as $type) {
+                            $customised_logotypes[] = $type;
+                        }
+                        $customised_logoimages = array();
+                        $input_logoimage = rcube_utils::get_input_value('_customisedlogoimage_' . $skin, rcube_utils::INPUT_POST) ?: array();
+                        foreach($input_logoimage as $image) {
+                            $customised_logoimages[] = $image;
+                        }
+                        $customised_logo = array();
+                        foreach($customised_logotemplates as $key => $template) {
+                            if ($template != '') {
+                                $idx = $skin . ':' . $template . $customised_logotypes[$key];
+                                $customised_logo[$idx] = $customised_logoimages[$key];
+                            }
+                        }
+                        // we need a trick: to avoid escaping characters and problems with : in 'data:image' let's base64 encode again
+                        $new_settings['skins'][$skin]['customised_logo'] = json_encode(array_map('base64_encode', $customised_logo), JSON_FORCE_OBJECT);
+
+                    }
+
+                }
 
                 break;
 
@@ -1168,6 +1348,29 @@ class toolbox extends rcube_plugin
         $address_table->add('control', $del_button . $hidden_field->show());
     }
 
+    private function _customised_logo_row(&$logo_table, $class, $logo, $attrib, $row_attrib = array())
+    {
+        $hidden_customisedlogotemplate = new html_hiddenfield(array('name' => '_customisedlogotemplate_' . $logo['skin'] . '[]', 'value' => $logo['template']));
+        $hidden_customisedlogotype = new html_hiddenfield(array('name' => '_customisedlogotype_' . $logo['skin'] . '[]', 'value' => $logo['type']));
+        $hidden_customisedlogoimage = new html_hiddenfield(array('name' => '_customisedlogoimage_' . $logo['skin'] . '[]', 'value' => $logo['image']));
+
+        $row_attrib = !isset($class) ? array_merge($row_attrib, array('style' => 'display: none;')) : array_merge($row_attrib, array('class' => $class));
+        $logo_table->set_row_attribs($row_attrib);
+
+        $logo_table->add(array('class' => 'customised-logo-template'), ($logo['template'] == '*' ? rcmail::Q($this->gettext('customise-logo-template-all')) : $logo['template']));
+        $logo_table->add(array('class' => 'customised-logo-type'), rcmail::Q($this->gettext(array_flip($this->logo_types)[$logo['type']])));
+        $logoimage = html::img(array(
+            'src'     => $logo['image'] ?: 'program/resources/blank.gif',
+            'class'   => 'customised-logo-image-tag',
+            'height'  => 36,
+            'onerror' => "this.src = rcmail.assets_path('program/resources/blank.gif'); this.onerror = null",
+        ));
+        $logo_table->add(array('class' => 'customised-logo-image'), $logoimage);
+
+        $del_button = $this->rcube->output->button(array('command' => 'plugin.toolbox.delete_customised_logo', 'type' => 'link', 'class' => 'delete', 'label' => 'delete', 'content' => ' ', 'title' => 'delete', 'data-skin' => $logo['skin']));
+        $logo_table->add('control', $del_button . $hidden_customisedlogotemplate->show() . $hidden_customisedlogotype->show() . $hidden_customisedlogoimage->show());
+    }
+
     private function _load_prefs()
     {
         $this->user_prefs = $this->rcube->user->get_prefs();
@@ -1240,7 +1443,7 @@ class toolbox extends rcube_plugin
             foreach ($skins as $skin) {
                 if (in_array($skin, $this->skins_allowed)) {
                     $name = ucfirst($skin);
-                    $meta = @json_decode(@file_get_contents(INSTALL_PATH . "skins" . DIRECTORY_SEPARATOR . "$skin" . DIRECTORY_SEPARATOR . "meta.json"), true);
+                    $meta = @json_decode(@file_get_contents(INSTALL_PATH . "skins" . DIRECTORY_SEPARATOR . $skin . DIRECTORY_SEPARATOR . "meta.json"), true);
                     if (is_array($meta) && $meta['name']) {
                         $name    = $meta['name'];
                         $author  = $meta['url'] ? html::a(array('href' => $meta['url'], 'target' => '_blank'), rcube::Q($meta['author'])) : rcube::Q($meta['author']);
@@ -1265,13 +1468,33 @@ class toolbox extends rcube_plugin
         return $out;
     }
 
+    private function _get_templates($skin)
+    {
+        $path  = RCUBE_INSTALL_PATH . 'skins' . DIRECTORY_SEPARATOR . $skin . DIRECTORY_SEPARATOR . 'templates';
+        $templates = array();
+        $dir   = opendir($path);
+
+        if ($dir) {
+            while (($file = readdir($dir)) !== false) {
+                $filename = $path.'/'.$file;
+                if (preg_match('/^[^\/]+\.html/', $file) && is_file($filename) && is_readable($filename)) {
+                    $parts = pathinfo($filename);
+                    $templates[] = $parts['filename'];
+                }
+            }
+            closedir($dir);
+        }
+
+        return $templates;
+    }
+
     private function _init_storage()
     {
 
         if (!$this->storage) {
 
             // Add include path for internal classes
-            $include_path = $this->home . DIRECTORY_SEPARATOR . 'lib' . PATH_SEPARATOR;
+            $include_path = $this->home . '/lib' . PATH_SEPARATOR;
             $include_path .= ini_get('include_path');
             set_include_path($include_path);
 

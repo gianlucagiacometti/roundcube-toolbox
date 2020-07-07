@@ -152,6 +152,10 @@ table.toolbox-customisetable {
   }
 }
 
+table.toolbox-customisedlogotable td {
+  vertical-align: middle;
+}
+
 .tool-skin-additional-css {
   box-sizing: border-box;
   width: 100%;
@@ -169,7 +173,27 @@ fieldset {
   }
 
   &.additionalcss {
-    margin: 0 1rem 2rem 1rem !important;
+    margin: 0 1rem 0 1rem !important;
+
+    & legend {
+      font-size: .9em;
+      font-weight: bold;
+      margin: 0;
+    }
+  }
+
+  &.customiselogo {
+    margin: 0 1rem 0 1rem !important;
+
+    &-wrapper {
+      margin-top: 0 !important;
+      padding: 0 2rem 2rem 2rem;
+
+      & legend {
+        font-size: .9em;
+        margin: 0;
+      }
+    }
 
     & legend {
       font-size: .9em;
@@ -241,7 +265,8 @@ input[type="file"].blankpage-image-upload {
 }
 
 .customise-blankpage-label,
-.customise-additional-css-label {
+.customise-additional-css-label,
+.customise-logo-label {
   vertical-align: middle;
 }
 

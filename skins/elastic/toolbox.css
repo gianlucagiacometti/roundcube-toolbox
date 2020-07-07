@@ -135,6 +135,9 @@ table.toolbox-customisetable label.customise-additional-css-label {
 .customise-blankpage-type-table td.blankpage-type-content {
   padding-left: 3rem !important;
 }
+table.toolbox-customisedlogotable td {
+  vertical-align: middle;
+}
 .tool-skin-additional-css {
   box-sizing: border-box;
   width: 100%;
@@ -148,9 +151,25 @@ fieldset.blankpage legend {
   margin: .5rem 0 0 0;
 }
 fieldset.additionalcss {
-  margin: 0 1rem 2rem 1rem !important;
+  margin: 0 1rem 0 1rem !important;
 }
 fieldset.additionalcss legend {
+  font-size: .9em;
+  font-weight: bold;
+  margin: 0;
+}
+fieldset.customiselogo {
+  margin: 0 1rem 0 1rem !important;
+}
+fieldset.customiselogo-wrapper {
+  margin-top: 0 !important;
+  padding: 0 2rem 2rem 2rem;
+}
+fieldset.customiselogo-wrapper legend {
+  font-size: .9em;
+  margin: 0;
+}
+fieldset.customiselogo legend {
   font-size: .9em;
   font-weight: bold;
   margin: 0;
@@ -209,7 +228,8 @@ input[type="file"].blankpage-image-upload {
   text-decoration: none;
 }
 .customise-blankpage-label,
-.customise-additional-css-label {
+.customise-additional-css-label,
+.customise-logo-label {
   vertical-align: middle;
 }
 .CodeMirror {
