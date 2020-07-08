@@ -190,7 +190,8 @@ class toolbox extends rcube_plugin
                     rcube::write_log($this->logfile, "ERROR in [function init]: 'customised logo' database value has not a proper json format");
                 }
                 $logo = array_map('base64_decode', $logo);
-//                $this->rcube->config->set('skin_logo', array_merge($this->rcube->config->get('skin_logo'), $logo));
+                // Is it better to merge or replace?
+                // $this->rcube->config->set('skin_logo', array_merge($this->rcube->config->get('skin_logo'), $logo));
                 $this->rcube->config->set('skin_logo', $logo);
             }
             elseif ($this->loglevel > 2) {
@@ -203,13 +204,6 @@ class toolbox extends rcube_plugin
 
             $this->include_stylesheet($this->local_skin_path() . '/tabstyles.css');
 
-            foreach ($this->tools as $tool) {
-                if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [function init]: load plugin tool {$tool}");
-                }
-                $this->sections[$tool] = array('id' => $tool, 'class' => $tool, 'section' => rcmail::Q($this->gettext($tool)));
-            }
-
             // if not domain admin deactivate tool customise
             $this->_init_storage();
             if (in_array('customise', $this->tools)) {
@@ -218,10 +212,17 @@ class toolbox extends rcube_plugin
                 }
                 if (!$this->storage->is_domain_admin($this->rcube->user->get_username())) {
                     $key = array_search('customise', $this->tools);
-                        if ($key !== false) {
-                            array_splice($this->tools, $key, 1);
-                        }
+                    if ($key !== false) {
+                        array_splice($this->tools, $key, 1);
+                    }
                 }
+            }
+
+            foreach ($this->tools as $tool) {
+                if ($this->loglevel > 2) {
+                    rcube::write_log($this->logfile, "STEP in [function init]: load plugin tool {$tool}");
+                }
+                $this->sections[$tool] = array('id' => $tool, 'class' => $tool, 'section' => rcmail::Q($this->gettext($tool)));
             }
 
             if ($this->loglevel > 2) {
