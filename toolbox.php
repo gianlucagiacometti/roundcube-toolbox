@@ -1215,7 +1215,7 @@ class toolbox extends rcube_plugin
                         $new_settings['skins'][$skin]['blankpage_custom'] = $_POST['_blankpagecustom_' . $skin] ?: null;
                         $new_settings['skins'][$skin]['customise_css'] = rcube_utils::get_input_value('_additionalcssselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
                         $new_settings['skins'][$skin]['additional_css'] = rcube_utils::get_input_value('_additionalcss_' . $skin, rcube_utils::INPUT_POST) ?: null;
-                        $new_settings['skins'][$skin]['customise_logo'] = rcube_utils::get_input_value('_logoselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
+                        $new_settings['skins'][$skin]['customise_logo'] = rcube_utils::get_input_value('_customiselogoselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
 
                         if ($this->loglevel > 2) {
                             rcube::write_log($this->logfile, "STEP in [function save]: process customised logos");
