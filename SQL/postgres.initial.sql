@@ -42,7 +42,7 @@ CREATE TABLE public.toolbox_customise_skins
     customise_favicon boolean NOT NULL DEFAULT false,
     favicon text COLLATE pg_catalog."default",
     customise_logo boolean NOT NULL DEFAULT false,
-    customise_logo text COLLATE pg_catalog."default",
+    customised_logo text COLLATE pg_catalog."default",
     modified timestamp with time zone NOT NULL DEFAULT now(),
     modified_by character varying(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT toolbox_customise_skins_pkey PRIMARY KEY (id),

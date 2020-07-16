@@ -28,7 +28,7 @@ CREATE TABLE `toolbox_customise_skins` (
     `customise_favicon` boolean NOT NULL DEFAULT false,
     `favicon` text COLLATE utf8_general_ci DEFAULT NULL,
     `customise_logo` boolean NOT NULL DEFAULT false,
-    `customise_logo` text COLLATE utf8_general_ci DEFAULT NULL,
+    `customised_logo` text COLLATE utf8_general_ci DEFAULT NULL,
     `modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `modified_by` varchar(255) COLLATE utf8_general_ci NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci ROW_FORMAT=DYNAMIC;
@@ -50,7 +50,9 @@ CREATE OR REPLACE VIEW `toolbox_customise_skins_view` AS
     `toolbox_customise_skins.blankpage_url`,
     `toolbox_customise_skins.blankpage_custom`,
     `toolbox_customise_skins.customise_css`,
-    `toolbox_customise_skins.additional_css`
+    `toolbox_customise_skins.additional_css`,
+    `toolbox_customise_skins.customise_logo`,
+    `toolbox_customise_skins.customised_logo`
   FROM `toolbox_customise_skins`
     LEFT JOIN `toolbox_customise_domains` ON (`toolbox_customise_domains`.`id` = `toolbox_customise_skins`.`toolbox_customise_domain_id`);
 
