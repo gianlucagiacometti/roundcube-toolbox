@@ -27,6 +27,8 @@ CREATE TABLE `toolbox_customise_skins` (
     `additional_css` text COLLATE utf8_general_ci DEFAULT NULL,
     `customise_favicon` boolean NOT NULL DEFAULT false,
     `favicon` text COLLATE utf8_general_ci DEFAULT NULL,
+    `customise_logo` boolean NOT NULL DEFAULT false,
+    `customise_logo` text COLLATE utf8_general_ci DEFAULT NULL,
     `modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `modified_by` varchar(255) COLLATE utf8_general_ci NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci ROW_FORMAT=DYNAMIC;
