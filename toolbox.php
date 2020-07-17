@@ -230,6 +230,9 @@ class toolbox extends rcube_plugin
             }
             $this->add_hook('settings_actions', array($this, 'settings_tab'));
 
+            if ($this->loglevel > 2) {
+                rcube::write_log($this->logfile, "STEP in [function init]: register actions");
+            }
             $this->register_action('plugin.toolbox', array($this, 'init_html'));
             $this->register_action('plugin.toolbox.edit', array($this, 'init_html'));
             $this->register_action('plugin.toolbox.check', array($this, 'check'));
@@ -238,9 +241,16 @@ class toolbox extends rcube_plugin
             $this->register_action('plugin.toolbox.save', array($this, 'save'));
 
             if ($this->rcube->config->get('toolbox_vacation_jquery_calendar', false)) {
-                $format = $this->rcube->config->get('toolbox_vacation_jquery_dateformat', 'mm/dd/yy');
-                if ($this->rcube->output->type === "html")
-                $this->rcube->output->add_script("calendar_format='" . $format . "';");
+                if ($this->rcube->output->type === "html") {
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function init]: set calendar date format");
+                    }
+                    $format = $this->rcube->config->get('toolbox_vacation_jquery_dateformat', 'mm/dd/yy');
+                    $this->rcube->output->add_script("calendar_format='" . $format . "';");
+                }
+                if ($this->loglevel > 2) {
+                    rcube::write_log($this->logfile, "STEP in [function init]: load calendar script");
+                }
                 $this->include_script('js/toolbox.calendar.js');
             }
         }
