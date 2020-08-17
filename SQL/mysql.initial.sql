@@ -42,17 +42,17 @@ ALTER TABLE `toolbox_customise_skins`
 
 CREATE OR REPLACE VIEW `toolbox_customise_skins_view` AS
   SELECT
-    `toolbox_customise_domains.domain_name`,
-    `toolbox_customise_skins.skin`,
-    `toolbox_customise_skins.customise_blankpage`,
-    `toolbox_customise_skins.blankpage_type`,
-    `toolbox_customise_skins.blankpage_image`,
-    `toolbox_customise_skins.blankpage_url`,
-    `toolbox_customise_skins.blankpage_custom`,
-    `toolbox_customise_skins.customise_css`,
-    `toolbox_customise_skins.additional_css`,
-    `toolbox_customise_skins.customise_logo`,
-    `toolbox_customise_skins.customised_logo`
+    `toolbox_customise_domains`.`domain_name`,
+    `toolbox_customise_skins`.`skin`,
+    `toolbox_customise_skins`.`customise_blankpage`,
+    `toolbox_customise_skins`.`blankpage_type`,
+    `toolbox_customise_skins`.`blankpage_image`,
+    `toolbox_customise_skins`.`blankpage_url`,
+    `toolbox_customise_skins`.`blankpage_custom`,
+    `toolbox_customise_skins`.`customise_css`,
+    `toolbox_customise_skins`.`additional_css`,
+    `toolbox_customise_skins`.`customise_logo`,
+    `toolbox_customise_skins`.`customised_logo`
   FROM `toolbox_customise_skins`
     LEFT JOIN `toolbox_customise_domains` ON (`toolbox_customise_domains`.`id` = `toolbox_customise_skins`.`toolbox_customise_domain_id`);
 
