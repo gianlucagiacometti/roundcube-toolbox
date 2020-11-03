@@ -169,7 +169,7 @@ $labels['safelogin-location'] = 'Adresse';
 $labels['safelogin-lastlogin'] = 'Dernière connexion';
 $labels['safelogin-history'] = 'Accéder à Historique';
 $labels['safelogin-browser'] = 'Navigateur';
-$labels['safelogin-os'] = 'Systeme d’exploitation’;
+$labels['safelogin-os'] = 'Systeme d’exploitation';
 
 
 /* Folders */
