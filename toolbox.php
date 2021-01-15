@@ -172,8 +172,14 @@ class toolbox extends rcube_plugin
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]: 'customise additional css' database option selected: override config");
                 }
-                if ( ($pos = stripos($args['content'], '<script ')) || ($pos = stripos($args['content'], '</head>')) ) {
-                    $args['content'] = substr_replace($args['content'], '<style>' . $customise['additional_css'] . '</style>', $pos, 0);
+                // we need a file in a folder named 'tmp' in plugin/toolbox (temp cannot be used for .htaccess limitations)
+                // filename must contain a dot for .htaccess limitations
+                // a file is needed since the 'blankpage' env variable needs a real file (loaded in apps.js)
+                $tmp = RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'stylesheet.' . $parts[1] . '.css';
+                file_put_contents($tmp, $customise['additional_css']);
+                $this->rcube->output->include_css('.' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
+                if ($this->loglevel > 2) {
+                    rcube::write_log($this->logfile, "STEP in [function init]: customised additional css loaded");
                 }
             }
             elseif ($this->loglevel > 2) {

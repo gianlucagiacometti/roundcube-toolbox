@@ -1,6 +1,9 @@
 Roundcube Webmail Toolbox
 =========================
 
+- Fixed load customised css from database
+
+
 Version 1.4.10-0 (2021-01-15, rc-1.4.10)
 ======================================
 
