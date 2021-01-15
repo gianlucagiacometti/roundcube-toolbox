@@ -49,6 +49,8 @@ class toolbox extends rcube_plugin
         'customise-logo-type-favicon' => "[favicon]",
         'customise-logo-type-print' => "[print]",
         'customise-logo-type-small' => "[small]"
+        'customise-logo-type-dark' => "[dark]"
+        'customise-logo-type-small-dark' => "[small-dark]"
     ];
 
     public function init()
