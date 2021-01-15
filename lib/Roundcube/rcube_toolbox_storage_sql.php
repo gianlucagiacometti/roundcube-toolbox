@@ -123,7 +123,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
     public function is_domain_admin($user)
     {
 
-        $domains = array();
+        $domains = [];
 
         // add postfixadmin domain admins
         if ($this->use_postfixadmin_domain_admins) {
@@ -158,7 +158,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
         foreach ($this->domain_admins as $key => $val) {
             if ($key == $user) {
                 if (($val == 'ALL') && !in_array($val, $domains)) {
-                    $domains = array('ALL');
+                    $domains = ['ALL'];
                 }
                 else {
                     foreach (explode(',', $val) as $domain) {
@@ -215,7 +215,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
             }
         }
 
-        $config = array();
+        $config = [];
         if ($this->db->affected_rows() > 0) {
             while ($sql_result && ($sql_arr = $this->db->fetch_assoc($sql_result))) {
                 $config['customise_blankpage'] = $sql_arr['customise_blankpage'];
@@ -235,7 +235,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 
     public function load_tool_data($user, $attrib='')
     {
-        $settings = array();
+        $settings = [];
         $parts = explode('@', $user);
 
         if ($this->loglevel > 2) {
@@ -440,10 +440,10 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                     }
                 }
 
-                $settings['skins'] = array();
+                $settings['skins'] = [];
                 if ($this->db->affected_rows() > 0) {
                     while ($sql_result && ($sql_arr = $this->db->fetch_assoc($sql_result))) {
-                        $settings['skins'][$sql_arr['skin']] = array(
+                        $settings['skins'][$sql_arr['skin']] = [
                             'customise_blankpage' => $sql_arr['customise_blankpage'],
                             'blankpage_type' => $sql_arr['blankpage_type'],
                             'blankpage_image' => $sql_arr['blankpage_image'],
@@ -453,7 +453,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                             'additional_css' => $sql_arr['additional_css'],
                             'customise_logo' => $sql_arr['customise_logo'],
                             'customised_logo' => $sql_arr['customised_logo']
-                            );
+                        ];
                     }
                 }
 
@@ -644,7 +644,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 
                 $settings['main']['modified'] = $this->db->now();
 
-                $addresses = array();
+                $addresses = [];
                 foreach ($settings['main']['addresses'] as $address) {
                     if ($address['value'] != '') {
                         $addresses[] = $address['value'];
@@ -731,7 +731,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 }
                 $this->_db_connect('postfix', 'w');
 
-                $queries = array();
+                $queries = [];
 
                 $settings['main']['active'] = $settings['main']['active'] == 1 ? 'true' : 'false';
                 $settings['main']['modified'] = $this->db->now();
@@ -763,47 +763,47 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 }
                 // if exists update else insert
                 if ($this->db->affected_rows() > 0) {
-                    $set = array();
+                    $set = [];
                     foreach ($settings['main'] as $field => $value) {
                         $set[] = "`{$field}` = {$value}";
                     }
-                    $queries[] = array(
+                    $queries[] = [
                                 'sql' => "UPDATE {$this->postfix_sql_vacation_table_name} SET "  . implode(', ', $set) .  " WHERE `{$this->postfix_sql_email_field_in_vacation}` = ? AND `{$this->postfix_sql_domain_field_in_vacation}` = ?;",
-                                'data' => array($user, $parts[1]),
+                                'data' => [$user, $parts[1]],
                                 'type' => 'update'
-                                );
+                    ];
                 }
                 else {
                     $settings['main']['created'] = $this->db->now();
-                    $queries[] = array(
+                    $queries[] = [
                                 'sql' => "INSERT INTO {$this->postfix_sql_vacation_table_name} (" . implode(', ', array_keys($settings['main'])) . ") VALUES (" . implode(',',array_values($settings['main'])) . ");",
-                                'data' => array(),
+                                'data' => [],
                                 'type' => 'insert'
-                                );
+                    ];
                 }
 
                 // delete old vacation notifications
-                $queries[] = array(
+                $queries[] = [
                                 'sql' => "DELETE FROM {$this->postfix_sql_vacation_notification_table_name} WHERE `{$this->postfix_sql_on_vacation_field_in_vacation_notification}` = ?;",
-                                'data' => array($user),
+                                'data' => [$user],
                                 'type' => 'delete'
-                                );
+                ];
 
                 //remove autoreply address from alias list, but keep custom aliases
                 $concat = $this->db->concat($this->db->quote($parts[0]),$this->db->quote('#'),$this->db->quote($parts[1]),$this->db->quote('@'),$this->db->quote($this->postfixadmin_vacation_domain));
-                $queries[] = array(
+                $queries[] = [
                                 'sql' => "UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = replace({$this->postfix_sql_goto_field_in_alias}, {$concat}, ''), `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ?;",
-                                'data' => array($user, $parts[1]),
+                                'data' => [$user, $parts[1]],
                                 'type' => 'update'
-                                );
+                ];
 
                 //add autoreply address as alias
                 $concat = $this->db->concat($this->postfix_sql_goto_field_in_alias,$this->db->quote($parts[0]),$this->db->quote('#'),$this->db->quote($parts[1]),$this->db->quote('@'),$this->db->quote($this->postfixadmin_vacation_domain));
-                $queries[] = array(
+                $queries[] = [
                                 'sql' => "UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = {$concat}, `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ? AND `{$this->postfix_sql_active_field_in_alias}` = true;",
-                                'data' => array($user, $parts[1]),
+                                'data' => [$user, $parts[1]],
                                 'type' => 'update'
-                                );
+                ];
 
                 foreach ($queries as $query) {
 
@@ -1046,13 +1046,13 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
             $ver = (float)phpversion();
             if ($ver > 7.0) {
                 $get_dsn = function() {
-                    return array('w' => $this->db_dsnw, 'r' => $this->db_dsnr);
+                    return ['w' => $this->db_dsnw, 'r' => $this->db_dsnr];
                 };
                 $db_dsn = $get_dsn->call($this->db);
             }
             else {
                 $array = (array)$this->db;
-                $db_dsn = array('w' => $array[chr(0).'*'.chr(0).db_dsnw], 'r' => $array[chr(0).'*'.chr(0).db_dsnr]);
+                $db_dsn = ['w' => $array[chr(0).'*'.chr(0).db_dsnw], 'r' => $array[chr(0).'*'.chr(0).db_dsnr]];
             }
             if (($db_dsn['w'] != $dsnw) || ($db_dsn['r'] != $dsnr)) {
                 $this->db = rcube_db::factory($this->$dsnw, $this->$dsnr, $this->$db_persistent);
@@ -1067,11 +1067,11 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
             if ($this->loglevel > 0) {
                 rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function _db_connect]: connection failed: " . $err_str);
             }
-            rcube::raise_error(array(
+            rcube::raise_error([
                 'code' => 603,
                 'type' => 'db',
                 'message' => $err_str
-            ), false, true);
+            ], false, true);
         }
         else {
             // try to instantiate helper class
@@ -1084,10 +1084,10 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 if ($this->loglevel > 0) {
                     rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function _db_connect]: failed to find storage helper class: {$class}");
                 }
-                rcube::raise_error(array('code' => 604, 'type' => 'toolbox',
+                rcube::raise_error(['code' => 604, 'type' => 'toolbox',
                     'line' => __LINE__, 'file' => __FILE__,
                     'message' => "Failed to find storage helper class: {$class}"
-                ), true, true);
+                ], true, true);
             }
 
         }

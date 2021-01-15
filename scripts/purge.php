@@ -41,8 +41,6 @@ $local_part_field_in_mailbox = $rcmail->config->get('toolbox_postfix_sql_local_p
 $maildir_field_in_mailbox = $rcmail->config->get('toolbox_postfix_sql_maildir_field_in_mailbox');
 $domain_table_name = $rcmail->config->get('toolbox_postfix_sql_domain_table_name');
 $domain_field_in_domain = $rcmail->config->get('toolbox_postfix_sql_domain_field_in_domain');
-$purge_trash_field_in_domain = $rcmail->config->get('toolbox_postfix_sql_purge_trash_field_in_domain');
-$purge_junk_field_in_domain = $rcmail->config->get('toolbox_postfix_sql_purge_junk_field_in_domain');
 $dsnw_roundcube = $rcmail->config->get('toolbox_roundcube_dsnw');
 $dsnr_roundcube = $rcmail->config->get('toolbox_roundcube_dsnr') != '' ? $rcmail->config->get('toolbox_roundcube_dsnr') : $rcmail->config->get('toolbox_roundcube_dsnw');
 $loglevel = $rcmail->config->get('toolbox_script_loglevel', 2);
@@ -95,14 +93,14 @@ if ($err_str = $db_postfix->is_error()) {
     exit($err_str . '\n');
 }
 
-$mailboxes = array();
+$mailboxes = [];
 while ($sql_result && ($sql_arr = $db_postfix->fetch_assoc($sql_result))) {
-    $mailboxes[] = array(
+    $mailboxes[] = [
         'username' => $sql_arr[$username_field_in_mailbox],
         'domain' => $sql_arr[$domain_field_in_mailbox],
         'local_part' => $sql_arr[$local_part_field_in_mailbox],
         'maildir' => $sql_arr[$maildir_field_in_mailbox],
-        );
+    ];
 }
 if ($loglevel > 2) {
     $rcmail->write_log($logfile, "SQL: " . count($mailboxes) . " mailboxes found");
@@ -131,40 +129,40 @@ foreach ($mailboxes as $mailbox) {
         }
         exit($err_str . '\n');
     }
-    $preferences = array();
+    $preferences = [];
     while ($sql_result && ($sql_arr = $db_postfix->fetch_assoc($sql_result))) {
         $preferences = (array)unserialize($sql_arr['preferences']);
     }
     if (($loglevel > 2) && !empty($preferences)) {
         $rcmail->write_log($logfile, "SQL: user's preferences found");
     }
-    $purge_trash = $preferences['toolbox_purge_trash'];
-    $purge_junk = $preferences['toolbox_purge_junk'];
+    $purge_trash = isset($preferences['toolbox_purge_trash']) ? $preferences['toolbox_purge_trash'] : 'NULL';
+    $purge_junk = isset($preferences['toolbox_purge_junk']) ? $preferences['toolbox_purge_junk'] : 'NULL';
 
     if (($purge_trash == 'NULL' || $purge_junk == 'NULL')) {
         if ($loglevel > 2) {
-            $rcmail->write_log($logfile, "SQL: SELECT `{$purge_trash_field_in_domain}`, `{$purge_junk_field_in_domain}` FROM `{$domain_table_name}` WHERE `{$domain_field_in_domain}` = '{$mailbox['domain']}';");
+            $rcmail->write_log($logfile, "SQL: SELECT `purge_trash`, `purge_junk` FROM `toolbox_customise_domains` WHERE `domain_name` = '{$mailbox['domain']}';");
         }
-        $sql_result = $db_postfix->query(
-            "SELECT `{$purge_trash_field_in_domain}`, `{$purge_junk_field_in_domain}` FROM `{$domain_table_name}` WHERE `{$domain_field_in_domain}` = ?;",
+        $sql_result = $db_roundcube->query(
+            "SELECT `purge_trash`, `purge_junk` FROM `toolbox_customise_domains` WHERE `domain_name` = ?;",
             $mailbox['domain']
             );
-        if ($err = $db_postfix->is_error()) {
+        if ($err = $db_roundcube->is_error()) {
             if ($loglevel > 1) {
-                $rcmail->write_log($logfile, 'ERROR: cannot read domain data for ' . $mailbox['domain'] . ': ' . $err);
+                $rcmail->write_log($logfile, 'ERROR: cannot read customised domain data for ' . $mailbox['domain'] . ': ' . $err);
             }
             exit($err . '\n');
         }
-        $sql_arr = $db_postfix->fetch_assoc($sql_result);
+        $sql_arr = $db_roundcube->fetch_assoc($sql_result);
         if ($purge_trash == 'NULL') {
-            $purge_trash = $sql_arr[$purge_trash_field_in_domain];
+            $purge_trash = !empty($sql_arr['purge_trash']) ? $sql_arr['purge_trash'] : 0;
         }
         if ($purge_junk == 'NULL') {
-            $purge_junk = $sql_arr[$purge_junk_field_in_domain];
+            $purge_junk = !empty($sql_arr['purge_junk']) ? $sql_arr['purge_junk'] : 0;
         }
     }
 
-    $purge = array('Trash' => intval($purge_trash), 'Junk' => intval($purge_junk));
+    $purge = ['Trash' => intval($purge_trash), 'Junk' => intval($purge_junk)];
     foreach ($purge as $key => $val) {
         $count = 0;
         $last = $val > 0 ? ($val == 1 ? ' 1 day' : ' ' . strval($val) . ' days') : 'ever';
@@ -176,7 +174,7 @@ foreach ($mailboxes as $mailbox) {
             $rcmail->write_log($logfile, '     keeps messages in ' . $key  . ' folder for' . $last);
         }
         if ($val > 0) {
-            $files = array_diff(scandir($folder), array('..', '.'));
+            $files = array_diff(scandir($folder), ['..', '.']);
             if (!empty($files)) {
                 foreach ($files as $file) {
                     if (file_exists($folder . '/' . $file) && ((time() - filemtime($folder . '/' . $file)) > ($val * 60 * 60 * 24))) {

@@ -21,7 +21,7 @@
   ],
   "require": {
     "php": ">=5.4.0",
-    "roundcube/plugin-installer": "~0.1.6"
+    "roundcube/plugin-installer": ">=0.2.0"
   },
   "suggest": {
     "piwik/device-detector": ">=3.10.2 required for tool SafeLogin"

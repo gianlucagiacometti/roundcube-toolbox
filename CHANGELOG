@@ -1,11 +1,21 @@
 Roundcube Webmail Toolbox
 =========================
 
+Version 1.4.9-0 (2021-01-14, rc-1.4.9)
+======================================
+
+- Fixed function rcmail_action::get_form_tags()
+- Fixed warnings in error.log for valiables not defined
+- Fixed minimum requirement for Roundcube plugin installer
+- Independent version of Codemirror
+
+
 Version 1.4.7-0 (2020-07-08, rc-1.4.7)
 ======================================
 
 - Fixed set_env with blankpage. Setting a base64-encoded page instead of a link to a physical page makes the plugin hang.
 - Added tool Customise
+
 
 Version 1.4.6-0 (2020-06-27, rc-1.4.6)
 ======================================

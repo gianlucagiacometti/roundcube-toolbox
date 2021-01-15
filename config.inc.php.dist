@@ -213,35 +213,6 @@ $config['toolbox_roundcube_dsnr'] = '';
 $config['toolbox_roundcube_db_persistent'] = false;
 
 
-// CUSTOMISE
-
-// IMPORTANT: tool available only for domain admins
-// global default values for all domains
-// Format: associative array per skin
-// BLANK PAGE
-// blankpage_type can be either url or image and the corresponding field (blankpage_url or blankpage_image) must be specified
-// blankpage_type = 'url': the blank page will be taken from the specified url
-// blankpage_type = 'image': the blank page will contain only a cenral image
-// NOTE: if blankpage_type is not specified either blankpage_url or blankpage_image will be ignored
-// blankpage_url: url of the blank page (local or remote)
-// blankpage_image: image of the blank pagee
-// CSS
-// and additional css can be specified per domain
-// additional_css: the href of the additional css
-// Example:
-// array(
-//   'classic' => array('blankpage_type' => 'url', 'blankpage_url' => 'https://mypage.com', 'additional_css' => './myfolder/mycss.css'),
-//   'larry' => array('additional_css' => 'skins/larry/mycss.css'),
-//   'elastic' => array('blankpage_type' => 'image', 'blankpage_image' => 'images/myimage.png'),
-//   'default' => array('blankpage_type' => 'image', 'blankpage_image' => 'images/defaultimage.png', 'additional_css' => 'skins/elastic/defaultcss.css'),
-//   )
-// IMPORTANT: per domain settings specified within the gui will override this configuration
-// 'default', if set, is used for all skins not specified
-// empty array or empty array elements mean roundcube default settings
-// default value: array()
-$config['toolbox_customise_skins'] = array();
-
-
 // ALIASES TOOL OPTIONS
 
 
@@ -292,6 +263,35 @@ $config['toolbox_vacation_interval_time'] = array(
     'replyonceperday' => 60*60 * 24, // Reply once per day to each address
     'replyonceperweek' => 60*60 * 24*7 // Reply once per week to each address
     );
+
+
+// CUSTOMISE
+
+// IMPORTANT: tool available only for domain admins
+// global default values for all domains
+// Format: associative array per skin
+// BLANK PAGE
+// blankpage_type can be either url or image and the corresponding field (blankpage_url or blankpage_image) must be specified
+// blankpage_type = 'url': the blank page will be taken from the specified url
+// blankpage_type = 'image': the blank page will contain only a cenral image
+// NOTE: if blankpage_type is not specified either blankpage_url or blankpage_image will be ignored
+// blankpage_url: url of the blank page (local or remote)
+// blankpage_image: image of the blank pagee
+// CSS
+// and additional css can be specified per domain
+// additional_css: the href of the additional css
+// Example:
+// array(
+//   'classic' => array('blankpage_type' => 'url', 'blankpage_url' => 'https://mypage.com', 'additional_css' => './myfolder/mycss.css'),
+//   'larry' => array('additional_css' => 'skins/larry/mycss.css'),
+//   'elastic' => array('blankpage_type' => 'image', 'blankpage_image' => 'images/myimage.png'),
+//   'default' => array('blankpage_type' => 'image', 'blankpage_image' => 'images/defaultimage.png', 'additional_css' => 'skins/elastic/defaultcss.css'),
+//   )
+// IMPORTANT: per domain settings specified within the gui will override this configuration
+// 'default', if set, is used for all skins not specified
+// empty array or empty array elements mean roundcube default settings
+// default value: array()
+$config['toolbox_customise_skins'] = array();
 
 
 // PLUGIN LOG/DEBUG OPTIONS
