@@ -179,7 +179,9 @@ class toolbox extends rcube_plugin
                 // a file is needed since the 'blankpage' env variable needs a real file (loaded in apps.js)
                 $tmp = RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'stylesheet.' . $parts[1] . '.css';
                 file_put_contents($tmp, $customise['additional_css']);
-                $this->rcube->output->include_css('.' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
+                if ($this->rcube->task == 'settings') {
+                    $this->rcube->output->include_css('.' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
+                }
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]: customised additional css loaded");
                 }
@@ -190,7 +192,9 @@ class toolbox extends rcube_plugin
                     if ($this->loglevel > 2) {
                         rcube::write_log($this->logfile, "STEP in [function init]: valid customised additional css file defined, found and loaded: {$config['additional_css']}");
                     }
-                    $this->rcube->output->include_css($config['additional_css']);
+                    if ($this->rcube->task == 'settings') {
+                        $this->rcube->output->include_css($config['additional_css']);
+                    }
                 }
                 elseif ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]: customised additional css file not found, empty or not defined");
