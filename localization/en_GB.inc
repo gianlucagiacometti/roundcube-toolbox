@@ -44,7 +44,7 @@ $messages['aliases-aliascreatederror'] = 'Error while creating alias';
 $messages['aliases-aliasupdated'] = 'Alias updated successfully';
 $messages['aliases-aliasupdatederror'] = 'Error while updating alias';
 $messages['aliases-aliasnameerror'] = 'Alias contains characters not allowed';
-$messages['aliases-noalias'] = 'No aliases found';
+$messages['aliases-noaliases'] = 'No aliases found';
 $messages['aliases-novalidalias'] = 'Alias name empty';
 
 
@@ -52,6 +52,7 @@ $messages['aliases-novalidalias'] = 'Alias name empty';
 /* Author: Gianluca Giacometti */
 
 $labels['forward'] = 'Forward addresses';
+$labels['forward-manage'] = 'Manage forward addresses';
 $labels['forward-address'] = 'Forward address';
 $labels['forward-addaddress'] = 'Add forward address';
 $labels['forward-keepcopies'] = 'Keep copies of original messages';
@@ -69,6 +70,7 @@ $messages['forward-noaddress'] = 'No address found';
 /* Author: Gianluca Giacometti */
 
 $labels['vacation'] = 'Out of office';
+$labels['vacation-manage'] = 'Manage out of office message';
 $labels['vacation-subject'] = 'Subject:';
 $labels['vacation-body'] = 'Message:';
 $labels['vacation-active'] = 'Active';
@@ -92,6 +94,7 @@ $messages['vacation-nomessage'] = 'Please fill the message of your out-of-office
 /* Author: Gianluca Giacometti */
 
 $labels['purge'] = 'Purge';
+$labels['purge-manage'] = 'Manage purge options';
 $labels['purge-domainsettings'] = 'Domain settings';
 $labels['purge-trash'] = 'Keep messages in Rubbish folder for';
 $labels['purge-junk'] = 'Keep messages in Spam folder for';

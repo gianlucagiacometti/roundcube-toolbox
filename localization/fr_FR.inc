@@ -43,14 +43,16 @@ $messages['aliases-aliascreatederror'] = 'Error while creating alias';
 $messages['aliases-aliasupdated'] = 'Alias updated successfully';
 $messages['aliases-aliasupdatederror'] = 'Error while updating alias';
 $messages['aliases-aliasnameerror'] = 'Alias contains characters not allowed';
-$messages['aliases-noalias'] = 'No aliases found';
+$messages['aliases-noaliases'] = 'No aliases found';
 $messages['aliases-novalidalias'] = 'Alias name empty';
 
 
 /* Forward */
 /* Author: Valentin Samir */
+/* Author: Helena Branch */
 
 $labels['forward'] = 'Adresses de réexpédition';
+$labels['forward-manage'] = 'Gérer adresses de réexpédition';
 $labels['forward-address'] = 'Adresse de réexpédition';
 $labels['forward-addaddress'] = 'Ajouter une adresse de réexpédition';
 $labels['forward-keepcopies'] = 'Garder une copie du message original';
@@ -68,6 +70,7 @@ $messages['forward-noaddress'] = 'No address found';
 /* Author: Helena Branch */
 
 $labels['vacation'] = 'Répondeur';
+$labels['vacation-manage'] = 'Manage out of office message';
 $labels['vacation-subject'] = 'Sujet :';
 $labels['vacation-body'] = 'Message :';
 $labels['vacation-active'] = 'Active';
@@ -91,6 +94,7 @@ $messages['vacation-nomessage'] = 'Veuillez saisir le message de votre répondeu
 /* Author: Helena Branch */
 
 $labels['purge'] = 'Vider les dossiers';
+$labels['purge-manage'] = 'Manage purge options';
 $labels['purge-domainsettings'] = 'Domain settings';
 $labels['purge-trash'] = 'Garder les messages dans Corbeilles pendant';
 $labels['purge-junk'] = 'Garder les messages dans Messages indésirables pendant';

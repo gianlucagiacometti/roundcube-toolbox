@@ -44,14 +44,16 @@ $messages['aliases-aliascreatederror'] = 'Alias konnte nicht angelegt werden';
 $messages['aliases-aliasupdated'] = 'Alias erfolgreich aktualisiert';
 $messages['aliases-aliasupdatederror'] = 'Alias konnte nicht aktualisiert werden';
 $messages['aliases-aliasnameerror'] = 'Alias contains characters not allowed';
-$messages['aliases-noalias'] = 'Keine Aliase gefunden';
+$messages['aliases-noaliases'] = 'Keine Aliase gefunden';
 $messages['aliases-novalidalias'] = 'Alias-Name leer';
 
 
 /* Forward */
 /* Author: Jan B. Fiedler */
+/* Author:  */
 
 $labels['forward'] = 'Forward addresses';
+$labels['forward-manage'] = 'Manage forward addresses';
 $labels['forward-address'] = 'Forward address';
 $labels['forward-addaddress'] = 'Add forward address';
 $labels['forward-keepcopies'] = 'Original Nachricht behalten';
@@ -70,6 +72,7 @@ $messages['forward-noaddress'] = 'No address found';
 /* Author: Christian Boltz */
 
 $labels['vacation'] = 'Abwesenheit';
+$labels['vacation-manage'] = 'Manage out of office message';
 $labels['vacation-subject'] = 'Betreff:';
 $labels['vacation-body'] = 'Nachricht:';
 $labels['vacation-active'] = 'Aktiv';
@@ -93,6 +96,7 @@ $messages['vacation-nomessage'] = 'Bitte geben Sie den Text Ihrer Abwesenheitsna
 /* Author: Philipp Kapfer */
 
 $labels['purge'] = 'Ordnerbereinigung';
+$labels['purge-manage'] = 'Manage purge options';
 $labels['purge-domainsettings'] = 'Domain settings';
 $labels['purge-trash'] = 'Nachrichten im Papierkorb behalten für';
 $labels['purge-junk'] = 'Nachrichten im Spamordner behalten für';
