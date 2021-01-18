@@ -976,7 +976,7 @@ class toolbox extends rcube_plugin
         $this->rcube->output->set_env('toolbox_input_error_class', $attrib['input_error_class'] ?: 'error');
 
         unset($attrib['form']);
-        list($form_start, $form_end) = get_form_tags($attrib + ['enctype' => 'multipart/form-data'], 'plugin.toolbox.save', null, ['name' => '_section', 'value' => $this->cur_section]);
+        list($form_start, $form_end) = rcmail_action::get_form_tags($attrib + ['enctype' => 'multipart/form-data'], 'plugin.toolbox.save', null, ['name' => '_section', 'value' => $this->cur_section]);
 
         if ($this->loglevel > 2) {
             rcube::write_log($this->logfile, "STEP in [function tool_render_form]: render form for tool {$this->cur_section}");
