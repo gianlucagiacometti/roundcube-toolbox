@@ -298,7 +298,7 @@ $config['toolbox_customise_skins'] = array();
 
 // Log file
 // default value: toolbox.log
-$config['toolbox_logfile'] = 'toolbox.log';
+$config['toolbox_logfile'] = 'toolbox';
 
 // Log level
 // values:
@@ -314,7 +314,7 @@ $config['toolbox_loglevel'] = 1;
 
 // Script log file
 // default value: toolbox.log
-$config['toolbox_script_logfile'] = 'toolbox.script.log';
+$config['toolbox_script_logfile'] = 'toolbox.script';
 
 // Log level
 // values:
