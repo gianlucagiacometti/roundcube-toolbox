@@ -148,7 +148,7 @@ class toolbox extends rcube_plugin
                                     if ($this->loglevel > 2) {
                                         rcube::write_log($this->logfile, "STEP in [function init]: write new watermark in folder tmp");
                                     }
-                                    $this->rcube->output->set_env('blankpage', '.' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
+                                    $this->rcube->output->set_env('blankpage', 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
                                 }
                             }
                         }
@@ -160,7 +160,7 @@ class toolbox extends rcube_plugin
                             // a file is needed since the 'blankpage' env variable needs a real file (loaded in apps.js)
                             $tmp = RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'blankpage.' . $parts[1] . '.html';
                             file_put_contents($tmp, $config['blankpage_custom']);
-                            $this->rcube->output->set_env('blankpage', '.' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
+                            $this->rcube->output->set_env('blankpage', 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
                         }
                         break;
                 }
@@ -180,7 +180,7 @@ class toolbox extends rcube_plugin
                 file_put_contents($tmp, $customise['additional_css']);
                  // css is loaded only under some circumstances (not when rcmail_output_json is called)
                 if (method_exists($this->rcube->output, 'include_css')) {
-                     $this->rcube->output->include_css('.' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
+                     $this->rcube->output->include_css('plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
                 }
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]: customised additional css loaded");
@@ -263,13 +263,6 @@ class toolbox extends rcube_plugin
             $this->register_action('plugin.toolbox.save', [$this, 'save']);
 
             if ($this->rcube->config->get('toolbox_vacation_jquery_calendar', false)) {
-                if ($this->rcube->output->type === "html") {
-                    if ($this->loglevel > 2) {
-                        rcube::write_log($this->logfile, "STEP in [function init]: set calendar date format");
-                    }
-                    $format = $this->rcube->config->get('toolbox_vacation_jquery_dateformat', 'mm/dd/yy');
-                    $this->rcube->output->add_script("calendar_format='" . $format . "';");
-                }
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]: load calendar script");
                 }
@@ -309,6 +302,12 @@ class toolbox extends rcube_plugin
             }
             $this->rcube->html_editor('toolbox');
             $this->rcube->output->add_script(sprintf("window.rcmail_editor_settings = %s", $this->_config_editor()), 'head');
+
+            if ($this->loglevel > 2) {
+                rcube::write_log($this->logfile, "STEP in [function init]: set calendar date format");
+            }
+            $format = $this->rcube->config->get('toolbox_vacation_jquery_dateformat', 'mm/dd/yy');
+            $this->rcube->output->add_script("calendar_format='" . $format . "';");
 
             if ($this->loglevel > 2) {
                 rcube::write_log($this->logfile, "STEP in [function init_html]: selected tool: {$this->cur_section}");
@@ -1235,6 +1234,7 @@ class toolbox extends rcube_plugin
                             'image/png24',
                             'image/png32',
                             'image/svg',
+                            'image/svg+xml',
                             'image/ico'
                         ];
                         $base64 = null;

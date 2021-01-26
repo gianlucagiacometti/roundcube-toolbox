@@ -6,7 +6,7 @@ $messages = array();
 
 
 /* TOOLBOX */
-/* Author: helena Branch */
+/* Author: Helena Branch */
 $labels['toolbox'] = 'Outils';
 $labels['toolbox-description'] = 'Ensemble des outils pour améliorer la gestion de la messagerie web';
 $labels['toolbox-usersettings'] = 'User settings';

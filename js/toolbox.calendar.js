@@ -15,6 +15,8 @@
  * for the JavaScript code in this file.
  */
 
+let calendar_format = 'dd/mm/yy';
+
 $(function() {
 	$('#rcmfd_vacationactivefrom').datepicker( {
 		dateFormat : calendar_format,
