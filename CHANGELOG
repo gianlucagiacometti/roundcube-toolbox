@@ -11,7 +11,7 @@ Version 1.4.10.2 (2021-01-27, rc-git-master)
 
 Version 1.4.10.1 (2021-01-16, rc-git-master)
 ============================================
-- Added tool Detach Attachment
+- Added tool Detach Attachments
 - Fixed load customised css from database
 
 
