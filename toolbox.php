@@ -31,7 +31,7 @@
 
 class toolbox extends rcube_plugin
 {
-    public $task = 'mail|settings|tasks|addressbook';
+    public $task = 'login|mail|settings|tasks|addressbook';
 
     private $storage;
     private $tools;
@@ -52,6 +52,8 @@ class toolbox extends rcube_plugin
         'customise-logo-type-dark' => "[dark]",
         'customise-logo-type-small-dark' => "[small-dark]"
     ];
+    private $attachments;
+    private $lifespan;
 
     public function init()
     {
@@ -68,16 +70,52 @@ class toolbox extends rcube_plugin
         $this->tools = $this->rcube->config->get('toolbox_tools');
         $this->skin = $this->rcube->config->get('skin');
         $this->skins_allowed = $this->rcube->config->get('skins_allowed');
+        $this->attachments = slashify($this->rcube->config->get('toolbox_detach_storage', 'plugins/toolbox/attachments'));
+        $this->lifespan = $this->rcube->config->get('toolbox_detach_lifespan', 30);
+        $this->detach_total = $this->rcube->config->get('toolbox_detach_total', 1024 * 1024 * 50);
+        $this->detach_single = $this->rcube->config->get('toolbox_detach_single', 1024 * 1024 * 25);
 
         $this->cur_section = rcube_utils::get_input_value('_section', rcube_utils::INPUT_GPC);
 
-        if (in_array('customise', $this->tools)) {
+        // load user's preferences
+        if ($this->loglevel > 2) {
+            rcube::write_log($this->logfile, "STEP in [function init]: load user's preferences");
+        }
+        $this->_load_prefs();
 
-            // load user's preferences
+        // message preview
+        if (in_array('preview', $this->tools)) {
+
             if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: load user's preferences");
+                rcube::write_log($this->logfile, "STEP in [function init]: 'preview' tool active and loaded");
             }
-            $this->_load_prefs();
+
+            if (isset($this->user_prefs['toolbox_message_preview']) && ($this->user_prefs['toolbox_message_preview'] !== false)) {
+                if ((rcube_utils::get_input_value('_task', rcube_utils::INPUT_GPC) == "mail") && !in_array(rcube_utils::get_input_value('_action', rcube_utils::INPUT_GPC), ["show", "compose"])) {
+                    if (method_exists($this->rcube->output, 'include_css')) {
+                        if ($this->loglevel > 2) {
+                            rcube::write_log($this->logfile, "STEP in [function init]: load disable message preview stylesheet");
+                        }
+                        $this->rcube->output->include_css('plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'skins' . DIRECTORY_SEPARATOR . 'elastic' . DIRECTORY_SEPARATOR . 'nopreview.css');
+                    }
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function init]: load set mark as read by double click script");
+                    }
+                    $this->include_script('js' . DIRECTORY_SEPARATOR . 'toolbox.doubleclick.js');
+                }
+            }
+            elseif (isset($this->user_prefs['toolbox_message_preview']) && ($this->user_prefs['toolbox_message_preview'] !== false)) {
+                if ((rcube_utils::get_input_value('_task', rcube_utils::INPUT_GPC) == "mail") && !in_array(rcube_utils::get_input_value('_action', rcube_utils::INPUT_GPC), ["show", "compose"])) {
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function init]: load set mark as read by double clicking with mouse script");
+                    }
+                    $this->include_script('js' . DIRECTORY_SEPARATOR . 'toolbox.doubleclick.js');
+                }
+            }
+
+        }
+
+        if (in_array('customise', $this->tools)) {
 
             // load customised skin configuration from config
             if ($this->loglevel > 2) {
@@ -178,9 +216,9 @@ class toolbox extends rcube_plugin
                 // filename must contain a dot for .htaccess limitations
                 $tmp = RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'stylesheet.' . $parts[1] . '.css';
                 file_put_contents($tmp, $customise['additional_css']);
-                 // css is loaded only under some circumstances (not when rcmail_output_json is called)
+                // css is loaded only under some circumstances (not when rcmail_output_json is called)
                 if (method_exists($this->rcube->output, 'include_css')) {
-                     $this->rcube->output->include_css('plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
+                    $this->rcube->output->include_css('plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
                 }
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]: customised additional css loaded");
@@ -194,7 +232,7 @@ class toolbox extends rcube_plugin
                     }
                     // css is loaded only under some circumstances (not when rcmail_output_json is called)
                     if (method_exists($this->rcube->output, 'include_css')) {
-                         $this->rcube->output->include_css($config['additional_css']);
+                        $this->rcube->output->include_css($config['additional_css']);
                     }
                 }
                 elseif ($this->loglevel > 2) {
@@ -221,6 +259,22 @@ class toolbox extends rcube_plugin
             }
 
         } // end if customise
+
+        if (in_array('attachments', $this->tools)) {
+            if ($this->loglevel > 2) {
+                rcube::write_log($this->logfile, "STEP in [function init]: 'attachments' tool active and loaded");
+            }
+            $this->add_hook('attachment_upload', array($this, 'detach_attachment'));
+            $this->add_hook('message_compose', array($this, 'remove_session'));
+            $this->add_hook('startup', array($this, 'download_detached'));
+            $this->add_hook('toolbox_attachment_label', array($this, 'attachment_label'));
+            if (rcube_utils::get_input_value('_action', rcube_utils::INPUT_GPC) == 'compose') {
+                if ($this->loglevel > 2) {
+                    rcube::write_log($this->logfile, "STEP in [function init]:modify hint in compose window");
+                }
+                $this->add_hook('template_object_composeattachmentform', array($this, 'update_hint'));
+            }
+        } // end if attachments
 
         if ($this->rcube->task == 'settings') {
 
@@ -276,6 +330,151 @@ class toolbox extends rcube_plugin
     {
         $p['actions'][] = ['action' => 'plugin.toolbox', 'class' => 'toolbox', 'label' => 'toolbox.toolbox', 'title' => 'toolbox.toolbox-description', 'role' => 'button', 'aria-disabled' => 'false', 'tabindex' => '99'];
         return $p;
+    }
+
+    public function download_detached() {
+        if (rcube_utils::get_input_value('_action', rcube_utils::INPUT_GPC) == 'plugin.toolbox.attachment') {
+            if ($this->loglevel > 2) {
+                rcube::write_log($this->logfile, "STEP in [function download_detached]: GET call received");
+            }
+            if ($file = rcube_utils::get_input_value('_filename', rcube_utils::INPUT_GPC)) {
+                if ($this->loglevel > 2) {
+                    rcube::write_log($this->logfile, "STEP in [function download_detached]: file required: {$file}");
+                }
+                $path = $this->attachments . urlencode($file);
+                if (file_exists($path)) {
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function download_detached]: file found");
+                    }
+                    $temp_dir = $this->rcube->config->get('temp_dir');
+                    $tmpfname = tempnam($temp_dir, 'zip');
+                    $zip = new ZipArchive();
+                    $zip->open($tmpfname, ZIPARCHIVE::OVERWRITE);
+                    $zip->addFile($path, preg_replace("/[^0-9A-Za-z_.]/", '_', substr($file, 33)));
+                    $zip->close();
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function download_detached]: temporary zip file created");
+                    }
+                    $browser = new rcube_browser;
+                    $this->rcube->output->nocacheing_headers();
+                    // send download headers
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function download_detached]: sending download headers");
+                    }
+                    header("Content-Type: application/octet-stream");
+                    if ($browser->ie)
+                        header("Content-Type: application/force-download");
+                    // don't kill the connection if download takes more than 30 sec.
+                    @set_time_limit(0);
+                    header("Content-Disposition: attachment; filename=\"". substr($file, 33) .".zip\"");
+                    header("Content-length: " . filesize($tmpfname));
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function download_detached]: sending file");
+                    }
+                    readfile($tmpfname);
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function download_detached]: delete temporary file");
+                    }
+                    unlink($tmpfname);
+                }
+                else {
+                    if ($this->loglevel > 1) {
+                        rcube::write_log($this->logfile, "ERROR in [function download_detached]: file not found: {$file}");
+                    }
+                    rcube::raise_error([
+                        'code' => 404,
+                        'type' => 'php',
+                        'file' => __FILE__,
+                        'line' => __LINE__,
+                        'message' => "File not found {$path}"
+                    ], true, true);
+                }
+                exit;
+            }
+        }
+    }
+
+    public function remove_session($args) {
+        if ($this->loglevel > 2) {
+            rcube::write_log($this->logfile, "STEP in [function remove_session]: remove attachments_total value from session");
+        }
+        $this->rcube->session->remove('attachments_total');
+        return $args;
+    }
+
+    public function attachment_label($args) {
+        if ($this->loglevel > 2) {
+            rcube::write_log($this->logfile, "STEP in [function attachment_label]: set the label in the html message");
+        }
+        $args['label'] = rcmail::Q($this->gettext('attachment-expiry-date'));
+        return $args;
+    }
+
+    public function update_hint($args) {
+        if ($args['mode'] == 'hint') {
+            if ($this->loglevel > 2) {
+                rcube::write_log($this->logfile, "STEP in [function upload_hint]: use hook to upload the content of the hint");
+            }
+            $args['content'] = $args['content'] . "<div class='hint'>" . rcmail::Q($this->gettext(['name' => 'attachment-maxuploadsize', 'vars' => ['totalsize' => round($this->detach_total/(1024 * 1024)), 'singlesize' => round($this->detach_single/(1024 * 1024)), 'lifespan' => $this->lifespan]])) . "</div>";
+        }
+        return $args;
+    }
+
+    static public function detach_attachment($args) {
+        $rcmail = rcube::get_instance();
+        $loglevel = $rcmail->config->get('toolbox_loglevel', 1);
+        if ($loglevel > 0) {
+            $logfile = $rcmail->config->get('toolbox_logfile', 'toolbox.log');
+            if ($loglevel > 2) {
+                rcube::write_log($logfile, "STEP in [function detach_attachment]: load function");
+            }
+        }
+        $file = $args['path'];
+        $total = 0;
+        if(isset($_SESSION['attachments_total'])){
+            $total = $_SESSION['attachments_total'];
+        }
+        $size = filesize($file);
+        $total = $total + $size;
+        $_SESSION['attachments_total'] = $total;
+        if ($total >= $rcmail->config->get('toolbox_detach_total', 1024 * 1024 * 50) || $size >= $rcmail->config->get('toolbox_detach_single', 1024 * 1024 * 25)) {
+            $mime = strtolower($args['mimetype']);
+            if ($mime == 'text/calendar' || $mime == 'text/ical' || $mime == 'application/ics') {
+                return $args;
+            }
+            $plugin = $rcmail->plugins->exec_hook('toolbox_attachment_label', ['label' => '']);
+            $label = $plugin['label'];
+            $args['id'] = md5(session_id() . microtime());
+            $filename = urlencode($args['id'] . '_' . $args['name']);
+            $dest = slashify($rcmail->config->get('toolbox_detach_storage', 'plugins/toolbox/attachments')) . $filename;
+            if (copy($file, $dest)) {
+                if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == '1' || strtolower($_SERVER['HTTPS']) == 'on')) {
+                    $s = "s";
+                }
+                else {
+                    $s = "";
+                }
+                $url = 'http' . $s . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?_action=plugin.toolbox.attachment&_filename=' . $filename;
+                $html = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">' . "\r\n";
+                $html  = "<html><body><div>";
+                if ($size > 1024 * 1024) {
+                    $disp_size = round($total/1024/1024, 2) . " MBytes";
+                }
+                elseif ($size > 1024) {
+                    $disp_size = round($total/1024, 2) . " KBytes";
+                }
+                else {
+                    $disp_size = round($total, 2) . " Bytes";
+                }
+                $html .= "<a href='" . $url . "'>" . rcmail::Q(utf8_decode(htmlentities($args['name'], ENT_COMPAT, 'UTF-8'))) . "</a> (" . $disp_size . ") ";
+                $html .= "[" . utf8_decode($label) . ": " . date($rcmail->config->get('date_format','d-m-Y') . ' ' . $rcmail->config->get('time_format','H:i'), time() + 86400 * (int) $rcmail->config->get('toolbox_detach_lifespan', 30)) . "]";
+                $html .= "</div></body></html>";
+                file_put_contents($file, $html);
+                $args['name'] = $args['name'] . '.html';
+                $args['mimetype'] = 'text/html';
+            }
+        }
+        return $args;
     }
 
     public function init_html()
@@ -343,6 +542,7 @@ class toolbox extends rcube_plugin
             }
             $this->rcube->output->send('toolbox.toolbox');
         }
+
     }
 
     public function tool_section_list($attrib)
@@ -696,6 +896,31 @@ class toolbox extends rcube_plugin
                     ];
 
                 }
+
+                $form_content .= $this->_tool_render_fieldset($tooldata, 'main');
+
+                break;
+
+            case 'preview':
+
+                // load data
+                $selected = $this->storage->load_tool_data($this->rcube->user->get_username());
+
+                $tooldata = ['intro' => '', 'name' => rcmail::Q($this->gettext('preview-manage')), 'class' => 'toolbox-previewtable', 'cols' => 1];
+
+                $button_id = 'rcmfd_userpreview';
+                $input_userpreview = new html_checkbox(['name' => '_userpreview', 'id' => $button_id, 'value' => '1', 'class' => 'preview-selector', 'title' => rcmail::Q($this->gettext('preview-disable-message'))]);
+
+                $tooldata['rows']['preview'] = [
+                    'content' => $input_userpreview->show($this->user_prefs['toolbox_message_preview']) . html::label(['for' => $button_id, 'class' => 'preview-disable-label'], rcmail::Q($this->gettext('preview-disable-message')))
+                ];
+
+                $button_id = 'rcmfd_userdoubleclick';
+                $input_userdoubleclick = new html_checkbox(['name' => '_userdoubleclick', 'id' => $button_id, 'value' => '1', 'class' => 'doubleclick-selector', 'title' => rcmail::Q($this->gettext('preview-markasread-doubleclick'))]);
+
+                $tooldata['rows']['doubleclick'] = [
+                    'content' => $input_userdoubleclick->show($this->user_prefs['toolbox_markasread_doubleclick']) . html::label(['for' => $button_id, 'class' => 'preview-doubleclick-label'], rcmail::Q($this->gettext('preview-markasread-doubleclick')))
+                ];
 
                 $form_content .= $this->_tool_render_fieldset($tooldata, 'main');
 
@@ -1175,6 +1400,35 @@ class toolbox extends rcube_plugin
                 }
                 break;
 
+            case 'preview':
+
+                // save user's preview choice
+                if ($this->loglevel > 2) {
+                    rcube::write_log($this->logfile, "STEP in [function save]: save user's preview choice");
+                }
+                $this->user_prefs['toolbox_message_preview'] = rcube_utils::get_input_value('_userpreview', rcube_utils::INPUT_POST) ?: false;
+                $this->user_prefs['toolbox_markasread_doubleclick'] = rcube_utils::get_input_value('_userdoubleclick', rcube_utils::INPUT_POST) ?: false;
+                // we need to set Mark as read = never when message disable preview is set to true; this todisable the mark as read with single click event
+                if (($this->user_prefs['toolbox_message_preview'] !== false) || ($this->user_prefs['toolbox_markasread_doubleclick'] !== false)) {
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function save]: at least one between 'disable message preview' and 'mark as read by double clicking' is true: set mail_read_time to 'never'");
+                    }
+                    $this->user_prefs['mail_read_time'] = -1;
+                    $this->user_prefs['toolbox_markasread_doubleclick'] = true;
+                }
+                // and we go back to normality when message disable preview is set to false
+                elseif (($this->user_prefs['mail_read_time'] == -1) || ($this->user_prefs['toolbox_markasread_doubleclick'] == false)) {
+                    if ($this->loglevel > 2) {
+                        rcube::write_log($this->logfile, "STEP in [function save]: at least one between 'disable message preview' and 'mark as read by double clicking' is false: set mail_read_time to 'immediately'");
+                    }
+                    $this->user_prefs['mail_read_time'] = 0;
+                }
+                if (!$this->rcube->user->save_prefs($this->user_prefs)) {
+                    $this->rcube->display_server_error('errorsaving');
+                    return;
+                }
+                break;
+
             case 'vacation':
 
                 // save user's preferences
@@ -1545,8 +1799,11 @@ class toolbox extends rcube_plugin
                 if ($this->loglevel > 1) {
                     rcube::write_log($this->logfile, "ERROR in [function _init_storage]: failed to find storage class {$class}");
                 }
-                rcube::raise_error(['code' => 604, 'type' => 'toolbox',
-                    'line' => __LINE__, 'file' => __FILE__,
+                rcube::raise_error([
+                    'code' => 604,
+                    'type' => 'toolbox',
+                    'line' => __LINE__,
+                    'file' => __FILE__,
                     'message' => "Failed to find storage class {$class}"
                 ], true, true);
             }

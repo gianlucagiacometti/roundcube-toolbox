@@ -34,22 +34,46 @@ span.helpicon
   background-position: 6px -94px;
 }
 
-#sections-table #rcmrowvacation td.section
-{
-  background-image: url(images/listicons.png);
-  background-position: 6px -146px;
-}
-
 #sections-table #rcmrowpurge.selected td.section
 {
   background-image: url(images/listicons.png);
   background-position: 6px -119px;
 }
 
+#sections-table #rcmrowpreview td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -557px;
+}
+
+#sections-table #rcmrowpreview.selected td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -586px;
+}
+
+#sections-table #rcmrowvacation td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -146px;
+}
+
 #sections-table #rcmrowvacation.selected td.section
 {
   background-image: url(images/listicons.png);
   background-position: 6px -172px;
+}
+
+#sections-table #rcmrowattachments td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -615px;
+}
+
+#sections-table #rcmrowattachments.selected td.section
+{
+  background-image: url(images/listicons.png);
+  background-position: 6px -643px;
 }
 
 #sections-table #rcmrowsafelogin td.section

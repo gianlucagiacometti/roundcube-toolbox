@@ -38,10 +38,6 @@ input[type=radio]:checked + label:before {
 }
 
 .listing.iconized tr {
-  &.customise > td.section::before {
-    content: @fa-var-edit;
-  }
-
   &.aliases > td.section::before {
     content: @fa-var-user-friends;
   }
@@ -56,6 +52,18 @@ input[type=radio]:checked + label:before {
 
   &.purge > td.section::before {
     content: @fa-var-trash-alt;
+  }
+
+  &.preview > td.section::before {
+    content: @fa-var-eye-slash;
+  }
+
+  &.customise > td.section::before {
+    content: @fa-var-edit;
+  }
+
+  &.attachments > td.section::before {
+    content: @fa-var-file-upload;
   }
 
   &.tags > td.section::before {
@@ -130,12 +138,15 @@ input[type=radio]:checked + label:before {
   }
 }
 
+table.toolbox-previewtable,
 table.toolbox-customisetable {
   margin: 0;
 
   & label {
     padding-left: 0.5rem;
 
+    &.preview-disable-label,
+    &.preview-doubleclick-label,
     &.customise-blankpage-label,
     &.customise-additional-css-label {
       margin-top: 0.5rem;
@@ -264,6 +275,8 @@ input[type="file"].blankpage-image-upload {
   }
 }
 
+.preview-disable-label,
+.preview-doubleclick-label,
 .customise-blankpage-label,
 .customise-additional-css-label,
 .customise-logo-label {

@@ -11,15 +11,19 @@
 // 'forward' [tool to manage forward addresses in postfixadmin]
 // 'vacation' [tool to manage postfixadmin vacation]
 // 'purge' [tool to periodically purge Trash and Junk folders]
+// 'preview' [tool to disable message previe]
 // 'customise' [tool to customise Blank Page and CSS per domain]
+// 'attachments' [tool to replace large attachments with a link in outgoing messages]
 
-$config['toolbox_tools'] = array(
+$config['toolbox_tools'] = [
     'aliases',
     'forward',
     'vacation',
     'purge',
+    'preview',
     'customise',
-    );
+    'attachments',
+];
 
 
 // POSTFIX/POSTFIXADMIN DATA SOURCE SETTINGS
@@ -181,21 +185,21 @@ $config['toolbox_postfixadmin_vacation_domain'] = 'autoreply.mydomain.tld';
 // all domains: 'ALL'
 // some domains: string containing csv list of domains
 // Example:
-// array(
+// [
 //   'admin1' => 'domain1, domain2',
 //   'admin2' => 'domain3',
 //   'admin3' => 'ALL',
-//   )
+// ]
 // the admins will be added to the domain admins from postfixadmin database if available
-// default value: array()
-$config['toolbox_domain_admins'] = array();
+// default value: []
+$config['toolbox_domain_admins'] = [];
 
 // Postfixadmin
 
 // use postfixadmin domain admins
 // note: if false only static domain admins will be used if any
 // default value: true
-$config['toolbox_use_postfixadmin_domain_admins'] = true;
+$config['toolbox_use_postfixadmin_domain_admins'] = true
 
 
 // ROUNDCUBE DATA SOURCE SETTINGS
@@ -230,6 +234,9 @@ $config['toolbox_purge_maildir_path'] = '/web/vmail';
 $config['toolbox_purge_script_debug'] = true;
 
 
+// PREVIEW TOOL OPTIONS
+
+
 // VACATION TOOL OPTIONS
 
 // default vacation subject
@@ -240,14 +247,14 @@ $config['toolbox_vacation_message'] = 'I\'m currently out of office until...<br 
 
 // vacation start/end date formats
 // all formats must be consistent
-$config['toolbox_vacation_dateformat'] = array(
+$config['toolbox_vacation_dateformat'] = [
     'php' => 'd/m/Y',
     'pgsql' => 'DD/MM/YYYY',
     'mysql' => '%d/%m/%Y',
     'sqlite' => '%d/%m/%Y',
     'oracle' => 'DD/MM/YYYY',
     'mssql' => 'dd/mm/yyyy'
-    );
+];
 
 // jquery calendar (jqueryui plugin must be enabled)
 $config['toolbox_vacation_jquery_calendar'] = true;
@@ -257,47 +264,78 @@ $config['toolbox_vacation_jquery_dateformat'] = 'dd/mm/yy';
 $config['toolbox_vacation_message_mime'] = '';
 
 // vacation reply type
-$config['toolbox_vacation_interval_time'] = array(
+$config['toolbox_vacation_interval_time'] = [
     'replyonce' => 0, // Reply one time to each address
     'replytoeverymail' => 1, // Reply to every message (considered annoying)
     'replyonceperday' => 60*60 * 24, // Reply once per day to each address
     'replyonceperweek' => 60*60 * 24*7 // Reply once per week to each address
-    );
+];
 
 
-// CUSTOMISE
+// CUSTOMISE TOOL OPTIONS
 
-// IMPORTANT: tool available only for domain admins
 // global default values for all domains
 // Format: associative array per skin
+
 // BLANK PAGE
 // blankpage_type can be either url or image and the corresponding field (blankpage_url or blankpage_image) must be specified
 // blankpage_type = 'url': the blank page will be taken from the specified url
 // blankpage_type = 'image': the blank page will contain only a cenral image
 // NOTE: if blankpage_type is not specified either blankpage_url or blankpage_image will be ignored
 // blankpage_url: url of the blank page (local or remote)
-// blankpage_image: image of the blank pagee
+// blankpage_image: image of the blank page
+// NOTE: when blankpage_type is set to custom you must create a temporarty folder in the root folder of the plugin writable by the web server
+
 // CSS
 // and additional css can be specified per domain
 // additional_css: the href of the additional css
 // Example:
-// array(
-//   'classic' => array('blankpage_type' => 'url', 'blankpage_url' => 'https://mypage.com', 'additional_css' => './myfolder/mycss.css'),
-//   'larry' => array('additional_css' => 'skins/larry/mycss.css'),
-//   'elastic' => array('blankpage_type' => 'image', 'blankpage_image' => 'images/myimage.png'),
-//   'default' => array('blankpage_type' => 'image', 'blankpage_image' => 'images/defaultimage.png', 'additional_css' => 'skins/elastic/defaultcss.css'),
-//   )
-// IMPORTANT: per domain settings specified within the gui will override this configuration
+// [
+//   'classic' => ['blankpage_type' => 'url', 'blankpage_url' => 'https://mypage.com', 'additional_css' => './myfolder/mycss.css'],
+//   'larry' => ['additional_css' => 'skins/larry/mycss.css'],
+//   'elastic' => ['blankpage_type' => 'image', 'blankpage_image' => 'images/myimage.png'],
+//   'default' => ['blankpage_type' => 'image', 'blankpage_image' => 'images/defaultimage.png', 'additional_css' => 'skins/elastic/defaultcss.css'],
+// ]
+// per domain settings specified within the gui will override this configuration
 // 'default', if set, is used for all skins not specified
 // empty array or empty array elements mean roundcube default settings
-// default value: array()
-$config['toolbox_customise_skins'] = array();
+// default value: []
+$config['toolbox_customise_skins'] = [];
+
+
+// ATTACHMENTS TOOL OPTIONS
+
+// size of all attachments in bytes to trigger detachment
+// type of value: Integer
+// value of (1024 * 1024 * 1) means 1Mb
+// 0 means detach always
+// default value: 50 Mb
+$config['toolbox_detach_total'] = 1024 * 1024 * 50;
+
+// size of a single attachments in bytes to trigger detachment
+// type of value: Integer
+// value of (1024 * 1024 * 1) means 1Mb
+// 0 means detach always
+// default value: 25 Mb
+$config['toolbox_detach_single'] = 1024 * 1024 * 25;
+
+// lifespan of detached attachments
+// type of value: Integer
+// default value: 30 days
+// per domain settings specified within the gui will override this configuration
+$config['toolbox_detach_lifespan'] = 30;
+
+// storage folder's relative url for detached attachments
+// NOTE: you must create a dedicated folder in the root folder of the plugin writable by the web server
+// default value: 'plugins/toolbox/attachments'
+$config['toolbox_detach_storage'] = 'plugins/toolbox/attachments';
 
 
 // PLUGIN LOG/DEBUG OPTIONS
 
 // Log file
 // default value: toolbox.log
+// log file extension is added automatically by RC
 $config['toolbox_logfile'] = 'toolbox';
 
 // Log level
@@ -313,7 +351,8 @@ $config['toolbox_loglevel'] = 1;
 // SCRIPTS LOG/DEBUG OPTIONS
 
 // Script log file
-// default value: toolbox.log
+// default value: toolbox.script.log
+// log file extension is added automatically by RC
 $config['toolbox_script_logfile'] = 'toolbox.script';
 
 // Log level

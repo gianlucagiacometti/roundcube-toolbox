@@ -1,16 +1,27 @@
 Roundcube Webmail Toolbox
 =========================
 
+Version 1.4.10.2 (2021-01-27, rc-git-master)
+============================================
+
+- Added tool Message Preview
+- Fixed visualisation bugs when loading blankpage on small screens
+- re-numbering sub-versions
+
+
+Version 1.4.10.1 (2021-01-16, rc-git-master)
+============================================
+- Added tool Detach Attachment
 - Fixed load customised css from database
 
 
-Version 1.4.10-0 (2021-01-15, rc-1.4.10)
-======================================
+Version 1.4.10.0 (2021-01-15, rc-1.4.10)
+========================================
 
 - Updated version number to follow the last Rouncube release
 
 
-Version 1.4.9-0 (2021-01-14, rc-1.4.9)
+Version 1.4.9.0 (2021-01-14, rc-1.4.9)
 ======================================
 
 - Fixed function rcmail_action::get_form_tags()
@@ -19,14 +30,14 @@ Version 1.4.9-0 (2021-01-14, rc-1.4.9)
 - Independent version of Codemirror
 
 
-Version 1.4.7-0 (2020-07-08, rc-1.4.7)
+Version 1.4.7.0 (2020-07-08, rc-1.4.7)
 ======================================
 
 - Fixed set_env with blankpage. Setting a base64-encoded page instead of a link to a physical page makes the plugin hang.
 - Added tool Customise
 
 
-Version 1.4.6-0 (2020-06-27, rc-1.4.6)
+Version 1.4.6.0 (2020-06-27, rc-1.4.6)
 ======================================
 
 - Added tool Aliases

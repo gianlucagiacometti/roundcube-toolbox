@@ -6,21 +6,7 @@ table.records-table tr > .status > a::before,
 table.records-table tr > .control > a::before,
 #listcontrols > a:not(.select)::before,
 span.helpicon::after {
-  font-size: 1.25em;
-  display: block;
-  float: left;
-  margin: 0 .25rem 0 0;
-  width: 1.18em;
-  height: 1em;
-  font-family: 'Icons';
-  font-style: normal;
-  font-weight: 900;
-  text-decoration: inherit;
-  text-align: center;
-  speak: none;
-  font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
+  font-size: 1.25em;display: block;float: left;margin: 0 0.25rem 0 0;width: 1.18em;height: 1em;font-family: 'Icons';font-style: normal;font-weight: 900;text-decoration: inherit;text-align: center;speak: none;font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;-webkit-font-smoothing: antialiased;
 }
 input[type=radio] {
   border: 0;
@@ -38,16 +24,13 @@ input[type=radio] + label:before {
   content: "\f111";
   letter-spacing: 10px;
   font-size: 1.2em;
-  color: #37beff;
+  color: #5c0700;
 }
 input[type=radio]:checked + label:before {
   content: "\f058";
   letter-spacing: 10px;
   font-size: 1.2em;
-  color: #37beff;
-}
-.listing.iconized tr.customise > td.section::before {
-  content: "\f044";
+  color: #5c0700;
 }
 .listing.iconized tr.aliases > td.section::before {
   content: "\f500";
@@ -60,6 +43,15 @@ input[type=radio]:checked + label:before {
 }
 .listing.iconized tr.purge > td.section::before {
   content: "\f2ed";
+}
+.listing.iconized tr.preview > td.section::before {
+  content: "\f070";
+}
+.listing.iconized tr.customise > td.section::before {
+  content: "\f044";
+}
+.listing.iconized tr.attachments > td.section::before {
+  content: "\f574";
 }
 .listing.iconized tr.tags > td.section::before {
   content: "\f02c";
@@ -86,7 +78,7 @@ input[type=radio]:checked + label:before {
 .tool-skin {
   display: block;
   margin: 0;
-  padding: .7rem .3rem .3rem .7rem;
+  padding: 0.7rem 0.3rem 0.3rem 0.7rem;
   border: 1px solid #ccc;
   background: #fff;
   border-radius: 4px;
@@ -101,7 +93,7 @@ input[type=radio]:checked + label:before {
 }
 .tool-skin .skinauthor {
   font-weight: normal;
-  font-size: .9em;
+  font-size: 0.9em;
   color: #999;
 }
 .tool-skin .skinauthor a {
@@ -116,15 +108,23 @@ input[type=radio]:checked + label:before {
   border: 1px solid #ccc;
   background: #fff;
   border-radius: 4px;
-  margin-bottom: .3rem;
+  margin-bottom: 0.3rem;
 }
+table.toolbox-previewtable,
 table.toolbox-customisetable {
   margin: 0;
 }
+table.toolbox-previewtable label,
 table.toolbox-customisetable label {
   padding-left: 0.5rem;
 }
+table.toolbox-previewtable label.preview-disable-label,
+table.toolbox-customisetable label.preview-disable-label,
+table.toolbox-previewtable label.preview-doubleclick-label,
+table.toolbox-customisetable label.preview-doubleclick-label,
+table.toolbox-previewtable label.customise-blankpage-label,
 table.toolbox-customisetable label.customise-blankpage-label,
+table.toolbox-previewtable label.customise-additional-css-label,
 table.toolbox-customisetable label.customise-additional-css-label {
   margin-top: 0.5rem;
 }
@@ -146,15 +146,15 @@ fieldset.blankpage {
   margin: 0 1rem 0 1rem !important;
 }
 fieldset.blankpage legend {
-  font-size: .9em;
+  font-size: 0.9em;
   font-weight: bold;
-  margin: .5rem 0 0 0;
+  margin: 0.5rem 0 0 0;
 }
 fieldset.additionalcss {
   margin: 0 1rem 0 1rem !important;
 }
 fieldset.additionalcss legend {
-  font-size: .9em;
+  font-size: 0.9em;
   font-weight: bold;
   margin: 0;
 }
@@ -166,18 +166,18 @@ fieldset.customiselogo-wrapper {
   padding: 0 2rem 2rem 2rem;
 }
 fieldset.customiselogo-wrapper legend {
-  font-size: .9em;
+  font-size: 0.9em;
   margin: 0;
 }
 fieldset.customiselogo legend {
-  font-size: .9em;
+  font-size: 0.9em;
   font-weight: bold;
   margin: 0;
 }
 fieldset.purge legend {
   font-size: 1.15em;
   font-weight: bold;
-  margin: .3rem 0 0 0;
+  margin: 0.3rem 0 0 0;
 }
 .blankpage-item-image {
   display: inline-block;
@@ -210,7 +210,7 @@ input[type="file"].blankpage-image-upload {
   font-size: 1.25em;
   display: block;
   float: left;
-  margin: 0 .25rem 0 0;
+  margin: 0 0.25rem 0 0;
   width: 1.18em;
   height: 1em;
   font-family: 'Icons';
@@ -227,6 +227,8 @@ input[type="file"].blankpage-image-upload {
 .blankpage-image-delete-button:hover {
   text-decoration: none;
 }
+.preview-disable-label,
+.preview-doubleclick-label,
 .customise-blankpage-label,
 .customise-additional-css-label,
 .customise-logo-label {
@@ -253,7 +255,7 @@ table.addressprefstable tr > .scroller .icon-checkbox + label::before {
 }
 table.sortable-table > thead > tr > th > a {
   text-decoration: none;
-  color: #2c363a;
+  color: #3b1d1d;
   white-space: nowrap;
 }
 table.sortable-table > thead > tr > th > a::after {
@@ -306,17 +308,17 @@ table.records-table tr > .control > a::before {
 table.records-table tr > .status > a.delete::before,
 table.records-table tr > .control > a.delete::before {
   content: "\f2ed";
-  color: #2c363a;
+  color: #3b1d1d;
 }
 #listcontrols {
   display: block;
   text-align: right;
   width: 100%;
-  font-size: .9em;
+  font-size: 0.9em;
   margin-bottom: -7px;
 }
 #listcontrols > a:not(.select) {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 #listcontrols > a:not(.select):last-child {
   margin-right: 0;
