@@ -32,7 +32,7 @@ Update database using the appropriate file in the SQL folder.
 
 Customise tool needs a folder called 'tmp' writeable by the web browser.<br />
 Attachments tool needs a folder called attachments writeable by the web browser.<br />
-The file /bin/iniplugin.sh can do the job for you.
+The file /bin/initplugin.sh can do the job for you.
 
 Config
 ------
