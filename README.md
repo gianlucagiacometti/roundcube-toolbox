@@ -17,7 +17,7 @@ Available tools
 * **forward** [tool to manage forward addresses in postfixadmin]
 * **vacation** [tool to manage postfixadmin vacation]
 * **purge** [tool to periodically purge Trash and Junk folders]
-* **preview** [tool to disable message previe]
+* **preview** [tool to disable message preview]
 * **customise** [tool to customise Blank Page and CSS per domain]
 * **attachments** [tool to replace large attachments with a link in outgoing messages]
 
