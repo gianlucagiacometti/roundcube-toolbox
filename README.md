@@ -13,13 +13,13 @@ Master branch works with the Git version of Roundcube Webmail
 
 Available tools
 ---------------
-* 'aliases' [tool to manage aliases in postfixadmin]
-* 'forward' [tool to manage forward addresses in postfixadmin]
-* 'vacation' [tool to manage postfixadmin vacation]
-* 'purge' [tool to periodically purge Trash and Junk folders]
-* 'preview' [tool to disable message previe]
-* 'customise' [tool to customise Blank Page and CSS per domain]
-* 'attachments' [tool to replace large attachments with a link in outgoing messages]
+* **aliases** [tool to manage aliases in postfixadmin]
+* **forward** [tool to manage forward addresses in postfixadmin]
+* **vacation** [tool to manage postfixadmin vacation]
+* **purge** [tool to periodically purge Trash and Junk folders]
+* **preview** [tool to disable message previe]
+* **customise** [tool to customise Blank Page and CSS per domain]
+* **attachments** [tool to replace large attachments with a link in outgoing messages]
 
 Requirements
 ------------
