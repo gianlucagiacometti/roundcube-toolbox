@@ -3,8 +3,6 @@ Roundcube Toolbox
 This plugin is a set of tools for [Roundcube Webmail](https://github.com/roundcube/roundcubemail)<br />
 Some tools are designed to work with [PostfixAdmin](https://github.com/postfixadmin/postfixadmin) / [Postfix with sql backend](http://www.postfix.org/DATABASE_README.html)
 
-
-
 ATTENTION
 ---------
 This plugin works with RC 1.4.x.
@@ -12,6 +10,16 @@ This plugin works with RC 1.4.x.
 Release 1.4.10 of the plugin works with 1.4.10 of Roundcube Webmail
 
 Master branch works with the Git version of Roundcube Webmail
+
+Available tools
+---------------
+* 'aliases' [tool to manage aliases in postfixadmin]
+* 'forward' [tool to manage forward addresses in postfixadmin]
+* 'vacation' [tool to manage postfixadmin vacation]
+* 'purge' [tool to periodically purge Trash and Junk folders]
+* 'preview' [tool to disable message previe]
+* 'customise' [tool to customise Blank Page and CSS per domain]
+* 'attachments' [tool to replace large attachments with a link in outgoing messages]
 
 Requirements
 ------------
