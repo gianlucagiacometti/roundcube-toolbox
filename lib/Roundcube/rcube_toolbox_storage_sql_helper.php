@@ -157,7 +157,7 @@ class rcube_toolbox_storage_sql_helper
     // convert formatted string into timestamp/datetime
     public function to_timestamp($field, $format)
     {
-        $date = DateTime::createFromFormat($format['php'], $date);
+        $date = DateTime::createFromFormat($format['php'], $field);
         $dsn = $this->db::parse_dsn($this->dsn);
         $format = $format[$dsn['phptype']];
         switch ($dsn['phptype']) {

@@ -1,6 +1,8 @@
 Roundcube Webmail Toolbox
 =========================
 
+- Fixed mysql date format conversion in sql helper
+
 Version 1.4.10.2 (2021-01-27, rc-git-master)
 ============================================
 
