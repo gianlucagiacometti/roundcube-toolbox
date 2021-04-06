@@ -96,12 +96,12 @@ class toolbox extends rcube_plugin
                         if ($this->loglevel > 2) {
                             rcube::write_log($this->logfile, "STEP in [function init]: load disable message preview stylesheet");
                         }
-                        $this->rcube->output->include_css('plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'skins' . DIRECTORY_SEPARATOR . 'elastic' . DIRECTORY_SEPARATOR . 'nopreview.css');
+                        $this->rcube->output->include_css('plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'skins' . \DIRECTORY_SEPARATOR . 'elastic' . \DIRECTORY_SEPARATOR . 'nopreview.css');
                     }
                     if ($this->loglevel > 2) {
                         rcube::write_log($this->logfile, "STEP in [function init]: load set mark as read by double click script");
                     }
-                    $this->include_script('js' . DIRECTORY_SEPARATOR . 'toolbox.doubleclick.js');
+                    $this->include_script('js' . \DIRECTORY_SEPARATOR . 'toolbox.doubleclick.js');
                 }
             }
             elseif (isset($this->user_prefs['toolbox_message_preview']) && ($this->user_prefs['toolbox_message_preview'] !== false)) {
@@ -109,7 +109,7 @@ class toolbox extends rcube_plugin
                     if ($this->loglevel > 2) {
                         rcube::write_log($this->logfile, "STEP in [function init]: load set mark as read by double clicking with mouse script");
                     }
-                    $this->include_script('js' . DIRECTORY_SEPARATOR . 'toolbox.doubleclick.js');
+                    $this->include_script('js' . \DIRECTORY_SEPARATOR . 'toolbox.doubleclick.js');
                 }
             }
 
@@ -172,21 +172,21 @@ class toolbox extends rcube_plugin
                             }
                             $image = $config['blankpage_image'];
                             // we read the content of the file 'watermark.html' in the skin folder and change the url content with our cutomised image
-                            if (file_exists(RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'skins' . DIRECTORY_SEPARATOR . $this->skin . DIRECTORY_SEPARATOR . 'watermark.html')) {
+                            if (file_exists(RCUBE_INSTALL_PATH . \DIRECTORY_SEPARATOR . 'skins' . \DIRECTORY_SEPARATOR . $this->skin . \DIRECTORY_SEPARATOR . 'watermark.html')) {
                                 if ($this->loglevel > 2) {
                                     rcube::write_log($this->logfile, "STEP in [function init]: found original watermark");
                                 }
-                                $blankpage = file_get_contents(RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'skins' . DIRECTORY_SEPARATOR . $this->skin . DIRECTORY_SEPARATOR . 'watermark.html');
+                                $blankpage = file_get_contents(RCUBE_INSTALL_PATH . \DIRECTORY_SEPARATOR . 'skins' . \DIRECTORY_SEPARATOR . $this->skin . \DIRECTORY_SEPARATOR . 'watermark.html');
                                 if ($blankpage != '') {
                                     // we need a file in a folder named 'tmp' in plugin/toolbox (temp cannot be used for .htaccess limitations)
                                     // filename must contain a dot for .htaccess limitations
                                     // a file is needed since the 'blankpage' env variable needs a real file (loaded in apps.js)
-                                    $tmp = RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'blankpage.' . $parts[1] . '.html';
+                                    $tmp = RCUBE_INSTALL_PATH . \DIRECTORY_SEPARATOR . 'plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . 'blankpage.' . $parts[1] . '.html';
                                     file_put_contents($tmp, preg_replace('!url\(.*?\)!U', "url(" . $config['blankpage_image'] . ")", $blankpage));
                                     if ($this->loglevel > 2) {
                                         rcube::write_log($this->logfile, "STEP in [function init]: write new watermark in folder tmp");
                                     }
-                                    $this->rcube->output->set_env('blankpage', 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
+                                    $this->rcube->output->set_env('blankpage', 'plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . basename($tmp));
                                 }
                             }
                         }
@@ -196,9 +196,9 @@ class toolbox extends rcube_plugin
                             // we need a file in a folder named 'tmp' in plugin/toolbox (temp cannot be used for .htaccess limitations)
                             // filename must contain a dot for .htaccess limitations
                             // a file is needed since the 'blankpage' env variable needs a real file (loaded in apps.js)
-                            $tmp = RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'blankpage.' . $parts[1] . '.html';
+                            $tmp = RCUBE_INSTALL_PATH . \DIRECTORY_SEPARATOR . 'plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . 'blankpage.' . $parts[1] . '.html';
                             file_put_contents($tmp, $config['blankpage_custom']);
-                            $this->rcube->output->set_env('blankpage', 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
+                            $this->rcube->output->set_env('blankpage', 'plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . basename($tmp));
                         }
                         break;
                 }
@@ -214,11 +214,11 @@ class toolbox extends rcube_plugin
                 }
                 // we need a file in a folder named 'tmp' in plugin/toolbox (temp cannot be used for .htaccess limitations)
                 // filename must contain a dot for .htaccess limitations
-                $tmp = RCUBE_INSTALL_PATH . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'stylesheet.' . $parts[1] . '.css';
+                $tmp = RCUBE_INSTALL_PATH . \DIRECTORY_SEPARATOR . 'plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . 'stylesheet.' . $parts[1] . '.css';
                 file_put_contents($tmp, $customise['additional_css']);
                 // css is loaded only under some circumstances (not when rcmail_output_json is called)
                 if (method_exists($this->rcube->output, 'include_css')) {
-                    $this->rcube->output->include_css('plugins' . DIRECTORY_SEPARATOR . $this->ID . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp));
+                    $this->rcube->output->include_css('plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . basename($tmp));
                 }
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]: customised additional css loaded");
@@ -1721,7 +1721,7 @@ class toolbox extends rcube_plugin
         if ($dir) {
 
             while (($file = readdir($dir)) !== false) {
-                $filename = $path . DIRECTORY_SEPARATOR . $file;
+                $filename = $path . \DIRECTORY_SEPARATOR . $file;
                 if (!preg_match('/^\./', $file) && is_dir($filename) && is_readable($filename)) {
                     $skins[] = $file;
                 }
@@ -1732,7 +1732,7 @@ class toolbox extends rcube_plugin
             foreach ($skins as $skin) {
                 if (in_array($skin, $this->skins_allowed)) {
                     $name = ucfirst($skin);
-                    $meta = @json_decode(@file_get_contents(INSTALL_PATH . "skins" . DIRECTORY_SEPARATOR . $skin . DIRECTORY_SEPARATOR . "meta.json"), true);
+                    $meta = @json_decode(@file_get_contents(INSTALL_PATH . "skins" . \DIRECTORY_SEPARATOR . $skin . \DIRECTORY_SEPARATOR . "meta.json"), true);
                     if (is_array($meta) && $meta['name']) {
                         $name    = $meta['name'];
                         $author  = isset($meta['url']) ? html::a(['href' => $meta['url'], 'target' => '_blank'], rcube::Q($meta['author'])) : rcube::Q($meta['author']);
@@ -1759,7 +1759,7 @@ class toolbox extends rcube_plugin
 
     private function _get_templates($skin)
     {
-        $path  = RCUBE_INSTALL_PATH . 'skins' . DIRECTORY_SEPARATOR . $skin . DIRECTORY_SEPARATOR . 'templates';
+        $path  = RCUBE_INSTALL_PATH . 'skins' . \DIRECTORY_SEPARATOR . $skin . \DIRECTORY_SEPARATOR . 'templates';
         $templates = [];
         $dir   = opendir($path);
 
@@ -1783,7 +1783,7 @@ class toolbox extends rcube_plugin
         if (!$this->storage) {
 
             // Add include path for internal classes
-            $include_path = $this->home . '/lib' . PATH_SEPARATOR;
+            $include_path = $this->home . '/lib' . \PATH_SEPARATOR;
             $include_path .= ini_get('include_path');
             set_include_path($include_path);
 
