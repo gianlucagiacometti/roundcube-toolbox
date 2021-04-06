@@ -199,7 +199,7 @@ $config['toolbox_domain_admins'] = [];
 // use postfixadmin domain admins
 // note: if false only static domain admins will be used if any
 // default value: true
-$config['toolbox_use_postfixadmin_domain_admins'] = true
+$config['toolbox_use_postfixadmin_domain_admins'] = true;
 
 
 // ROUNDCUBE DATA SOURCE SETTINGS
