@@ -32,6 +32,7 @@ This plugin is released under the [GNU General Public License Version 3+](https:
 Install
 -------
 * Place this plugin folder into plugins directory of Roundcube
+* Change the folder name to 'toolbox'
 * Add 'toolbox' to `$config['plugins']` in your Roundcube config file
 
 **NB:** When downloading the plugin from GitHub you will need to create a directory called toolbox and place the files in there, ignoring the root directory in the downloaded archive.
