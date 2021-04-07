@@ -133,6 +133,8 @@ $labels['customise-logo-type-all-types'] = 'All types';
 $labels['customise-logo-type-favicon'] = 'Favicon';
 $labels['customise-logo-type-print'] = 'Print';
 $labels['customise-logo-type-small'] = 'Small';
+$labels['customise-logo-type-dark'] = 'Logo in dark mode';
+$labels['customise-logo-type-small-dark'] = 'Small in dark mode';
 $labels['customise-logo-add-template'] = 'Add template';
 $labels['customise-logo-image'] = 'Image';
 
