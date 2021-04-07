@@ -486,3 +486,43 @@ html.layout-phone {
     }
   }
 }
+
+// dark mode
+& when (@dark-mode-enabled = true) {
+  html.dark-mode {
+    .table-striped tbody tr:nth-of-type(2n+1) {
+      background-color: rgba(0,0,0,.15);
+    }
+
+    .form-control:disabled {
+      background-color: @color-dark-checkbox;
+    }
+
+    #alias-addresses-cont,
+    #forward-addresses-cont {
+      // Firefox does not inherit scrollbar size from the html element
+      scrollbar-width: thin;
+    }
+
+    table.fixedcopy {
+      > thead {
+        background-color: @color-dark-background;
+      }
+    }
+
+    table.sortable-table > thead > tr > th > a {
+      color: @color-dark-font;
+
+      &::after {
+        color: fadeout(@color-dark-font, 50%);
+      }
+    }
+
+    table.records-table tr > .tick,
+    table.records-table tr > .control {
+      > a.delete::before {
+        color: @color-dark-font;
+      }
+    }
+  }
+}

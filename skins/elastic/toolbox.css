@@ -384,3 +384,26 @@ html.layout-phone .address-input.input-group .input-group-append:last-child > :l
   border-bottom-left-radius: 0.25em;
   border-bottom-right-radius: 0.25em;
 }
+html.dark-mode .table-striped tbody tr:nth-of-type(2n+1) {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+html.dark-mode .form-control:disabled {
+  background-color: #4d6066;
+}
+html.dark-mode #alias-addresses-cont,
+html.dark-mode #forward-addresses-cont {
+  scrollbar-width: thin;
+}
+html.dark-mode table.fixedcopy > thead {
+  background-color: #21292c;
+}
+html.dark-mode table.sortable-table > thead > tr > th > a {
+  color: #c5d1d3;
+}
+html.dark-mode table.sortable-table > thead > tr > th > a::after {
+  color: rgba(197, 209, 211, 0.5);
+}
+html.dark-mode table.records-table tr > .tick > a.delete::before,
+html.dark-mode table.records-table tr > .control > a.delete::before {
+  color: #c5d1d3;
+}
