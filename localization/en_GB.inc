@@ -104,6 +104,15 @@ $labels['purge-day'] = 'day';
 $labels['purge-days'] = 'days';
 
 
+/* Preview */
+/* Author:  */
+
+$labels['preview'] = 'Message preview';
+$labels['preview-manage'] = 'Configure message preview';
+$labels['preview-disable-message'] = 'Disable message preview';
+$labels['preview-markasread-doubleclick'] = 'Mark a message read also by double clicking with mouse';
+
+
 /* Customise */
 /* Author: Gianluca Giacometti */
 
@@ -130,8 +139,6 @@ $labels['customise-logo-type-all-types'] = 'All types';
 $labels['customise-logo-type-favicon'] = 'Favicon';
 $labels['customise-logo-type-print'] = 'Print';
 $labels['customise-logo-type-small'] = 'Small';
-$labels['customise-logo-type-dark'] = 'Logo in dark mode';
-$labels['customise-logo-type-small-dark'] = 'Small in dark mode';
 $labels['customise-logo-add-template'] = 'Add template';
 $labels['customise-logo-image'] = 'Image';
 
@@ -142,6 +149,13 @@ $messages['customise-logo-emptycustomisedlogotemplate'] = 'The logo template can
 $messages['customise-logo-emptycustomisedlogoimage'] = 'The logo image cannot be empty';
 $messages['customise-logo-invalidcustomisedlogoimage'] = 'The logo image is invalid';
 $messages['customise-logo-nocustomisedlogo'] = 'No customised logo found';
+
+
+/* Detach Attachments */
+/* Author: Gianluca Giacometti */
+
+$labels['attachment-expiry-date'] = 'Download expires on';
+$labels['attachment-maxuploadsize'] = 'NOTE: If one attachment is greater than $singlesize MB or the entire set of attachments is grater than $totalsize MB the recipient will receive a link to a zip file, which will expire in $lifespan days';
 
 
 /* Tags */

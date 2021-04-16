@@ -102,6 +102,15 @@ $labels['purge-day'] = 'giorno';
 $labels['purge-days'] = 'giorni';
 
 
+/* Preview */
+/* Author: Gianluca Giacometti */
+
+$labels['preview'] = 'Anteprima messaggi';
+$labels['preview-manage'] = 'Configura la visualizzazione dell\'anteprima dei messaggi';
+$labels['preview-disable-message'] = 'Disabilita l\'anteprima dei messaggi';
+$labels['preview-markasread-doubleclick'] = 'Imposta un messaggio come letto anche con il doppio click del mouse';
+
+
 /* Customise */
 /* Author: Gianluca Giacometti */
 
@@ -128,8 +137,6 @@ $labels['customise-logo-type-all'] = 'Tutti i tipi';
 $labels['customise-logo-type-favicon'] = 'Favicon';
 $labels['customise-logo-type-print'] = 'Print';
 $labels['customise-logo-type-small'] = 'Small';
-$labels['customise-logo-type-dark'] = 'Logo in modalità scrura';
-$labels['customise-logo-type-small-dark'] = 'Small in modalità scura';
 $labels['customise-logo-add-template'] = 'Aggiungi';
 $labels['customise-logo-image'] = 'Immagine';
 
@@ -141,6 +148,12 @@ $messages['customise-logo-emptycustomisedlogoimage'] = 'L\'immagine del logo non
 $messages['customise-logo-invalidcustomisedlogoimage'] = 'L\'immagine del logo non è valida';
 $messages['customise-logo-nocustomisedlogo'] = 'Nessun logo personalizzato trovato';
 
+
+/* Detach Attachments */
+/* Author: Gianluca Giacometti */
+
+$labels['attachment-expiry-date'] = 'Scadenza download';
+$labels['attachment-maxuploadsize'] = 'NOTA: Se un singolo allegato supera $singlesize MB o l\'insieme degli allegati supera $totalsize MB verrà inviato al destinatario un collegamento ad un file .zip salvato localmente nel server valido per $lifespan giorno(i)';
 
 /* Tags */
 /* Author: Gianluca Giacometti */
