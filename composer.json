@@ -3,9 +3,9 @@
   "description": "Set of tools for Roundcube webmail",
   "keywords": ["roundcubemail","postfixadmin","postfix","roundcube","purge","vacation","login","customize", "cloud", "google","onedrive","dropbox","cloud","database","sql","tools","out-of-office", "forward"],
   "homepage": "https://github.com/gianlucagiacometti/roundcube-toolbox/",
-  "license": "GPL-3.0",
+  "license": "GPL-3.0-or-later",
   "type": "roundcube-plugin",
-  "version": "1.4.6.0",
+  "version": "1.4.9.0",
   "authors": [
     {
       "name": "Gianluca Giacometti",
