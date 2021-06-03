@@ -1,8 +1,12 @@
 Roundcube Webmail Toolbox
 =========================
 
+Version 1.4.11.0 (2021-06-03, rc-git-master)
+============================================
+
 - Changed license to GNU GPLv3+ with exceptions for skins
 - Fixed mysql date format conversion in sql helper
+- Fixed checkbox colours in dark mode
 
 Version 1.4.10.2 (2021-01-27, rc-git-master)
 ============================================
