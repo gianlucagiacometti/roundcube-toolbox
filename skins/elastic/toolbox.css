@@ -407,3 +407,7 @@ html.dark-mode table.records-table tr > .tick > a.delete::before,
 html.dark-mode table.records-table tr > .control > a.delete::before {
   color: #c5d1d3;
 }
+html.dark-mode input[type=radio] + label:before,
+html.dark-mode input[type=radio]:checked + label:before {
+  color: #fff;
+}
