@@ -524,5 +524,10 @@ html.layout-phone {
         color: @color-dark-font;
       }
     }
+
+    input[type=radio] + label:before,
+    input[type=radio]:checked + label:before {
+        color: @color-btn-primary;
+    }
   }
 }
