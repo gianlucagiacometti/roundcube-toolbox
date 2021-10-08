@@ -75,7 +75,7 @@ class toolbox extends rcube_plugin
         $this->detach_total = $this->rcube->config->get('toolbox_detach_total', 1024 * 1024 * 50);
         $this->detach_single = $this->rcube->config->get('toolbox_detach_single', 1024 * 1024 * 25);
 
-        $this->cur_section = rcube_utils::get_input_string('_section', rcube_utils::INPUT_GPC);
+        $this->cur_section = rcube_utils::get_input_value('_section', rcube_utils::INPUT_GPC);
 
         // load user's preferences
         if ($this->loglevel > 2) {
@@ -91,7 +91,7 @@ class toolbox extends rcube_plugin
             }
 
             if (isset($this->user_prefs['toolbox_message_preview']) && ($this->user_prefs['toolbox_message_preview'] !== false)) {
-                if ((rcube_utils::get_input_string('_task', rcube_utils::INPUT_GPC) == "mail") && !in_array(rcube_utils::get_input_string('_action', rcube_utils::INPUT_GPC), ["show", "compose"])) {
+                if ((rcube_utils::get_input_value('_task', rcube_utils::INPUT_GPC) == "mail") && !in_array(rcube_utils::get_input_value('_action', rcube_utils::INPUT_GPC), ["show", "compose"])) {
                     if (method_exists($this->rcube->output, 'include_css')) {
                         if ($this->loglevel > 2) {
                             rcube::write_log($this->logfile, "STEP in [function init]: load disable message preview stylesheet");
@@ -105,7 +105,7 @@ class toolbox extends rcube_plugin
                 }
             }
             elseif (isset($this->user_prefs['toolbox_message_preview']) && ($this->user_prefs['toolbox_message_preview'] !== false)) {
-                if ((rcube_utils::get_input_string('_task', rcube_utils::INPUT_GPC) == "mail") && !in_array(rcube_utils::get_input_string('_action', rcube_utils::INPUT_GPC), ["show", "compose"])) {
+                if ((rcube_utils::get_input_value('_task', rcube_utils::INPUT_GPC) == "mail") && !in_array(rcube_utils::get_input_value('_action', rcube_utils::INPUT_GPC), ["show", "compose"])) {
                     if ($this->loglevel > 2) {
                         rcube::write_log($this->logfile, "STEP in [function init]: load set mark as read by double clicking with mouse script");
                     }
@@ -268,7 +268,7 @@ class toolbox extends rcube_plugin
             $this->add_hook('message_compose', array($this, 'remove_session'));
             $this->add_hook('startup', array($this, 'download_detached'));
             $this->add_hook('toolbox_attachment_label', array($this, 'attachment_label'));
-            if (rcube_utils::get_input_string('_action', rcube_utils::INPUT_GPC) == 'compose') {
+            if (rcube_utils::get_input_value('_action', rcube_utils::INPUT_GPC) == 'compose') {
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]:modify hint in compose window");
                 }
@@ -333,11 +333,11 @@ class toolbox extends rcube_plugin
     }
 
     public function download_detached() {
-        if (rcube_utils::get_input_string('_action', rcube_utils::INPUT_GPC) == 'plugin.toolbox.attachment') {
+        if (rcube_utils::get_input_value('_action', rcube_utils::INPUT_GPC) == 'plugin.toolbox.attachment') {
             if ($this->loglevel > 2) {
                 rcube::write_log($this->logfile, "STEP in [function download_detached]: GET call received");
             }
-            if ($file = rcube_utils::get_input_string('_filename', rcube_utils::INPUT_GPC)) {
+            if ($file = rcube_utils::get_input_value('_filename', rcube_utils::INPUT_GPC)) {
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function download_detached]: file required: {$file}");
                 }
@@ -1214,7 +1214,7 @@ class toolbox extends rcube_plugin
     {
         $rcmail = rcmail::get_instance();
 
-        $this->cur_section = rcube_utils::get_input_string('_section', rcube_utils::INPUT_POST, true);
+        $this->cur_section = rcube_utils::get_input_value('_section', rcube_utils::INPUT_POST, true);
 
         $data = ['section' => $this->cur_section];
         $error = '';
@@ -1226,7 +1226,7 @@ class toolbox extends rcube_plugin
 
             case 'aliases':
 
-                $data['new_settings']['aliasname'] = mb_convert_case(rcube_utils::get_input_string('_aliasname', rcube_utils::INPUT_POST, true), MB_CASE_LOWER, RCUBE_CHARSET);
+                $data['new_settings']['aliasname'] = mb_convert_case(rcube_utils::get_input_value('_aliasname', rcube_utils::INPUT_POST, true), MB_CASE_LOWER, RCUBE_CHARSET);
 
                 $this->api->output->add_label('toolbox.aliases-aliasupdated');
 
@@ -1251,7 +1251,7 @@ class toolbox extends rcube_plugin
     {
         $rcmail = rcmail::get_instance();
 
-        $this->cur_section = rcube_utils::get_input_string('_section', rcube_utils::INPUT_POST);
+        $this->cur_section = rcube_utils::get_input_value('_section', rcube_utils::INPUT_POST);
 
         if ($this->loglevel > 2) {
             rcube::write_log($this->logfile, "STEP in [function check]: selected tool: {$this->cur_section}");
@@ -1260,7 +1260,7 @@ class toolbox extends rcube_plugin
 
             case 'aliases':
 
-                $new_alias = rcube_utils::get_input_string('_newaliasname', rcube_utils::INPUT_POST, true);
+                $new_alias = rcube_utils::get_input_value('_newaliasname', rcube_utils::INPUT_POST, true);
 
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function check]: initialise storage for tool {$this->cur_section}");
@@ -1298,7 +1298,7 @@ class toolbox extends rcube_plugin
     {
         $rcmail = rcmail::get_instance();
 
-        $this->cur_section = rcube_utils::get_input_string('_section', rcube_utils::INPUT_POST, true);
+        $this->cur_section = rcube_utils::get_input_value('_section', rcube_utils::INPUT_POST, true);
 
         $data = ['section' => $this->cur_section];
         $error = '';
@@ -1310,7 +1310,7 @@ class toolbox extends rcube_plugin
 
             case 'aliases':
 
-                $data['aliasname'] = mb_convert_case(rcube_utils::get_input_string('_aliasname', rcube_utils::INPUT_POST, true), MB_CASE_LOWER, RCUBE_CHARSET);
+                $data['aliasname'] = mb_convert_case(rcube_utils::get_input_value('_aliasname', rcube_utils::INPUT_POST, true), MB_CASE_LOWER, RCUBE_CHARSET);
 
                 $this->api->output->add_label('toolbox.aliases-aliasdeleted');
 
@@ -1356,8 +1356,8 @@ class toolbox extends rcube_plugin
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function save]: save alias");
                 }
-                $new_settings['main']['aliasname'] = mb_convert_case(trim(rcube_utils::get_input_string('_newaliasname', rcube_utils::INPUT_POST)), MB_CASE_LOWER, RCUBE_CHARSET);
-                $new_settings['main']['active'] = rcube_utils::get_input_string('_newaliasactive', rcube_utils::INPUT_POST);
+                $new_settings['main']['aliasname'] = mb_convert_case(trim(rcube_utils::get_input_value('_newaliasname', rcube_utils::INPUT_POST)), MB_CASE_LOWER, RCUBE_CHARSET);
+                $new_settings['main']['active'] = rcube_utils::get_input_value('_newaliasactive', rcube_utils::INPUT_POST);
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function save]: new alias name = '{$new_settings['main']['aliasname']}', new alias active = '{$new_settings['main']['active']}'");
                 }
@@ -1373,7 +1373,7 @@ class toolbox extends rcube_plugin
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function save]: save forward addresses");
                 }
-                $addresses = rcube_utils::get_input_string('_forwardaddresses', rcube_utils::INPUT_POST);
+                $addresses = rcube_utils::get_input_value('_forwardaddresses', rcube_utils::INPUT_POST);
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function save]: new forward addresses = [" . implode(', ', $addresses) . "]");
                 }
@@ -1382,7 +1382,7 @@ class toolbox extends rcube_plugin
                     $new_settings['main']['addresses'][] = ['value' => mb_convert_case(trim($address), MB_CASE_LOWER, RCUBE_CHARSET)];
                 }
 
-                $new_settings['main']['keepcopies'] = rcube_utils::get_input_string('_forwardkeepcopies', rcube_utils::INPUT_POST) ?: false;
+                $new_settings['main']['keepcopies'] = rcube_utils::get_input_value('_forwardkeepcopies', rcube_utils::INPUT_POST) ?: false;
 
                 break;
 
@@ -1392,8 +1392,8 @@ class toolbox extends rcube_plugin
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function save]: save user's preferences");
                 }
-                $this->user_prefs['toolbox_purge_trash'] = rcube_utils::get_input_string('_usertrash', rcube_utils::INPUT_POST);
-                $this->user_prefs['toolbox_purge_junk'] = rcube_utils::get_input_string('_userjunk', rcube_utils::INPUT_POST);
+                $this->user_prefs['toolbox_purge_trash'] = rcube_utils::get_input_value('_usertrash', rcube_utils::INPUT_POST);
+                $this->user_prefs['toolbox_purge_junk'] = rcube_utils::get_input_value('_userjunk', rcube_utils::INPUT_POST);
                 if (!$this->rcube->user->save_prefs($this->user_prefs)) {
                     $this->rcube->display_server_error('errorsaving');
                     return;
@@ -1406,8 +1406,8 @@ class toolbox extends rcube_plugin
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function save]: save user's preview choice");
                 }
-                $this->user_prefs['toolbox_message_preview'] = rcube_utils::get_input_string('_userpreview', rcube_utils::INPUT_POST) ?: false;
-                $this->user_prefs['toolbox_markasread_doubleclick'] = rcube_utils::get_input_string('_userdoubleclick', rcube_utils::INPUT_POST) ?: false;
+                $this->user_prefs['toolbox_message_preview'] = rcube_utils::get_input_value('_userpreview', rcube_utils::INPUT_POST) ?: false;
+                $this->user_prefs['toolbox_markasread_doubleclick'] = rcube_utils::get_input_value('_userdoubleclick', rcube_utils::INPUT_POST) ?: false;
                 // we need to set Mark as read = never when message disable preview is set to true; this todisable the mark as read with single click event
                 if (($this->user_prefs['toolbox_message_preview'] !== false) || ($this->user_prefs['toolbox_markasread_doubleclick'] !== false)) {
                     if ($this->loglevel > 2) {
@@ -1435,7 +1435,7 @@ class toolbox extends rcube_plugin
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function save]: save user's preferences");
                 }
-                $this->user_prefs['toolbox_vacation_html_editor'] = rcube_utils::get_input_string('_vacationhtmleditor', rcube_utils::INPUT_POST);
+                $this->user_prefs['toolbox_vacation_html_editor'] = rcube_utils::get_input_value('_vacationhtmleditor', rcube_utils::INPUT_POST);
                 if (!$this->rcube->user->save_prefs($this->user_prefs)) {
                     $this->rcube->display_server_error('errorsaving');
                     return;
@@ -1445,12 +1445,12 @@ class toolbox extends rcube_plugin
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function save]: prepare vacation settings");
                 }
-                $new_settings['main']['active'] = rcube_utils::get_input_string('_vacationactive', rcube_utils::INPUT_POST) ?: false;
-                $new_settings['main']['activefrom'] = rcube_utils::get_input_string('_vacationactivefrom', rcube_utils::INPUT_POST) ?: date("Y-m-d H:i:s");
-                $new_settings['main']['activeuntil'] = rcube_utils::get_input_string('_vacationactiveuntil', rcube_utils::INPUT_POST) ?: date('"Y-m-d H:i:s"', strtotime("+1 week"));
-                $new_settings['main']['interval_time'] = rcube_utils::get_input_string('_vacationintervaltime', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_interval_time')['replyonce'];
-                $new_settings['main']['subject'] = rcube_utils::get_input_string('_vacationsubject', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_subject');
-                $new_settings['main']['body'] = rcube_utils::get_input_string('_vacationbody', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_body');
+                $new_settings['main']['active'] = rcube_utils::get_input_value('_vacationactive', rcube_utils::INPUT_POST) ?: false;
+                $new_settings['main']['activefrom'] = rcube_utils::get_input_value('_vacationactivefrom', rcube_utils::INPUT_POST) ?: date("Y-m-d H:i:s");
+                $new_settings['main']['activeuntil'] = rcube_utils::get_input_value('_vacationactiveuntil', rcube_utils::INPUT_POST) ?: date('"Y-m-d H:i:s"', strtotime("+1 week"));
+                $new_settings['main']['interval_time'] = rcube_utils::get_input_value('_vacationintervaltime', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_interval_time')['replyonce'];
+                $new_settings['main']['subject'] = rcube_utils::get_input_value('_vacationsubject', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_subject');
+                $new_settings['main']['body'] = rcube_utils::get_input_value('_vacationbody', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_body');
 
                 break;
 
@@ -1461,8 +1461,8 @@ class toolbox extends rcube_plugin
                     if ($this->loglevel > 2) {
                         rcube::write_log($this->logfile, "STEP in [function save]: prepare domain settings");
                     }
-                    $new_settings['domain']['purge_trash'] = rcube_utils::get_input_string('_domaintrash', rcube_utils::INPUT_POST) ?: 0;
-                    $new_settings['domain']['purge_junk'] = rcube_utils::get_input_string('_domainjunk', rcube_utils::INPUT_POST) ?: 0;
+                    $new_settings['domain']['purge_trash'] = rcube_utils::get_input_value('_domaintrash', rcube_utils::INPUT_POST) ?: 0;
+                    $new_settings['domain']['purge_junk'] = rcube_utils::get_input_value('_domainjunk', rcube_utils::INPUT_POST) ?: 0;
 
                     if ($this->loglevel > 2) {
                         rcube::write_log($this->logfile, "STEP in [function save]: prepare skin settings");
@@ -1471,9 +1471,9 @@ class toolbox extends rcube_plugin
                         if ($this->loglevel > 2) {
                             rcube::write_log($this->logfile, "STEP in [function save]: processing skin " . $skin);
                         }
-                        $new_settings['skins'][$skin]['customise_blankpage'] = rcube_utils::get_input_string('_blankpageselector_'.$skin, rcube_utils::INPUT_POST) ?: false;
-                        $new_settings['skins'][$skin]['blankpage_type'] = rcube_utils::get_input_string('_blankpagetype_'.$skin, rcube_utils::INPUT_POST) ?: null;
-                        $new_settings['skins'][$skin]['blankpage_url'] = rcube_utils::get_input_string('_blankpageurl_' . $skin, rcube_utils::INPUT_POST) ?: null;
+                        $new_settings['skins'][$skin]['customise_blankpage'] = rcube_utils::get_input_value('_blankpageselector_'.$skin, rcube_utils::INPUT_POST) ?: false;
+                        $new_settings['skins'][$skin]['blankpage_type'] = rcube_utils::get_input_value('_blankpagetype_'.$skin, rcube_utils::INPUT_POST) ?: null;
+                        $new_settings['skins'][$skin]['blankpage_url'] = rcube_utils::get_input_value('_blankpageurl_' . $skin, rcube_utils::INPUT_POST) ?: null;
                         $allowed_types = [
                             'image/jpeg',
                             'image/jpg',
@@ -1500,17 +1500,17 @@ class toolbox extends rcube_plugin
                             }
                         }
                         $new_settings['skins'][$skin]['blankpage_image'] = $base64 ?: null;
-                        $new_settings['skins'][$skin]['blankpage_image_control'] = rcube_utils::get_input_string('_blankpageimage_' . $skin . '_control', rcube_utils::INPUT_POST);
+                        $new_settings['skins'][$skin]['blankpage_image_control'] = rcube_utils::get_input_value('_blankpageimage_' . $skin . '_control', rcube_utils::INPUT_POST);
                         $new_settings['skins'][$skin]['blankpage_custom'] = $_POST['_blankpagecustom_' . $skin] ?: null;
-                        $new_settings['skins'][$skin]['customise_css'] = rcube_utils::get_input_string('_additionalcssselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
-                        $new_settings['skins'][$skin]['additional_css'] = rcube_utils::get_input_string('_additionalcss_' . $skin, rcube_utils::INPUT_POST) ?: null;
-                        $new_settings['skins'][$skin]['customise_logo'] = rcube_utils::get_input_string('_customiselogoselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
+                        $new_settings['skins'][$skin]['customise_css'] = rcube_utils::get_input_value('_additionalcssselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
+                        $new_settings['skins'][$skin]['additional_css'] = rcube_utils::get_input_value('_additionalcss_' . $skin, rcube_utils::INPUT_POST) ?: null;
+                        $new_settings['skins'][$skin]['customise_logo'] = rcube_utils::get_input_value('_customiselogoselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
 
                         if ($this->loglevel > 2) {
                             rcube::write_log($this->logfile, "STEP in [function save]: process customised logos");
                         }
                         $customised_logotemplates = [];
-                        $input_logotemplate = rcube_utils::get_input_string('_customisedlogotemplate_' . $skin, rcube_utils::INPUT_POST) ?: [];
+                        $input_logotemplate = rcube_utils::get_input_value('_customisedlogotemplate_' . $skin, rcube_utils::INPUT_POST) ?: [];
                         foreach($input_logotemplate as $template) {
                             $customised_logotemplates[] = $template;
                         }
@@ -1518,12 +1518,12 @@ class toolbox extends rcube_plugin
                             rcube::write_log($this->logfile, "STEP in [function save]: " . count($customised_templates) . " customised logos found for skin " . $skin);
                         }
                         $customised_logotypes = [];
-                        $input_logotype = rcube_utils::get_input_string('_customisedlogotype_' . $skin, rcube_utils::INPUT_POST) ?: [];
+                        $input_logotype = rcube_utils::get_input_value('_customisedlogotype_' . $skin, rcube_utils::INPUT_POST) ?: [];
                         foreach($input_logotype as $type) {
                             $customised_logotypes[] = $type;
                         }
                         $customised_logoimages = [];
-                        $input_logoimage = rcube_utils::get_input_string('_customisedlogoimage_' . $skin, rcube_utils::INPUT_POST) ?: [];
+                        $input_logoimage = rcube_utils::get_input_value('_customisedlogoimage_' . $skin, rcube_utils::INPUT_POST) ?: [];
                         foreach($input_logoimage as $image) {
                             $customised_logoimages[] = $image;
                         }
