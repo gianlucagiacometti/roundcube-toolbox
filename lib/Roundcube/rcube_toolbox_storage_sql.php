@@ -790,7 +790,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 ];
 
                 //remove autoreply address from alias list, but keep custom aliases
-                $concat = $this->db->concat($this->db->quote($parts[0]),$this->db->quote('#'),$this->db->quote($parts[1]),$this->db->quote('@'),$this->db->quote($this->postfixadmin_vacation_domain));
+                $concat = $this->db->concat($this->db->quote(","),$this->db->quote($parts[0]),$this->db->quote('#'),$this->db->quote($parts[1]),$this->db->quote('@'),$this->db->quote($this->postfixadmin_vacation_domain));
                 $queries[] = [
                                 'sql' => "UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = replace({$this->postfix_sql_goto_field_in_alias}, {$concat}, ''), `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ?;",
                                 'data' => [$user, $parts[1]],
@@ -798,12 +798,14 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 ];
 
                 //add autoreply address as alias
-                $concat = $this->db->concat($this->postfix_sql_goto_field_in_alias,$this->db->quote($parts[0]),$this->db->quote('#'),$this->db->quote($parts[1]),$this->db->quote('@'),$this->db->quote($this->postfixadmin_vacation_domain));
-                $queries[] = [
-                                'sql' => "UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = {$concat}, `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ? AND `{$this->postfix_sql_active_field_in_alias}` = true;",
-                                'data' => [$user, $parts[1]],
-                                'type' => 'update'
-                ];
+                if ($settings['main']['active'] == 'true') {
+                    $concat = $this->db->concat($this->postfix_sql_goto_field_in_alias,$this->db->quote(","),$this->db->quote($parts[0]),$this->db->quote('#'),$this->db->quote($parts[1]),$this->db->quote('@'),$this->db->quote($this->postfixadmin_vacation_domain));
+                    $queries[] = [
+                                    'sql' => "UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = {$concat}, `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ? AND `{$this->postfix_sql_active_field_in_alias}` = true;",
+                                    'data' => [$user, $parts[1]],
+                                    'type' => 'update'
+                    ];
+                }
 
                 foreach ($queries as $query) {
 
