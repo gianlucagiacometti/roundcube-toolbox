@@ -50,43 +50,45 @@ $messages['aliases-novalidalias'] = 'Alias-Name leer';
 
 /* Forward */
 /* Author: Jan B. Fiedler */
+/* Author: Björn Barz */
 
-$labels['forward'] = 'Forward addresses';
-$labels['forward-manage'] = 'Manage forward addresses';
-$labels['forward-address'] = 'Forward address';
-$labels['forward-addaddress'] = 'Add forward address';
-$labels['forward-keepcopies'] = 'Original Nachricht behalten';
+$labels['forward'] = 'Weiterleitungen';
+$labels['forward-manage'] = 'Weiterleitungen verwalten';
+$labels['forward-address'] = 'Weiterleitungs-Ziel';
+$labels['forward-addaddress'] = 'Weiterleitung hinzufügen';
+$labels['forward-keepcopies'] = 'Original-Nachricht behalten';
 
-$messages['forward-invalidaddress'] = 'E-Mail Addresse ist nicht gültig';
-$messages['forward-atleastoneaddress'] = 'At least one forward address is required if no copy is kept in mailbox';
-$messages['forward-emptyaddress'] = 'The forward address cannot be empty';
-$messages['forward-deleteaddress'] = 'Do you really want to delete this address?';
-$messages['forward-deletealladdresses'] = 'Delete all addresses';
-$messages['forward-addressexists'] = 'This address already exists';
-$messages['forward-noaddress'] = 'No address found';
+$messages['forward-invalidaddress'] = 'E-Mail-Adresse ist nicht gültig';
+$messages['forward-atleastoneaddress'] = 'Wenn keine Kopie der Original-Nachricht behalten wird, muss mindestens eine Weiterleitung eingerichtet sein';
+$messages['forward-emptyaddress'] = 'Die Ziel-Adresse darf nicht leer sein';
+$messages['forward-deleteaddress'] = 'Möchten Sie diese Weiterleitungs-Adresse wirklich löschen?';
+$messages['forward-deletealladdresses'] = 'Alle Weiterleitungen löschen';
+$messages['forward-addressexists'] = 'Diese Adresse existiert bereits';
+$messages['forward-noaddress'] = 'Keine Weiterleitungs-Ziele eingerichtet';
 
 
 /* Vacation */
 /* Author: Boris Huisgen */
 /* Author: Christian Boltz */
+/* Author: Björn Barz */
 
 $labels['vacation'] = 'Abwesenheit';
-$labels['vacation-manage'] = 'Manage out of office message';
+$labels['vacation-manage'] = 'Abwesenheitsnachricht verwalten';
 $labels['vacation-subject'] = 'Betreff:';
 $labels['vacation-body'] = 'Nachricht:';
 $labels['vacation-active'] = 'Aktiv';
-$labels['vacation-activefrom'] = 'Aktive ab dem:';
-$labels['vacation-activeuntil'] = 'Aktive bis zum:';
+$labels['vacation-activefrom'] = 'Aktiv ab dem:';
+$labels['vacation-activeuntil'] = 'Aktiv bis zum:';
 $labels['vacation-intervaltime'] = 'Antworttyp:';
 $labels['vacation-replyonce'] = 'Einmal antworten';
 $labels['vacation-replytoeverymail'] = 'Jede Mail beantworten';
 $labels['vacation-replyonceperday'] = 'Einmal pro Tag antworten';
 $labels['vacation-replyonceperweek'] = 'Einmal pro Woche antworten';
-$labels['vacation-htmleditor'] = 'Activate HTML editor';
+$labels['vacation-htmleditor'] = 'HTML-Editor verwenden';
 
 $messages['vacation-invalidstartdate'] = 'Bitte wählen Sie ein gültiges Startdatum.';
 $messages['vacation-invalidenddate'] = 'Bitte wählen Sie ein gültiges Enddatum.';
-$messages['vacation-invaliddateinterval'] = 'Das Intervall der Date ist ungültig.';
+$messages['vacation-invaliddateinterval'] = 'Das Antwort-Intervall ist ungültig.';
 $messages['vacation-nosubject'] = 'Bitte geben Sie den Betreff Ihrer Abwesenheitsnachricht an.';
 $messages['vacation-nomessage'] = 'Bitte geben Sie den Text Ihrer Abwesenheitsnachricht an.';
 
