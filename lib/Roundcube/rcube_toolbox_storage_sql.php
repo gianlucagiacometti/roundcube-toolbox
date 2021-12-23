@@ -776,7 +776,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 else {
                     $settings['main']['created'] = $this->db->now();
                     $queries[] = [
-                                'sql' => "INSERT INTO {$this->postfix_sql_vacation_table_name} (" . implode(', ', array_keys($settings['main'])) . ") VALUES (" . implode(',',array_values($settings['main'])) . ");",
+                                'sql' => "INSERT INTO {$this->postfix_sql_vacation_table_name} (email, domain, " . implode(', ', array_keys($settings['main'])) . ") VALUES ('" . $user . "','" . $parts[1] . "'," . implode(',',array_values($settings['main'])) . ");",
                                 'data' => [],
                                 'type' => 'insert'
                     ];
