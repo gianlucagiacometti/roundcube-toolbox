@@ -128,7 +128,7 @@ $labels['customise-blankpage'] = 'Customized blank page';
 $labels['customise-blankpage-skin'] = 'Blank page';
 $labels['customise-blankpage-skin-default'] = 'Default Roundcube blank page';
 $labels['customise-blankpage-skin-image'] = 'Blank page with just a centered image';
-$labels['customise-blankpage-skin-url'] = 'Local or external page url';
+$labels['customise-blankpage-skin-url'] = 'Local or external page URL';
 $labels['customise-blankpage-skin-custom'] = 'Custom-made page';
 $labels['customise-blankpage-image'] = 'Image';
 $labels['customise-blankpage-url'] = 'Address';
@@ -160,15 +160,15 @@ $messages['customise-logo-nocustomisedlogo'] = 'No customized logo found';
 /* Author: Gianluca Giacometti */
 
 $labels['attachment-expiry-date'] = 'Download expires on';
-$labels['attachment-maxuploadsize'] = 'NOTE: If one attachment is greater than $singlesize MB or the entire set of attachments is grater than $totalsize MB the recipient will receive a link to a zip file, which will expire in $lifespan days';
+$labels['attachment-maxuploadsize'] = 'NOTE: If one attachment is greater than $singlesize MB or the entire set of attachments is greater than $totalsize MB the recipient will receive a link to a zip file, which will expire in $lifespan days';
 
 
 /* Tags */
 /* Author: Gianluca Giacometti */
 
 $labels['tags'] = 'Tags';
-$labels['tags-label'] = 'Etichetta';
-$labels['tags-labels'] = 'Etichette';
+$labels['tags-label'] = 'Tag';
+$labels['tags-labels'] = 'Labels';
 
 
 /* Cloud */
@@ -200,5 +200,5 @@ $labels['safelogin-os'] = 'Operating system';
 /* Folders */
 /* Author: Gianluca Giacometti */
 
-$labels['folders'] = 'Riepilogo cartelle';
-$labels['folders-numberoffiles'] = 'Numero file';
+$labels['folders'] = 'Folder summary';
+$labels['folders-numberoffiles'] = 'Number of files';
