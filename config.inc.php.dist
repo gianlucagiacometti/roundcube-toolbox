@@ -219,6 +219,10 @@ $config['toolbox_roundcube_db_persistent'] = false;
 
 // ALIASES TOOL OPTIONS
 
+// If false, single domain mode is used for aliases:
+// * only aliases matching the user's domain are shown
+// * on the settings page, the domain in each alias' address is hidden (and must not be specified by the used)
+$config['toolbox_aliases_multiple_domains'] = true;
 
 // FORWARD TOOL OPTIONS
 
