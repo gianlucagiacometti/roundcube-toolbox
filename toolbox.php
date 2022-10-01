@@ -639,9 +639,13 @@ class toolbox extends rcube_plugin
                 if (!empty($settings['aliases'])) {
                     foreach ($settings['aliases'] as $alias) {
                         $active = $alias['active'];
-                        $elements = explode("@", trim($alias['address']));
+                        $address = trim($alias['address']);
+                        $elements = $this->rcube->config->get('toolbox_aliases_multiple_domains') ? array($address) : explode("@", $address);
+                        if ($this->loglevel > 2) {
+                            rcube::write_log($this->logfile, "STEP in [function tool_render_form]: $addr ($elements[0]@$elements[1]) valid:" . ($elements[0] != '' ? '✅' : '❎') . " active:" . ($active ? '✅' : '❎') );
+                        }
                         if ($elements[0] != "") {
-                            $aliases[] = ['name' => $elements[0], 'domain' => $elements[1], 'active' => $active];
+                            $aliases[] = [$address, 'name' => $elements[0], 'domain' => $elements[1], 'active' => $active];
                         }
                     }
                 }
@@ -1231,7 +1235,7 @@ class toolbox extends rcube_plugin
                 $this->api->output->add_label('toolbox.aliases-aliasupdated');
 
                 if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [function toggle]: initialise storage for tool {$this->cur_section}");
+                    rcube::write_log($this->logfile, "STEP in [function toggle]: ({$data['new_settings']['aliasname']}) initialise storage for tool {$this->cur_section}");
                 }
                 $this->_init_storage();
 
@@ -1239,7 +1243,10 @@ class toolbox extends rcube_plugin
                     $error = rcmail::Q($this->gettext('aliases-aliasupdatederror'));
                 }
 
-                $rcmail->output->command('plugin.toolbox.check_toggle', $error);
+                if ($this->loglevel > 2) {
+                    rcube::write_log($this->logfile, "STEP in [function toggle]: ({$data['new_settings']['aliasname']}) command:" . "plugin.toolbox.check_toggle({$data['new_settings']['aliasname']})" . " data:" . $error);
+                }
+                $rcmail->output->command("plugin.toolbox.check_toggle({$data['new_settings']['aliasname']})", $error);
 
                 break;
 
@@ -1612,7 +1619,7 @@ class toolbox extends rcube_plugin
         $row_attrib = !isset($class) ? array_merge($row_attrib, ['style' => 'display: none;']) : array_merge($row_attrib, ['class' => $class]);
         $address_table->set_row_attribs($row_attrib);
 
-        $button_type = isset($alias['active']) && $alias['active'] !== false ? 'enabled' : 'disabled';
+        $button_type = isset($alias['active']) && $alias['active'] != false ? 'enabled' : 'disabled';
         $address_table->add(['class' => 'email ' . $button_type], (isset($alias['name']) ? $alias['name'] : ''));
 
         $toggle = isset($alias['active']) && $alias['active'] !== false ? rcmail::Q($this->gettext('toolbox-disable')) : rcmail::Q($this->gettext('toolbox-enable'));

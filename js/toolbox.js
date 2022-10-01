@@ -261,30 +261,33 @@ $(document).ready(function() {
                 }
 
                 if (rcmail.env.cur_section == 'aliases') {
-
-                    rcmail.register_command('plugin.toolbox.toggle_alias', function(aliasname, obj) {
-                        var aliasrow = $(obj).closest('tr');
-                        var aliasname = $(aliasrow).find('input[name^=_aliasname]').val();
-                        rcmail.addEventListener('plugin.toolbox.check_toggle', checktoggle);
-                        rcmail.http_post('plugin.toolbox.toggle', { _section: rcmail.env.cur_section, _aliasname: aliasname });
-                        function checktoggle(response) {
-                            if (response != "") {
-                                rcmail.display_message(response, 'warning');
-                            }
-                            else {
-                                var name = $(aliasrow).find('td.email');
-                                var active = $(aliasrow).find('input[name^=_aliasactive]');
-                                rcmail.toolbox_toggle_alias($(name), $(active), $(obj));
-                                rcmail.display_message(rcmail.get_label('aliases-aliasupdated','toolbox'), 'confirmation');
-                            }
-                            return false;
+                    let listening_toggle = new Set();
+                    rcmail.register_command('plugin.toolbox.toggle_alias', function(aliasname_, obj) {
+                        let aliasrow = $(obj).closest('tr');
+                        let aliasname = $(aliasrow).find('input[name^=_aliasname]').val();
+                        let aliasid = '(' + aliasname + ')';
+                        if (!listening_toggle.has(aliasid)) {
+                            listening_toggle.add(aliasid);
+                            rcmail.addEventListener('plugin.toolbox.check_toggle' + aliasid, handler = function(response) {
+                                if (response !== "") {
+                                    rcmail.display_message(aliasid + " " + response, 'warning');
+                                }
+                                else {
+                                    var name = $(aliasrow).find('td.email');
+                                    var active = $(aliasrow).find('input[name^=_aliasactive]');
+                                    rcmail.toolbox_toggle_alias($(name), $(active), $(obj));
+                                    rcmail.display_message(rcmail.get_label('aliases-aliasupdated','toolbox') + ' ' + aliasid, 'confirmation');
+                                }
+                            });
                         }
+
+                        rcmail.http_post('plugin.toolbox.toggle', { _section: rcmail.env.cur_section, _aliasname: aliasname });
                         return false;
                     }, true);
 
-                    rcmail.register_command('plugin.toolbox.delete_alias', function(aliasname, obj) {
-                        var aliasrow = $(obj).closest('tr');
-                        var aliasname = $(aliasrow).find('input[name^=_aliasname]').val();
+                    rcmail.register_command('plugin.toolbox.delete_alias', function(aliasname_, obj) {
+                        let aliasrow = $(obj).closest('tr');
+                        let aliasname = $(aliasrow).find('input[name^=_aliasname]').val();
                         rcmail.confirm_dialog(rcmail.get_label('aliases-aliasdeleteconfirm','toolbox')+'<br><br><span style="font-weight: bold;">'+aliasname+'</span>', 'delete', function(e, ref) {
                             rcmail.addEventListener('plugin.toolbox.check_delete', checkdelete);
                             rcmail.http_post('plugin.toolbox.delete', { _section: rcmail.env.cur_section, _aliasname: aliasname });

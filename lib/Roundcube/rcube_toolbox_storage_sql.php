@@ -278,11 +278,18 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                         if ($this->loglevel > 1) {
                             rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: execute query [SELECT `{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_goto_field_in_alias}` = '{$user}' AND `{$this->postfix_sql_domain_field_in_alias}` = '{$parts[1]}' AND `{$this->postfix_sql_address_field_in_alias}` != '{$user}';]");
                         }
-                        $sql_result = $this->db->query(
-                            "SELECT `{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_goto_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ? AND `{$this->postfix_sql_address_field_in_alias}` != ?;",
-                            $user,
-                            $parts[1],
-                            $user);
+                        if (rcube::get_instance()->config->get('toolbox_aliases_multiple_domains')) {
+                            $sql_result = $this->db->query(
+                                "SELECT `{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_goto_field_in_alias}` = ? AND `{$this->postfix_sql_address_field_in_alias}` != ?;",
+                                $user,
+                                $user);
+                        } else {
+                            $sql_result = $this->db->query(
+                                "SELECT `{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_goto_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ? AND `{$this->postfix_sql_address_field_in_alias}` != ?;",
+                                $user,
+                                $parts[1],
+                                $user);
+                        }
                         if ($this->loglevel > 0) {
                             if ($err_str = $this->db->is_error()) {
                                 rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_tool_data]: cannot read alias from database: " . $err_str);
@@ -484,7 +491,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 }
                 $this->_db_connect('postfix', 'w');
 
-                $address = $data['aliasname'] . '@' . $parts[1];
+                $address = rcube::get_instance()->config->get('toolbox_aliases_multiple_domains') ? $data['aliasname'] : $data['aliasname'] . '@' . $parts[1];
 
                 if ($this->loglevel > 1) {
                     rcube::write_log($this->logfile, "SQL in [storage].[sql].[function delete_tool_data]: execute query [DELETE FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_address_field_in_alias}` = '{$address}' AND `{$this->postfix_sql_goto_field_in_alias}` = '{$user}';]");
@@ -538,7 +545,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 }
                 $this->_db_connect('postfix', 'w');
 
-                $address = $settings['aliasname'] . '@' . $parts[1];
+                $address = rcube::get_instance()->config->get('toolbox_aliases_multiple_domains') ? $settings['aliasname'] : $settings['aliasname'] . '@' . $parts[1];
 
                 if ($this->loglevel > 1) {
                     rcube::write_log($this->logfile, "SQL in [storage].[sql].[function toggle_tool_data]: execute query [UPDATE `{$this->postfix_sql_alias_table_name}` SET `{$this->postfix_sql_active_field_in_alias}` = NOT `{$this->postfix_sql_active_field_in_alias}` WHERE `{$this->postfix_sql_address_field_in_alias}` = '{$address}' AND `{$this->postfix_sql_goto_field_in_alias}` = '{$user}';]");
@@ -601,19 +608,17 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 }
                 $this->_db_connect('postfix', 'w');
 
-                $address = $settings['main']['aliasname'] . '@' . $parts[1];
+                $address = $settings['main']['aliasname'];
+                if (!str_contains($address, '@') || !rcube::get_instance()->config->get('toolbox_aliases_multiple_domains')) $address .= '@' . $parts[1];
 
                 if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [INSERT INTO `{$this->postfix_sql_alias_table_name}` (`{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_domain_field_in_alias}`, `{$this->postfix_sql_created_field_in_alias}`, `{$this->postfix_sql_modified_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}`) VALUES ('{$address}', '{$user}', '{$parts[1]}', '{$this->db->now()}', '{$this->db->now()}', '{$settings['main']['active']}');]");
+                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [INSERT INTO `{$this->postfix_sql_alias_table_name}` (`{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_domain_field_in_alias}`, `{$this->postfix_sql_created_field_in_alias}`, `{$this->postfix_sql_modified_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}`) VALUES ('{$address}', '{$user}', '{$parts[1]}', {$this->db->now()}, {$this->db->now()}, '{$settings['main']['active']}');]");
                 }
                 $this->db->query(
-                    "INSERT INTO `{$this->postfix_sql_alias_table_name}` (`{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_domain_field_in_alias}`, `{$this->postfix_sql_created_field_in_alias}`, `{$this->postfix_sql_modified_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}`) VALUES (?, ?, ?, ?, ?, ?);",
+                    "INSERT INTO `{$this->postfix_sql_alias_table_name}` (`{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_domain_field_in_alias}`, `{$this->postfix_sql_created_field_in_alias}`, `{$this->postfix_sql_modified_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}`) VALUES (?, ?, ?, {$this->db->now()}, {$this->db->now()}, {$settings['main']['active']});",
                     $address,
                     $user,
-                    $parts[1],
-                    $this->db->now(),
-                    $this->db->now(),
-                    $settings['main']['active']);
+                    $parts[1]);
                 if ($this->loglevel > 0) {
                     if ($err_str = $this->db->is_error()) {
                         rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot insert into alias: " . $err_str);
