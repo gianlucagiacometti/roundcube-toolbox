@@ -134,7 +134,7 @@ class toolbox extends rcube_plugin
 
             // customise blank page
             $options = ['blankpage_type', 'blankpage_url', 'blankpage_image', 'blankpage_custom'];
-            if (customise['customise_blankpage'] !== false) {
+            if ($customise['customise_blankpage'] !== false) {
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]: 'customise blank page' database option selected: override config");
                 }
