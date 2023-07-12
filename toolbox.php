@@ -134,7 +134,7 @@ class toolbox extends rcube_plugin
 
             // customise blank page
             $options = ['blankpage_type', 'blankpage_url', 'blankpage_image', 'blankpage_custom'];
-            if ($config['customise_blankpage'] !== false) {
+            if (customise['customise_blankpage'] !== false) {
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]: 'customise blank page' database option selected: override config");
                 }
@@ -264,15 +264,15 @@ class toolbox extends rcube_plugin
             if ($this->loglevel > 2) {
                 rcube::write_log($this->logfile, "STEP in [function init]: 'attachments' tool active and loaded");
             }
-            $this->add_hook('attachment_upload', array($this, 'detach_attachment'));
-            $this->add_hook('message_compose', array($this, 'remove_session'));
-            $this->add_hook('startup', array($this, 'download_detached'));
-            $this->add_hook('toolbox_attachment_label', array($this, 'attachment_label'));
+            $this->add_hook('attachment_upload', [$this, 'detach_attachment']);
+            $this->add_hook('message_compose', [$this, 'remove_session']);
+            $this->add_hook('startup', [$this, 'download_detached']);
+            $this->add_hook('toolbox_attachment_label', [$this, 'attachment_label']);
             if (rcube_utils::get_input_value('_action', rcube_utils::INPUT_GPC) == 'compose') {
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function init]:modify hint in compose window");
                 }
-                $this->add_hook('template_object_composeattachmentform', array($this, 'update_hint'));
+                $this->add_hook('template_object_composeattachmentform', [$this, 'update_hint']);
             }
         } // end if attachments
 
@@ -640,7 +640,8 @@ class toolbox extends rcube_plugin
                     foreach ($settings['aliases'] as $alias) {
                         $active = $alias['active'];
                         $address = trim($alias['address']);
-                        $elements = $this->rcube->config->get('toolbox_aliases_multiple_domains') ? array($address) : explode("@", $address);
+                        // when toolbox_aliases_multiple_domains == true there is a mistake in the following procedure
+                        $elements = $this->rcube->config->get('toolbox_aliases_multiple_domains') ? [$address] : explode("@", $address);
                         if ($this->loglevel > 2) {
                             rcube::write_log($this->logfile, "STEP in [function tool_render_form]: $addr ($elements[0]@$elements[1]) valid:" . ($elements[0] != '' ? '✅' : '❎') . " active:" . ($active ? '✅' : '❎') );
                         }
