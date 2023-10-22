@@ -1624,9 +1624,9 @@ class toolbox extends rcube_plugin
         $address_table->add(['class' => 'email ' . $button_type], (isset($alias['name']) ? $alias['name'] : ''));
 
         $toggle = isset($alias['active']) && $alias['active'] !== false ? rcmail::Q($this->gettext('toolbox-disable')) : rcmail::Q($this->gettext('toolbox-enable'));
-        $enable_button = $this->rcube->output->button(['command' => 'plugin.toolbox.toggle_alias', 'type' => 'link', 'class' => $button_type, 'label' => 'toolbox.toolbox-'.$button_type, 'content' => ' ', 'title' => 'toolbox.toolbox-'.$button_type]);
         $input_active = new html_checkbox(['name' => '_aliasactive[]', 'value' => '1', 'style' => 'display: none;']);
-        $address_table->add('status', $enable_button . $input_active->show(isset($alias['active']) ? $alias['active'] : ''));
+        $enable_button = $this->rcube->output->button(['command' => 'plugin.toolbox.toggle_alias', 'type' => 'link', 'class' => $button_type, 'label' => 'toolbox.toolbox-'.$button_type, 'content' => $input_active->show(isset($alias['active']) ? $alias['active'] : ''), 'title' => 'toolbox.toolbox-'.$button_type]);
+        $address_table->add('status', $enable_button);
 
         $del_button = $this->rcube->output->button(['command' => 'plugin.toolbox.delete_alias', 'type' => 'link', 'class' => 'delete', 'label' => 'delete', 'content' => ' ', 'title' => 'delete']);
         $address_table->add('control', $del_button . $hidden_name->show());
