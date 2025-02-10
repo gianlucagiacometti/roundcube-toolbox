@@ -5,9 +5,9 @@ Some tools are designed to work with [PostfixAdmin](https://github.com/postfixad
 
 ATTENTION
 ---------
-This plugin works with RC 1.6.
+This plugin works with RC 1.7.
 
-Release 1.6.0 of the plugin works with 1.6 of Roundcube Webmail
+Release 1.7.0 of the plugin works with 1.7 of Roundcube Webmail
 
 Master branch works with the Git version of Roundcube Webmail
 
