@@ -1,6 +1,12 @@
 Roundcube Webmail Toolbox
 =========================
 
+Version 1.7.0 (2025-02-10, rc-1.7)
+==================================
+
+- Fix path for blankpage after RC introduced static.php to manage static resources
+- Updated version number to follow the last Rouncube release
+
 Version 1.6.0 (2023-01-01, rc-1.6)
 ==================================
 
