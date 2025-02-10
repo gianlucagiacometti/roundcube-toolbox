@@ -186,7 +186,7 @@ class toolbox extends rcube_plugin
                                     if ($this->loglevel > 2) {
                                         rcube::write_log($this->logfile, "STEP in [function init]: write new watermark in folder tmp");
                                     }
-                                    $this->rcube->output->set_env('blankpage', 'plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . basename($tmp));
+                                    $this->rcube->output->set_env('blankpage', 'static.php' . \DIRECTORY_SEPARATOR . 'plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . basename($tmp));
                                 }
                             }
                         }
@@ -198,7 +198,7 @@ class toolbox extends rcube_plugin
                             // a file is needed since the 'blankpage' env variable needs a real file (loaded in apps.js)
                             $tmp = RCUBE_INSTALL_PATH . \DIRECTORY_SEPARATOR . 'plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . 'blankpage.' . $parts[1] . '.html';
                             file_put_contents($tmp, $config['blankpage_custom']);
-                            $this->rcube->output->set_env('blankpage', 'plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . basename($tmp));
+                            $this->rcube->output->set_env('blankpage', 'static.php' . \DIRECTORY_SEPARATOR . 'plugins' . \DIRECTORY_SEPARATOR . $this->ID . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . basename($tmp));
                         }
                         break;
                 }
