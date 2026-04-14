@@ -819,14 +819,25 @@ class toolbox extends rcube_plugin
                 $field_id = 'rcmfd_vacationintervaltime';
                 $input_vacationintervaltime = new html_select(['name' => '_vacationintervaltime', 'id' => $field_id]);
 
-                $options = $this->rcube->config->get('toolbox_vacation_interval_time');
-                foreach($options as $name => $option) {
-                    $input_vacationintervaltime->add(rcmail::Q($this->gettext('vacation-'.$name)), intval($option));
+                $options = (array) $this->rcube->config->get('toolbox_vacation_interval_time');
+                foreach ($options as $name => $option) {
+                    $input_vacationintervaltime->add(
+                        rcmail::Q($this->gettext('vacation-' . $name)),
+                        (string) intval($option)
+                    );
                 }
+
+                $default_interval_time = isset($options['replyonce'])
+                    ? (string) intval($options['replyonce'])
+                    : (count($options) ? (string) intval(reset($options)) : '0');
+
+                $selected_interval_time = isset($selected['interval_time'])
+                    ? (string) intval($selected['interval_time'])
+                    : $default_interval_time;
 
                 $tooldata['rows']['vacationintervaltime'] = [
                     'title' => html::label($field_id, rcmail::Q($this->gettext('vacation-intervaltime'))),
-                    'content' => $input_vacationintervaltime->show($selected['interval_time'])
+                    'content' => $input_vacationintervaltime->show($selected_interval_time)
                 ];
 
                 $field_id = 'rcmfd_vacationsubject';
@@ -1456,7 +1467,14 @@ class toolbox extends rcube_plugin
                 $new_settings['main']['active'] = rcube_utils::get_input_value('_vacationactive', rcube_utils::INPUT_POST) ?: false;
                 $new_settings['main']['activefrom'] = rcube_utils::get_input_value('_vacationactivefrom', rcube_utils::INPUT_POST) ?: date("Y-m-d H:i:s");
                 $new_settings['main']['activeuntil'] = rcube_utils::get_input_value('_vacationactiveuntil', rcube_utils::INPUT_POST) ?: date('"Y-m-d H:i:s"', strtotime("+1 week"));
-                $new_settings['main']['interval_time'] = rcube_utils::get_input_value('_vacationintervaltime', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_interval_time')['replyonce'];
+                $interval_time_options = (array) $this->rcube->config->get('toolbox_vacation_interval_time');
+                $default_interval_time = isset($interval_time_options['replyonce'])
+                    ? intval($interval_time_options['replyonce'])
+                    : (count($interval_time_options) ? intval(reset($interval_time_options)) : 0);
+                $interval_time_input = rcube_utils::get_input_value('_vacationintervaltime', rcube_utils::INPUT_POST);
+                $new_settings['main']['interval_time'] = ($interval_time_input === null || $interval_time_input === '')
+                    ? $default_interval_time
+                    : intval($interval_time_input);
                 $new_settings['main']['subject'] = rcube_utils::get_input_value('_vacationsubject', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_subject');
                 $new_settings['main']['body'] = rcube_utils::get_input_value('_vacationbody', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_body');
 
