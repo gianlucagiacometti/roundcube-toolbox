@@ -49,8 +49,8 @@ class toolbox_tool_aliases extends toolbox_tool_module
             foreach ($settings['aliases'] as $alias) {
                 $active = $alias['active'];
                 $address = trim($alias['address']);
-                // when toolbox_aliases_multiple_domains == true there is a mistake in the following procedure
-                $elements = $this->rcube->config->get('toolbox_aliases_multiple_domains') ? [$address] : explode("@", $address);
+                // Multi-domain mode displays the complete address; single-domain mode hides its domain.
+                $elements = $this->rcube->config->get('toolbox_aliases_multiple_domains') ? [$address] : explode("@", $address, 2);
                 if ($this->loglevel > 2) {
                     rcube::write_log($this->logfile, "STEP in [function tool_render_form]: {$address} ({$elements[0]}@" . ($elements[1] ?? "") . ") valid:" . ($elements[0] != '' ? '✅' : '❎') . " active:" . ($active ? '✅' : '❎') );
                 }
@@ -117,7 +117,7 @@ class toolbox_tool_aliases extends toolbox_tool_module
         if ($this->loglevel > 2) {
             rcube::write_log($this->logfile, "STEP in [function save]: save alias");
         }
-        $new_settings['main']['aliasname'] = mb_convert_case(trim(rcube_utils::get_input_value('_newaliasname', rcube_utils::INPUT_POST)), MB_CASE_LOWER, RCUBE_CHARSET);
+        $new_settings['main']['aliasname'] = mb_convert_case(trim((string) rcube_utils::get_input_value('_newaliasname', rcube_utils::INPUT_POST)), MB_CASE_LOWER, RCUBE_CHARSET);
         $new_settings['main']['active'] = rcube_utils::get_input_value('_newaliasactive', rcube_utils::INPUT_POST);
         if ($this->loglevel > 2) {
             rcube::write_log($this->logfile, "STEP in [function save]: new alias name = '{$new_settings['main']['aliasname']}', new alias active = '{$new_settings['main']['active']}'");
@@ -181,29 +181,20 @@ class toolbox_tool_aliases extends toolbox_tool_module
     {
         $rcmail = rcmail::get_instance();
 
-        $new_alias = rcube_utils::get_input_value('_newaliasname', rcube_utils::INPUT_POST, true);
+        $new_alias = (string) rcube_utils::get_input_value('_newaliasname', rcube_utils::INPUT_POST, true);
 
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function check]: initialise storage for tool aliases");
+        // Check the complete address globally, without listing other users' aliases.
+        // Storage enforces the same validation again on INSERT (not just via AJAX).
+        $status = $storage->alias_creation_error($this->rcube->user->get_username(), $new_alias);
+        if ($status === 'exists') {
+            $error = rcmail::Q($this->plugin->gettext('aliases-aliasexistsindomain'));
         }
-
-        $error = '';
-
-        // check alias existence in domain
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function check]: check alias existence in domain");
-        }
-        $selected = $storage->load_tool_data($this->rcube->user->get_username(), 'allaliases');
-        foreach ($selected['aliases'] as $alias) {
-            $element = explode('@', trim($alias['address']));
-            if (($error == '') && ($element[0] == $new_alias)) {
-                $error = rcmail::Q($this->plugin->gettext('aliases-aliasexistsindomain'));
-            }
-        }
-
-        // check wrong chars in alias
-        if (($error == '') && !preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*/", mb_convert_case($new_alias, MB_CASE_LOWER, RCUBE_CHARSET))) {
+        elseif ($status !== null) {
+            // Do not disclose cross-domain authorization details to this endpoint.
             $error = rcmail::Q($this->plugin->gettext('aliases-aliasnameerror'));
+        }
+        else {
+            $error = '';
         }
 
         $rcmail->output->command('plugin.toolbox.check_alias', $error);

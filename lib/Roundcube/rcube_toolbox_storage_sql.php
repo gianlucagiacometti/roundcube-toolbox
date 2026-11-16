@@ -123,6 +123,12 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
     public function is_domain_admin($user)
     {
 
+        // Domain-specific administration requires a username with a domain.
+        $parts = explode('@', $user);
+        if (!isset($parts[1]) || $parts[0] === '' || $parts[1] === '') {
+            return false;
+        }
+
         $domains = [];
 
         // add postfixadmin domain admins
@@ -170,8 +176,6 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
             }
         }
 
-        $parts = explode('@', $user);
-
         return in_array($parts[1], $domains) || in_array('ALL', $domains) ? true : false;
 
     }
@@ -179,6 +183,10 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
     public function load_customised_config($user, $skin)
     {
         $parts = explode('@', $user);
+        if (!isset($parts[1]) || $parts[0] === '' || $parts[1] === '') {
+            // Never use an absent domain to look up another domain's settings.
+            return [];
+        }
 
         if ($this->loglevel > 2) {
             rcube::write_log($this->logfile, "STEP in [storage].[sql].[function load_customised_config]: connecting to roundcube database in read mode");
@@ -237,6 +245,10 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
     {
         $settings = [];
         $parts = explode('@', $user);
+        if ((!isset($parts[1]) || $parts[0] === '' || $parts[1] === '')
+            && in_array($this->tool, ['aliases', 'vacation', 'customise'], true)) {
+            return $settings;
+        }
 
         if ($this->loglevel > 2) {
             rcube::write_log($this->logfile, "STEP in [storage].[sql].[function load_tool_data]: enter {$this->tool} section");
@@ -451,6 +463,9 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
         $result = true;
 
         $parts = explode('@', $user);
+        if (!isset($parts[1]) || $parts[0] === '' || $parts[1] === '') {
+            return false;
+        }
 
         if ($this->loglevel > 2) {
             rcube::write_log($this->logfile, "STEP in [storage].[sql].[function delete_tool_data]: enter {$data['section']} section");
@@ -464,7 +479,11 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 }
                 $this->_db_connect('postfix', 'w');
 
-                $address = rcube::get_instance()->config->get('toolbox_aliases_multiple_domains') ? $data['aliasname'] : $data['aliasname'] . '@' . $parts[1];
+                $address = $this->normalise_alias_address($user, (string) ($data['aliasname'] ?? ''));
+                if ($address === null) {
+                    $result = false;
+                    break;
+                }
 
                 if ($this->loglevel > 1) {
                     rcube::write_log($this->logfile, "SQL in [storage].[sql].[function delete_tool_data]: execute query [DELETE FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_address_field_in_alias}` = '{$address}' AND `{$this->postfix_sql_goto_field_in_alias}` = '{$user}';]");
@@ -481,7 +500,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                     }
                     $sql_result = $this->db->affected_rows();
                     if (!$sql_result) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function delete_tool_data]: no record deleted in alias [values: {$this->postfix_sql_address_field_in_alias} = '{$settings['main']['address']}', {$this->postfix_sql_goto_field_in_alias} = '{$user}']");
+                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function delete_tool_data]: no record deleted in alias [values: {$this->postfix_sql_address_field_in_alias} = '{$address}', {$this->postfix_sql_goto_field_in_alias} = '{$user}']");
                         $result = false;
                         break;
                     }
@@ -505,6 +524,9 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 
         $settings = $data['new_settings'];
         $parts = explode('@', $user);
+        if (!isset($parts[1]) || $parts[0] === '' || $parts[1] === '') {
+            return false;
+        }
 
         if ($this->loglevel > 2) {
             rcube::write_log($this->logfile, "STEP in [storage].[sql].[function toggle_tool_data]: enter {$data['section']} section");
@@ -518,7 +540,11 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 }
                 $this->_db_connect('postfix', 'w');
 
-                $address = rcube::get_instance()->config->get('toolbox_aliases_multiple_domains') ? $settings['aliasname'] : $settings['aliasname'] . '@' . $parts[1];
+                $address = $this->normalise_alias_address($user, (string) ($settings['aliasname'] ?? ''));
+                if ($address === null) {
+                    $result = false;
+                    break;
+                }
 
                 if ($this->loglevel > 1) {
                     rcube::write_log($this->logfile, "SQL in [storage].[sql].[function toggle_tool_data]: execute query [UPDATE `{$this->postfix_sql_alias_table_name}` SET `{$this->postfix_sql_active_field_in_alias}` = NOT `{$this->postfix_sql_active_field_in_alias}` WHERE `{$this->postfix_sql_address_field_in_alias}` = '{$address}' AND `{$this->postfix_sql_goto_field_in_alias}` = '{$user}';]");
@@ -535,7 +561,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                     }
                     $sql_result = $this->db->affected_rows();
                     if (!$sql_result) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function toggle_tool_data]: no activation toggled in alias [values: {$this->postfix_sql_address_field_in_alias} = '{$settings['main']['address']}', {$this->postfix_sql_goto_field_in_alias} = '{$user}']");
+                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function toggle_tool_data]: no activation toggled in alias [values: {$this->postfix_sql_address_field_in_alias} = '{$address}', {$this->postfix_sql_goto_field_in_alias} = '{$user}']");
                         $result = false;
                         break;
                     }
@@ -559,6 +585,11 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 
         $settings = $data['new_settings'];
         $parts = explode('@', $user);
+        if ((!isset($parts[1]) || $parts[0] === '' || $parts[1] === '')
+            && in_array($data['section'] ?? '', ['aliases', 'forward', 'vacation', 'customise'], true)) {
+            // Refuse domain-specific writes without a valid username domain.
+            return false;
+        }
 
         if ($this->loglevel > 2) {
             rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: enter {$data['section']} section");
@@ -567,31 +598,33 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 
             case 'aliases':
 
-                // double check to avoid messing up the database
-                if ($settings['main']['aliasname'] == '') {
+                // Validate again at write time: AJAX validation can be bypassed.
+                // Only configured boolean SQL literals are allowed in the INSERT.
+                $active = $settings['main']['active'] ?? null;
+                if (!in_array($active, ['true', 'false'], true)) {
+                    $result = false;
+                    break;
+                }
+                $aliasname = (string) ($settings['main']['aliasname'] ?? '');
+                $status = $this->alias_creation_error($user, $aliasname, 'w');
+                if ($status !== null) {
                     if ($this->loglevel > 0) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: {$this->postfix_sql_address_field_in_alias} cannot be empty");
+                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: alias creation rejected ({$status})");
                     }
                     $result = false;
                     break;
                 }
-
-                if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: connecting to postfix database in write mode");
-                }
-                $this->_db_connect('postfix', 'w');
-
-                $address = $settings['main']['aliasname'];
-                if (!str_contains($address, '@') || !rcube::get_instance()->config->get('toolbox_aliases_multiple_domains')) $address .= '@' . $parts[1];
+                $address = $this->normalise_alias_address($user, $aliasname);
+                $address_domain = substr(strrchr($address, '@'), 1);
 
                 if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [INSERT INTO `{$this->postfix_sql_alias_table_name}` (`{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_domain_field_in_alias}`, `{$this->postfix_sql_created_field_in_alias}`, `{$this->postfix_sql_modified_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}`) VALUES ('{$address}', '{$user}', '{$parts[1]}', {$this->db->now()}, {$this->db->now()}, '{$settings['main']['active']}');]");
+                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [INSERT INTO `{$this->postfix_sql_alias_table_name}` (`{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_domain_field_in_alias}`, `{$this->postfix_sql_created_field_in_alias}`, `{$this->postfix_sql_modified_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}`) VALUES ('{$address}', '{$user}', '{$address_domain}', {$this->db->now()}, {$this->db->now()}, '{$settings['main']['active']}');]");
                 }
                 $this->db->query(
                     "INSERT INTO `{$this->postfix_sql_alias_table_name}` (`{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_domain_field_in_alias}`, `{$this->postfix_sql_created_field_in_alias}`, `{$this->postfix_sql_modified_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}`) VALUES (?, ?, ?, {$this->db->now()}, {$this->db->now()}, {$settings['main']['active']});",
                     $address,
                     $user,
-                    $parts[1]);
+                    $address_domain);
                 if ($this->loglevel > 0) {
                     if ($err_str = $this->db->is_error()) {
                         rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot insert into alias: " . $err_str);
@@ -600,7 +633,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                     }
                     $sql_result = $this->db->affected_rows();
                     if (!$sql_result) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: record not inserted in alias [values: {$this->postfix_sql_address_field_in_alias} = '{$address}', {$this->postfix_sql_goto_field_in_alias} = '{$user}', {$this->postfix_sql_domain_field_in_alias} = '{$parts[1]}', created = '{$this->db->now()}', modified = '{$this->db->now()}', {$this->postfix_sql_active_field_in_alias} = '{$settings['main']['active']}']");
+                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: record not inserted in alias [values: {$this->postfix_sql_address_field_in_alias} = '{$address}', {$this->postfix_sql_goto_field_in_alias} = '{$user}', {$this->postfix_sql_domain_field_in_alias} = '{$address_domain}', created = '{$this->db->now()}', modified = '{$this->db->now()}', {$this->postfix_sql_active_field_in_alias} = '{$settings['main']['active']}']");
                         $result = false;
                         break;
                     }
@@ -964,6 +997,126 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 
         return $result;
 
+    }
+
+    /**
+     * Normalize an alias address according to the configured single/multiple-domain mode.
+     *
+     * Unqualified aliases continue to refer to the user's own domain. An explicit
+     * domain is permitted syntactically only in multiple-domain mode. An invalid
+     * address or username is rejected instead of silently guessing a domain.
+     *
+     * @param string $user Authenticated full mailbox address.
+     * @param string $alias Submitted alias name or full email address.
+     * @return ?string Lowercase full alias address, or null when invalid.
+     */
+    public function normalise_alias_address(string $user, string $alias): ?string
+    {
+        $user_parts = explode('@', $user);
+        if (count($user_parts) !== 2 || $user_parts[0] === '' || $user_parts[1] === '') {
+            return null;
+        }
+
+        $alias = strtolower(trim($alias));
+        if (!$this->toolbox_multiple_domains_enabled() && str_contains($alias, '@')) {
+            return null;
+        }
+
+        $address = str_contains($alias, '@') ? $alias : $alias . '@' . strtolower($user_parts[1]);
+        $address_parts = explode('@', $address);
+        if (count($address_parts) !== 2 || strlen($address) > 254) {
+            return null;
+        }
+
+        [$local, $domain] = $address_parts;
+        if (!preg_match('/\A[_a-z0-9-]+(?:\.[_a-z0-9-]+)*\z/', $local)
+            || !preg_match('/\A[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*\z/', $domain)) {
+            return null;
+        }
+
+        foreach (explode('.', $domain) as $label) {
+            if (strlen($label) > 63) {
+                return null;
+            }
+        }
+
+        return $address;
+    }
+
+    /**
+     * Read the multiple-domain alias configuration from Roundcube.
+     *
+     * @return bool Whether fully qualified cross-domain alias names are enabled.
+     */
+    private function toolbox_multiple_domains_enabled(): bool
+    {
+        return (bool) rcube::get_instance()->config->get('toolbox_aliases_multiple_domains', false);
+    }
+
+    /**
+     * Validate an alias creation request against authorization and global uniqueness.
+     *
+     * Cross-domain creation requires an existing static or PostfixAdmin domain-admin
+     * assignment. Same-domain aliases remain available to regular mailbox users.
+     * Checks use the selected PostfixAdmin SQL connection mode and fail closed.
+     *
+     * @param string $user Authenticated mailbox address.
+     * @param string $alias Proposed alias name/address.
+     * @param string $mode Database connection mode: read for AJAX check, write for INSERT.
+     * @return ?string Null when permitted/available; otherwise invalid, unauthorized, exists, or storage.
+     */
+    public function alias_creation_error(string $user, string $alias, string $mode = 'r'): ?string
+    {
+        $address = $this->normalise_alias_address($user, $alias);
+        if ($address === null) {
+            return 'invalid';
+        }
+
+        $user_parts = explode('@', strtolower($user), 2);
+        $address_parts = explode('@', $address, 2);
+        $domain = $address_parts[1];
+        $this->_db_connect('postfix', $mode);
+
+        if ($domain !== $user_parts[1]) {
+            $authorized = false;
+            foreach ((array) $this->domain_admins as $admin => $assigned) {
+                if (strcasecmp((string) $admin, $user) !== 0) {
+                    continue;
+                }
+                $allowed_domains = array_map('trim', explode(',', strtolower((string) $assigned)));
+                if (in_array('all', $allowed_domains, true) || in_array($domain, $allowed_domains, true)) {
+                    $authorized = true;
+                    break;
+                }
+            }
+
+            if (!$authorized && $this->use_postfixadmin_domain_admins) {
+                $sql_result = $this->db->query(
+                    "SELECT `{$this->postfix_sql_domain_field_in_domain_admins}` FROM `{$this->postfix_sql_domain_admins_table_name}` WHERE `{$this->postfix_sql_username_field_in_domain_admins}` = ? AND (`{$this->postfix_sql_domain_field_in_domain_admins}` = ? OR `{$this->postfix_sql_domain_field_in_domain_admins}` = 'ALL');",
+                    $user,
+                    $domain
+                );
+                if (!$sql_result || $this->db->is_error()) {
+                    return 'storage';
+                }
+                $authorized = (bool) $this->db->fetch_assoc($sql_result);
+            }
+
+            if (!$authorized) {
+                return 'unauthorized';
+            }
+        }
+
+        // Never enumerate unrelated domains in AJAX. Check exactly one address.
+        $sql_result = $this->db->query(
+            "SELECT `{$this->postfix_sql_address_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_address_field_in_alias}` = ?;",
+            $address
+        );
+        if (!$sql_result || $this->db->is_error()) {
+            return 'storage';
+        }
+
+        return $this->db->fetch_assoc($sql_result) ? 'exists' : null;
     }
 
     private function _db_connect($type, $mode)

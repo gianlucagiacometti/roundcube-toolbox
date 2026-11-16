@@ -221,9 +221,12 @@ $config['toolbox_roundcube_db_persistent'] = false;
 
 // ALIASES TOOL OPTIONS
 
-// If false, single domain mode is used for aliases:
-// * only aliases matching the user's domain are shown
-// * on the settings page, the domain in each alias' address is hidden (and must not be specified by the used)
+// If false, only local alias names in the user's own domain are accepted;
+// the domain is hidden on the settings page. If true, full addresses may be
+// entered and displayed. Cross-domain alias creation requires that the user
+// administer the target domain (via toolbox_domain_admins or PostfixAdmin's
+// domain_admins table); normal mailbox users can manage their own domain.
+// Existing aliases are always scoped to the authenticated mailbox for edits.
 $config['toolbox_aliases_multiple_domains'] = true;
 
 // FORWARD TOOL OPTIONS

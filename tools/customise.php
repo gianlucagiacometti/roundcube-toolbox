@@ -80,6 +80,12 @@ class toolbox_tool_customise extends toolbox_tool_module
      */
     public function apply_config($storage, string $skin, string $plugin_id): void
     {
+        $mailbox_parts = explode('@', $this->rcube->user->get_username());
+        if (!isset($mailbox_parts[1]) || $mailbox_parts[0] === '' || $mailbox_parts[1] === '') {
+            // Domain-specific assets cannot be named without a domain.
+            return;
+        }
+
         // Resolve Roundcube's active skin in this module, not in Toolbox.
         $skin = $this->active_skin($skin);
 
@@ -96,6 +102,7 @@ class toolbox_tool_customise extends toolbox_tool_module
             rcube::write_log($this->logfile, "STEP in [function init]: load customised skin configuration from database");
         }
         $customise = $storage->load_customised_config($this->rcube->user->get_username(), $skin);
+        $parts = explode('@', $this->rcube->user->get_username());
 
         // customise blank page
         $options = ['blankpage_type', 'blankpage_url', 'blankpage_image', 'blankpage_custom'];
@@ -104,7 +111,7 @@ class toolbox_tool_customise extends toolbox_tool_module
                 rcube::write_log($this->logfile, "STEP in [function init]: 'customise blank page' database option selected: override config");
             }
             foreach ($options as $option) {
-                $config[$option] = $customise[$option];
+                $config[$option] = $customise[$option] ?? '';
             }
         }
         else {
@@ -119,7 +126,6 @@ class toolbox_tool_customise extends toolbox_tool_module
         }
 
         if (isset($config['blankpage_type']) && (in_array($config['blankpage_type'], ['url', 'image', 'custom']))) {
-            $parts = explode('@', $this->rcube->user->get_username());
             if ($this->loglevel > 2) {
                 rcube::write_log($this->logfile, "STEP in [function init]: customised blank page type: " . $config['blankpage_type']);
             }
@@ -189,15 +195,18 @@ class toolbox_tool_customise extends toolbox_tool_module
                 rcube::write_log($this->logfile, "STEP in [function init]: customised additional css loaded");
             }
         }
-        elseif ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function init]: 'customise additional css' database option not selected: loading from config");
-            if (file_exists($config['additional_css'])) {
+        else {
+            if ($this->loglevel > 2) {
+                rcube::write_log($this->logfile, "STEP in [function init]: 'customise additional css' database option not selected: loading from config");
+            }
+            $additional_css = $config['additional_css'] ?? null;
+            if (is_string($additional_css) && $additional_css !== '' && is_file($additional_css)) {
                 if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [function init]: valid customised additional css file defined, found and loaded: {$config['additional_css']}");
+                    rcube::write_log($this->logfile, "STEP in [function init]: valid customised additional css file defined, found and loaded: {$additional_css}");
                 }
                 // css is loaded only under some circumstances (not when rcmail_output_json is called)
                 if (method_exists($this->rcube->output, 'include_css')) {
-                    $this->rcube->output->include_css($config['additional_css']);
+                    $this->rcube->output->include_css($additional_css);
                 }
             }
             elseif ($this->loglevel > 2) {
@@ -290,6 +299,7 @@ class toolbox_tool_customise extends toolbox_tool_module
 
             // set settings for each skin
             foreach ($this->get_skins() as $skin => $header) {
+                $skin_settings = $selected['skins'][$skin] ?? [];
 
                 // set field visibility
                 $row_attribs = [
@@ -325,7 +335,7 @@ class toolbox_tool_customise extends toolbox_tool_module
                 $input_blankpageselector = new html_checkbox(['name' => '_blankpageselector_' . $skin, 'id' => $button_id, 'value' => '1', 'class' => 'customise-blankpage-selector', 'title' => rcmail::Q($this->plugin->gettext('customise-blankpage'))]);
 
                 $tooldata['rows']['skinblankpage'] = [
-                    'content' => $input_blankpageselector->show(isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin]) ? $selected['skins'][$skin]['customise_blankpage'] : ' ') . html::label(['for' => $button_id, 'class' => 'customise-blankpage-label'], rcmail::Q($this->plugin->gettext('customise-blankpage')))
+                    'content' => $input_blankpageselector->show($skin_settings['customise_blankpage'] ?? ' ') . html::label(['for' => $button_id, 'class' => 'customise-blankpage-label'], rcmail::Q($this->plugin->gettext('customise-blankpage')))
                 ];
 
                 // blank page type table
@@ -335,25 +345,25 @@ class toolbox_tool_customise extends toolbox_tool_module
                 $button_id = 'rcmrb_blankpageskindefault_' . $skin;
                 $input_skindefault = new html_radiobutton(['name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => '', 'class' => 'customise-blankpage-skin-selector']);
 
-                $blankpagetype_table->add(['class' => 'blankpage-type-check'], $input_skindefault->show(isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin]) ? $selected['skins'][$skin]['blankpage_type'] : '') . html::label($button_id, rcmail::Q($this->plugin->gettext('customise-blankpage-skin-default'))));
+                $blankpagetype_table->add(['class' => 'blankpage-type-check'], $input_skindefault->show($skin_settings['blankpage_type'] ?? '') . html::label($button_id, rcmail::Q($this->plugin->gettext('customise-blankpage-skin-default'))));
 
                 // blank page as url
                 $button_id = 'rcmrb_blankpageskinurl_' . $skin;
                 $input_skinurl = new html_radiobutton(['name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => 'url', 'class' => 'customise-blankpage-skin-selector']);
 
-                $blankpagetype_table->add(['class' => 'blankpage-type-check'], $input_skinurl->show(isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin]) ? $selected['skins'][$skin]['blankpage_type'] : '') . html::label($button_id, rcmail::Q($this->plugin->gettext('customise-blankpage-skin-url'))));
+                $blankpagetype_table->add(['class' => 'blankpage-type-check'], $input_skinurl->show($skin_settings['blankpage_type'] ?? '') . html::label($button_id, rcmail::Q($this->plugin->gettext('customise-blankpage-skin-url'))));
 
                 $field_id = 'rcmfd_blankpageurl_' . $skin;
                 $input_blankpageurl = new html_inputfield(['name' => '_blankpageurl_' . $skin, 'class' => 'tool-skin-blankpage-url', 'type' => 'url', 'id' => $field_id, 'title' => rcmail::Q($this->plugin->gettext('customise-blankpage-url')), 'placeholder' => rcmail::Q($this->plugin->gettext('customise-blankpage-url'))]);
 
                 $blankpagetype_table->set_row_attribs($row_attribs['url']);
-                $blankpagetype_table->add(['class' => 'blankpage-type-content'], $input_blankpageurl->show(isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin]) ? $selected['skins'][$skin]['blankpage_url'] : '') . html::span(['id' => $button_id . '_content'], ''));
+                $blankpagetype_table->add(['class' => 'blankpage-type-content'], $input_blankpageurl->show($skin_settings['blankpage_url'] ?? '') . html::span(['id' => $button_id . '_content'], ''));
 
                 // blank page with custom image
                 $button_id = 'rcmrb_blankpageskinimage_' . $skin;
                 $input_skinimage = new html_radiobutton(['name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => 'image', 'class' => 'customise-blankpage-skin-selector']);
 
-                $blankpagetype_table->add(['class' => 'blankpage-type-check'], $input_skinimage->show(isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin]) ? $selected['skins'][$skin]['blankpage_type'] : '') . html::label($button_id, rcmail::Q($this->plugin->gettext('customise-blankpage-skin-image'))));
+                $blankpagetype_table->add(['class' => 'blankpage-type-check'], $input_skinimage->show($skin_settings['blankpage_type'] ?? '') . html::label($button_id, rcmail::Q($this->plugin->gettext('customise-blankpage-skin-image'))));
 
                 $image_id = 'rcmbtn_modifyblankpageimage_' . $skin;
                 $blankpageimage = html::img([
@@ -384,13 +394,13 @@ class toolbox_tool_customise extends toolbox_tool_module
                 $button_id = 'rcmrb_blankpageskincustom_' . $skin;
                 $input_skincustom = new html_radiobutton(['name' => '_blankpagetype_' . $skin, 'id' => $button_id, 'value' => 'custom', 'class' => 'customise-blankpage-skin-selector']);
 
-                $blankpagetype_table->add(['class' => 'blankpage-type-check'], $input_skincustom->show(isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin]) ? $selected['skins'][$skin]['blankpage_type'] : '') . html::label($button_id, rcmail::Q($this->plugin->gettext('customise-blankpage-skin-custom'))));
+                $blankpagetype_table->add(['class' => 'blankpage-type-check'], $input_skincustom->show($skin_settings['blankpage_type'] ?? '') . html::label($button_id, rcmail::Q($this->plugin->gettext('customise-blankpage-skin-custom'))));
 
                 $field_id = 'rcmfd_blankpagecustom_' . $skin;
                 $input_blankpagecustom = new html_textarea(['name' => '_blankpagecustom_' . $skin, 'id' => $field_id, 'spellcheck' => 1, 'rows' => 12, 'cols' => 92, 'class' => 'mce_editor']);
 
                 $blankpagetype_table->set_row_attribs($row_attribs['custom']);
-                $blankpagetype_table->add(['class' => 'blankpage-type-content'], $input_blankpagecustom->show(isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin]) ? $selected['skins'][$skin]['blankpage_custom'] : '') . html::span(['id' => $button_id . '_content'], ''));
+                $blankpagetype_table->add(['class' => 'blankpage-type-content'], $input_blankpagecustom->show($skin_settings['blankpage_custom'] ?? '') . html::span(['id' => $button_id . '_content'], ''));
 
                 // show blank page type table
                 $tooldata['rows']['blankpage'] = [
@@ -407,14 +417,14 @@ class toolbox_tool_customise extends toolbox_tool_module
                 $input_additionalcssselector = new html_checkbox(['name' => '_additionalcssselector_' . $skin, 'id' => $button_id, 'value' => '1', 'class' => 'customise-additional-css-selector', 'title' => rcmail::Q($this->plugin->gettext('customise-additional-css'))]);
 
                 $tooldata['rows']['skinadditionalcss'] = [
-                    'content' => $input_additionalcssselector->show(isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin]) ? $selected['skins'][$skin]['customise_css'] : '') . html::label(['for' => $button_id, 'class' => 'customise-additional-css-label'], rcmail::Q($this->plugin->gettext('customise-additional-css')))
+                    'content' => $input_additionalcssselector->show($skin_settings['customise_css'] ?? '') . html::label(['for' => $button_id, 'class' => 'customise-additional-css-label'], rcmail::Q($this->plugin->gettext('customise-additional-css')))
                 ];
 
                 $field_id = 'rcmfd_additionalcss_' . $skin;
                 $input_additionalcss = new html_textarea(['name' => '_additionalcss_' . $skin, 'id' => $field_id, 'spellcheck' => 1, 'rows' => 12, 'cols' => 92, 'class' => 'tool-skin-additional-css']);
 
                 $tooldata['rows']['additionalcss'] = [
-                    'content' => $input_additionalcss->show(isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin]) ? $selected['skins'][$skin]['additional_css'] : '') . html::span(['id' => $button_id . '_content'], ''),
+                    'content' => $input_additionalcss->show($skin_settings['additional_css'] ?? '') . html::span(['id' => $button_id . '_content'], ''),
                     'row_attribs' => $row_attribs['css']
                 ];
 
@@ -427,7 +437,7 @@ class toolbox_tool_customise extends toolbox_tool_module
                 $input_customiselogoselector = new html_checkbox(['name' => '_customiselogoselector_' . $skin, 'id' => $button_id, 'value' => '1', 'class' => 'customise-logo-selector', 'title' => rcmail::Q($this->plugin->gettext('customise-logo'))]);
 
                 $tooldata['rows']['skincustomiselogo'] = [
-                    'content' => $input_customiselogoselector->show(isset($selected['skins'][$skin]) && !empty($selected['skins'][$skin]) ? $selected['skins'][$skin]['customise_logo'] : '') . html::label(['for' => $button_id, 'class' => 'customise-logo-label'], rcmail::Q($this->plugin->gettext('customise-logo')))
+                    'content' => $input_customiselogoselector->show($skin_settings['customise_logo'] ?? '') . html::label(['for' => $button_id, 'class' => 'customise-logo-label'], rcmail::Q($this->plugin->gettext('customise-logo')))
                 ];
 
                 $form_content .= $render_fieldset($tooldata, 'customiselogo');
@@ -459,7 +469,7 @@ class toolbox_tool_customise extends toolbox_tool_module
                 $logo_table->add_header('logoimage', rcmail::Q($this->plugin->gettext('customise-logo-image')));
                 $logo_table->add_header('control', '&nbsp;');
 
-                $images = json_decode($selected['skins'][$skin]['customised_logo'], true);
+                $images = json_decode((string) ($skin_settings['customised_logo'] ?? ''), true);
 
                 $this->rcube->output->set_env('customised_logo_count_' . $skin, (!empty($images) ? count($images) : 0));
                 if (!empty($images)) {
@@ -551,8 +561,8 @@ class toolbox_tool_customise extends toolbox_tool_module
                     'image/ico'
                 ];
                 $base64 = null;
-                if ($filepath = $_FILES['_blankpageimage_' . $skin]['tmp_name']) {
-                    $filetype = $_FILES['_blankpageimage_' . $skin]['type'];
+                if ($filepath = ($_FILES['_blankpageimage_' . $skin]['tmp_name'] ?? null)) {
+                    $filetype = $_FILES['_blankpageimage_' . $skin]['type'] ?? '';
                     if (in_array($filetype, $allowed_types)) {
                         $filecont = file_get_contents($filepath);
                         $base64 = 'data:' . $filetype . ';base64,' . base64_encode($filecont);
@@ -560,7 +570,7 @@ class toolbox_tool_customise extends toolbox_tool_module
                 }
                 $new_settings['skins'][$skin]['blankpage_image'] = $base64 ?: null;
                 $new_settings['skins'][$skin]['blankpage_image_control'] = rcube_utils::get_input_value('_blankpageimage_' . $skin . '_control', rcube_utils::INPUT_POST);
-                $new_settings['skins'][$skin]['blankpage_custom'] = $_POST['_blankpagecustom_' . $skin] ?: null;
+                $new_settings['skins'][$skin]['blankpage_custom'] = ($_POST['_blankpagecustom_' . $skin] ?? null) ?: null;
                 $new_settings['skins'][$skin]['customise_css'] = rcube_utils::get_input_value('_additionalcssselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
                 $new_settings['skins'][$skin]['additional_css'] = rcube_utils::get_input_value('_additionalcss_' . $skin, rcube_utils::INPUT_POST) ?: null;
                 $new_settings['skins'][$skin]['customise_logo'] = rcube_utils::get_input_value('_customiselogoselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
@@ -574,7 +584,7 @@ class toolbox_tool_customise extends toolbox_tool_module
                     $customised_logotemplates[] = $template;
                 }
                 if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [function save]: " . count($customised_templates) . " customised logos found for skin " . $skin);
+                    rcube::write_log($this->logfile, "STEP in [function save]: " . count($customised_logotemplates) . " customised logos found for skin " . $skin);
                 }
                 $customised_logotypes = [];
                 $input_logotype = rcube_utils::get_input_value('_customisedlogotype_' . $skin, rcube_utils::INPUT_POST) ?: [];
