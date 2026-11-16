@@ -14,6 +14,7 @@
 // 'preview' [tool to disable message previe]
 // 'customise' [tool to customise Blank Page and CSS per domain]
 // 'attachments' [tool to replace large attachments with a link in outgoing messages]
+// 'password_hashes' [background tool to store additional configurable password hashes after password changes]
 
 $config['toolbox_tools'] = [
     'aliases',
@@ -23,6 +24,7 @@ $config['toolbox_tools'] = [
     'preview',
     'customise',
     'attachments',
+//    'password_hashes',
 ];
 
 
@@ -338,6 +340,37 @@ $config['toolbox_detach_lifespan'] = 30;
 $config['toolbox_detach_storage'] = 'attachments';
 
 
+// PASSWORD HASHES TOOL OPTIONS
+
+// Background tool enabled by 'password_hashes' in toolbox_tools.
+// No Toolbox settings tab or require/include is needed.
+// The existing mailbox table and username settings above are reused.
+// These fields must never be used as destinations for additional hashes.
+// 'password' is the standard primary password column; 'created' and
+// 'modified' are standard PostfixAdmin mailbox columns.
+// Adapt this list if the primary password column has another name.
+$config['toolbox_password_hashes_protected_fields'] = [
+    'password',
+    'created',
+    'modified',
+];
+
+// Each entry has its own algorithm, work factors, prefix and destination.
+// Add as many entries as needed. Columns must exist in the mailbox table.
+$config['toolbox_password_additional_algorithms'] = [
+    'argon2id' => [
+        'algorithm' => PASSWORD_ARGON2ID,
+        'options' => [
+            'memory_cost' => 65536,
+            'time_cost'   => 3,
+            'threads'     => 1,
+        ],
+        'prefix'     => '{ARGON2ID}',
+        'field_name' => 'password_argon2id',
+    ],
+];
+
+
 // PLUGIN LOG/DEBUG OPTIONS
 
 // Log file
@@ -373,3 +406,4 @@ $config['toolbox_script_logfile'] = 'toolbox.script';
 $config['toolbox_script_loglevel'] = 2;
 
 // END OF FILE
+

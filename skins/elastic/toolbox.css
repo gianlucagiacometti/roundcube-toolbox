@@ -411,3 +411,6 @@ html.dark-mode input[type=radio] + label:before,
 html.dark-mode input[type=radio]:checked + label:before {
   color: #fff;
 }
+html.dark-mode .toolbox-customisetable .CodeMirror-activeline-background {
+  background-color: #e9ecef;
+}
