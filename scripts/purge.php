@@ -60,9 +60,10 @@ $db_postfix->db_connect('r');
 // check DB connections and exit on failure
 if ($err_str = $db_postfix->is_error()) {
     if ($loglevel > 1) {
-        $rcmail->write_log($logfile, "ERROR: cannoct connect to database postfix: " . $err_str);
+        $rcmail->write_log($logfile, "ERROR: cannot connect to database postfix: " . $err_str);
     }
-    exit($err_str . "\n");
+    fwrite(STDERR, $err_str . "\n");
+    exit(1);
 }
 
 if ($loglevel > 3) {
@@ -75,9 +76,10 @@ $db_roundcube->db_connect('r');
 // check DB connections and exit on failure
 if ($err_str = $db_roundcube->is_error()) {
     if ($loglevel > 1) {
-        $rcmail->write_log($logfile, "ERROR: cannoct connect to database roundcube: " . $err_str);
+        $rcmail->write_log($logfile, "ERROR: cannot connect to database roundcube: " . $err_str);
     }
-    exit($err_str . "\n");
+    fwrite(STDERR, $err_str . "\n");
+    exit(1);
 }
 
 if ($loglevel > 2) {
@@ -90,7 +92,8 @@ if ($err_str = $db_postfix->is_error()) {
     if ($loglevel > 1) {
         $rcmail->write_log($logfile, "ERROR: cannot read mailboxes from database: " . $err_str);
     }
-    exit($err_str . '\n');
+    fwrite(STDERR, $err_str . "\n");
+    exit(1);
 }
 
 $mailboxes = [];
@@ -117,20 +120,20 @@ foreach ($mailboxes as $mailbox) {
     }
 
     // load user prefs
+    $preferences_sql = "SELECT `username`, `preferences` FROM `users` WHERE `username` = ?;";
     if ($loglevel > 2) {
-        $rcmail->write_log($logfile, "SQL: SELECT `username`, `preferences` FROM `users` WHERE `username` = '{$mailbox['username']}';");
+        $rcmail->write_log($logfile, 'SQL: ' . $preferences_sql);
     }
-    $sql_result = $db_roundcube->query(
-        "SELECT `username`, `preferences` FROM `users` WHERE `username` = '{$mailbox['username']}';"
-        );
+    $sql_result = $db_roundcube->query($preferences_sql, $mailbox['username']);
     if ($err_str = $db_roundcube->is_error()) {
         if ($loglevel > 1) {
             $rcmail->write_log($logfile, 'ERROR: cannot read preferences from database for user ' . $mailbox['username'] . ': ' . $err_str);
         }
-        exit($err_str . '\n');
+        fwrite(STDERR, $err_str . "\n");
+        exit(1);
     }
     $preferences = [];
-    while ($sql_result && ($sql_arr = $db_postfix->fetch_assoc($sql_result))) {
+    while ($sql_result && ($sql_arr = $db_roundcube->fetch_assoc($sql_result))) {
         $preferences = (array)unserialize($sql_arr['preferences']);
     }
     if (($loglevel > 2) && !empty($preferences)) {
@@ -151,7 +154,8 @@ foreach ($mailboxes as $mailbox) {
             if ($loglevel > 1) {
                 $rcmail->write_log($logfile, 'ERROR: cannot read customised domain data for ' . $mailbox['domain'] . ': ' . $err);
             }
-            exit($err . '\n');
+            fwrite(STDERR, $err . "\n");
+            exit(1);
         }
         $sql_arr = $db_roundcube->fetch_assoc($sql_result);
         if ($purge_trash == 'NULL') {
@@ -167,22 +171,40 @@ foreach ($mailboxes as $mailbox) {
         $count = 0;
         $last = $val > 0 ? ($val == 1 ? ' 1 day' : ' ' . strval($val) . ' days') : 'ever';
         $folder = $rcmail->config->get('toolbox_purge_maildir_path') . '/' . $mailbox['domain'] . '/' . $mailbox['local_part'] . '/Maildir/.' . $key . '/cur';
-        if (!file_exists($folder)) {
-            $rcmail->write_log($logfile, 'WARNNING: ' . $key . ' folder does not exist! (' . $folder . ')');
+        if (!is_dir($folder) || !is_readable($folder)) {
+            if ($loglevel > 0) {
+                $rcmail->write_log($logfile, 'WARNING: ' . $key . ' folder is missing or unreadable (' . $folder . ')');
+            }
+            continue;
         }
         if ($loglevel > 0) {
             $rcmail->write_log($logfile, '     keeps messages in ' . $key  . ' folder for' . $last);
         }
         if ($val > 0) {
-            $files = array_diff(scandir($folder), ['..', '.']);
+            $files = @scandir($folder);
+            if ($files === false) {
+                if ($loglevel > 0) {
+                    $rcmail->write_log($logfile, 'WARNING: cannot list ' . $key . ' folder (' . $folder . ')');
+                }
+                continue;
+            }
+            $files = array_diff($files, ['..', '.']);
             if (!empty($files)) {
                 foreach ($files as $file) {
-                    if (file_exists($folder . '/' . $file) && ((time() - filemtime($folder . '/' . $file)) > ($val * 60 * 60 * 24))) {
-                        if ($loglevel > 0) {
-                            $rcmail->write_log($logfile, '     purging file ' . $file . ' (dated ' . date('Y-m-d H:i:s', filemtime($folder . '/' . $file)) . ') from ' . $key . ' folder of user ' .  $mailbox['local_part'] . '@' . $mailbox['domain']);
+                    $path = $folder . '/' . $file;
+                    if (!file_exists($path)) {
+                        continue;
+                    }
+                    $modified = @filemtime($path);
+                    if ($modified !== false && (time() - $modified) > ($val * 60 * 60 * 24)) {
+                        if (@unlink($path)) {
+                            $count++;
+                            if ($loglevel > 0) {
+                                $rcmail->write_log($logfile, '     purging file ' . $file . ' (dated ' . date('Y-m-d H:i:s', $modified) . ') from ' . $key . ' folder of user ' .  $mailbox['local_part'] . '@' . $mailbox['domain']);
+                            }
+                        } elseif ($loglevel > 0) {
+                            $rcmail->write_log($logfile, 'WARNING: failed to purge file ' . $file . ' from ' . $key . ' folder of user ' . $mailbox['local_part'] . '@' . $mailbox['domain']);
                         }
-                        unlink($folder . '/' . $file);
-                        $count++;
                     }
                 }
                 if (($count > 0) && $loglevel > 0) {
