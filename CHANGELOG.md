@@ -49,6 +49,18 @@
 - Improved Customise's CSS active-line contrast in Elastic dark mode.
 - Restored Roundcube's native message read/unread handling, removing Toolbox's
   conflicting double-click toggle; native mail_read_time remains authoritative.
+- Fixed PHP warnings caused by missing configuration values in the
+  Customise and Vacation modules.
+- Prevented undefined array key warnings when a username does not
+  contain a valid domain, without changing valid username handling.
+- Fixed Vacation Reply Type selection when reopening the form,
+  preserving saved values including zero (PR #33).
+- Fixed multiple-domain alias handling, including full-address
+  duplicate checks, domain validation, authorization and correct
+  SQL domain assignment (issue #29).
+- Improved attachment directory initialization and temporary
+  directory setup.
+- Improved the reliability and safety of the purge cron script.
 
 ## Version 1.7.0 (2025-02-10, rc-1.7)
 
