@@ -1,0 +1,405 @@
+/**
+ * Toolbox Tags styles for the Elastic skin.
+ *
+ * Compile this standalone source to toolbox.tags.css beside this file.
+ * Sections: shared values, definition editor, message badges, list tags, and modal.
+ */
+.toolbox-tags-manager {
+  max-width: 780px;
+  width: 100%;
+}
+.toolbox-tags-preference {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  margin-bottom: 1rem;
+}
+.toolbox-tags-preference input {
+  flex: 0 0 auto;
+  margin: 0;
+}
+.toolbox-tags-preference label {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.toolbox-tags-preference-help {
+  flex: 0 0 100%;
+  margin: 0;
+  color: var(--color-text-muted, #737373);
+  font-size: 0.9rem;
+}
+.toolbox-tags-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+.toolbox-tags-toolbar .button,
+.toolbox-tags-editor-actions .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.toolbox-tags-tree,
+.toolbox-tags-values {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.toolbox-tags-group {
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.6rem;
+  border: 1px solid var(--color-border, #d1d5db);
+  border-radius: 0.5rem;
+}
+.toolbox-tags-group summary {
+  display: list-item;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.toolbox-tags-group summary svg,
+.toolbox-tags-value > svg,
+.toolbox-tags-toolbar svg {
+  vertical-align: middle;
+  margin-right: 0.4rem;
+}
+.toolbox-tags-count {
+  display: inline-block;
+  margin-left: 0.6rem;
+  padding: 0 0.4rem;
+  border-radius: 0.6rem;
+  background: var(--color-background-alt, #f3f4f6);
+  font-size: 0.75rem;
+}
+.toolbox-tags-values {
+  padding-left: 1.7rem;
+  margin-top: 0.4rem;
+}
+.toolbox-tags-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+.toolbox-tags-group > details > .toolbox-tags-actions {
+  display: flex;
+  margin: 0.5rem 0 0.2rem 1.7rem;
+}
+.toolbox-tags-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  border-radius: 0.3rem;
+  padding: 0.3rem;
+  min-width: 2rem;
+  min-height: 2rem;
+}
+.toolbox-tags-button:hover,
+.toolbox-tags-button:focus-visible {
+  background: var(--color-background-alt, #e5e7eb);
+}
+.toolbox-tags-button.danger:hover,
+.toolbox-tags-button.danger:focus-visible {
+  color: #b42318;
+}
+.toolbox-tags-value {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.4rem;
+  padding: 0.15rem 0.3rem;
+}
+.toolbox-tags-value-name {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.toolbox-tags-swatch {
+  display: inline-block;
+  flex: 0 0 1rem;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 50%;
+}
+.toolbox-tags-empty,
+.toolbox-tags-archive,
+.toolbox-tags-removed,
+.toolbox-tags-value.is-archived {
+  color: var(--color-text-muted, #737373);
+}
+.toolbox-tags-empty {
+  padding: 0.5rem;
+}
+.toolbox-tags-archive {
+  margin: 0.8rem 0;
+}
+.toolbox-tags-editor {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border, #d1d5db);
+  border-radius: 0.5rem;
+}
+.toolbox-tags-editor[hidden],
+.toolbox-tags-field[hidden],
+.toolbox-tags-parent[hidden] {
+  display: none !important;
+}
+.toolbox-tags-editor h3 {
+  margin: 0 0 0.8rem;
+}
+.toolbox-tags-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.8rem;
+}
+.toolbox-tags-field input[type="text"] {
+  width: 100%;
+  max-width: 28rem;
+  box-sizing: border-box;
+}
+.toolbox-tags-field input[type="color"] {
+  width: 4rem;
+  height: 2.5rem;
+  padding: 0.15rem;
+  cursor: pointer;
+}
+.toolbox-tags-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+a.toolbox-tags:before {
+  font-family: Icons;
+  font-style: normal;
+  font-weight: 900;
+  content: "\f02c";
+}
+.toolbox-tags-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.7rem;
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(128, 128, 128, 0.3);
+}
+.toolbox-tags-badges {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.toolbox-tags-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  border-radius: 1rem;
+  background: rgba(128, 128, 128, 0.08);
+  font-size: 0.9rem;
+}
+.toolbox-tags-badge > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.toolbox-tags-badge .toolbox-tags-swatch {
+  flex-basis: 0.7rem;
+  width: 0.7rem;
+  height: 0.7rem;
+}
+.toolbox-tags-none {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+.toolbox-tags-edit {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgba(128, 128, 128, 0.45);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.toolbox-tags-edit:hover,
+.toolbox-tags-edit:focus-visible {
+  background: rgba(128, 128, 128, 0.15);
+}
+.messagelist td.subject .toolbox-tags-list-line {
+  display: flex;
+  flex: 0 0 100%;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0.15rem 0 0.25rem;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: normal;
+  line-height: 1.2;
+}
+.messagelist td.subject .toolbox-tags-list-badge {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.1rem 0.35rem;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  border-radius: 0.6rem;
+  overflow: hidden;
+  background: rgba(128, 128, 128, 0.08);
+  line-height: 1.2;
+}
+.messagelist td.subject .toolbox-tags-list-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.messagelist td.subject .toolbox-tags-list-badge .toolbox-tags-swatch {
+  flex: 0 0 0.55rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  line-height: 1;
+}
+.messagelist td.subject .toolbox-tags-list-more {
+  flex: 0 0 auto;
+  padding: 0.1rem 0.2rem;
+  line-height: 1.2;
+}
+.toolbox-tags-popup > .ui-dialog-content {
+  overflow: hidden;
+}
+.toolbox-tags-dialog {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+.toolbox-tags-assignment,
+.toolbox-tags-definition-panel {
+  flex: 1 1 0%;
+  min-height: 0;
+  min-width: 0;
+}
+.toolbox-tags-assignment {
+  overflow: auto;
+}
+.toolbox-tags-definition-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.toolbox-tags-definition-panel > .toolbox-tags-status,
+.toolbox-tags-definition-panel > button {
+  flex: 0 0 auto;
+}
+.toolbox-tags-definition-panel > button {
+  align-self: flex-start;
+}
+.toolbox-tags-options {
+  display: grid;
+  gap: 0.75rem;
+}
+.toolbox-tags-option-group {
+  min-width: 0;
+  padding: 0.5rem 0.7rem 0.7rem;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  border-radius: 0.3rem;
+}
+.toolbox-tags-option-group legend {
+  width: auto;
+  max-width: 100%;
+  padding: 0 0.25rem;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.toolbox-tags-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.4rem 0;
+  cursor: pointer;
+}
+.toolbox-tags-choice > input {
+  flex: 0 0 auto;
+  margin: 0;
+}
+.toolbox-tags-choice > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.toolbox-tags-choice > input:disabled {
+  cursor: wait;
+}
+.toolbox-tags-status {
+  margin: 0.75rem 0 0.5rem;
+  overflow-wrap: anywhere;
+}
+.toolbox-tags-status:empty,
+.toolbox-tags-dialog [hidden] {
+  display: none !important;
+}
+.toolbox-tags-status.is-error {
+  color: #b42318;
+}
+html.dark-mode .toolbox-tags-status.is-error {
+  color: #ffb4ab;
+}
+.toolbox-tags-views {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.4rem;
+  padding-bottom: 0.7rem;
+  margin-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+}
+.toolbox-tags-view {
+  flex: 1;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.toolbox-tags-view[aria-pressed="true"] {
+  background: rgba(128, 128, 128, 0.18);
+  font-weight: 600;
+}
+.toolbox-tags-view:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.toolbox-tags-popup .toolbox-tags-editor-frame {
+  display: block;
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  border: 0;
+}
+/* END OF FILE */

@@ -1,5 +1,47 @@
 # Roundcube Webmail Toolbox
 
+
+## Version 1.7.7 (2026-11-17, rc-1.7)
+
+### New Tags tool
+
+- Added the optional `tags` tool, enabled through `toolbox_tools`, with personal
+  parent names, child values and colours stored in Roundcube preferences.
+  Message assignments use stable IMAP keywords.
+- Added a tree editor with explicit New, Edit and Delete controls. Definitions
+  can be managed in Settings or in the Tag definitions view of the mail dialog.
+- Assign or remove tags from one message at a time through the toolbar,
+  optional message-list context menu, or Edit tags control in the message
+  header. The toolbar entry sits beside Thunderbird Labels when available.
+- Display applied tags outside the message header's collapsed Details section.
+  Message-list badges show two values plus a remainder count, with full text
+  available in tooltips and the accessible row description.
+- Enable list badges by default for users without a saved preference, while
+  preserving existing opt-outs. The per-user checkbox remains available in
+  Settings and the modal definition editor.
+- Extend the normal search box with complete tag names and values, ignoring
+  case. Tag matches are combined with ordinary text matches; Type/Unread and
+  Date filters continue to apply to both. Existing explicit search syntax is
+  preserved.
+- Keep message headers, list badges and submitted searches synchronized after
+  confirmed changes, with request-order and mailbox checks for late responses.
+
+### Installation and validation
+
+- Supply Tags styles as standalone `skins/elastic/toolbox.tags.less`; compile
+  it to `skins/elastic/toolbox.tags.css` with a LESS compiler before using the
+  tool.
+- Enable Tags in existing private configurations by adding `tags` to the
+  existing tool list. No new database tables or schema migration are required.
+- Clarified the existing `jqueryui` dependency in the README. This reflects
+  Toolbox's existing Settings editor behavior; dependency-loading code is
+  unchanged.
+- Added 76 Tags JavaScript behavior checks, PHP 8.1 syntax parsing, and an optional
+  PHP search suite using the pinned Roundcube 1.7.2 parser. The standalone PHP
+  suite was not executed during release validation; feature behavior was
+  confirmed separately on the development installation.
+
+
 ## Version 1.7.6 (2026-11-16, rc-1.7)
 
 ### New feature
@@ -62,10 +104,12 @@
   directory setup.
 - Improved the reliability and safety of the purge cron script.
 
+
 ## Version 1.7.0 (2025-02-10, rc-1.7)
 
 - Fix path for blankpage after RC introduced static.php to manage static resources
 - Updated version number to follow the last Rouncube release
+
 
 ## Version 1.6.0 (2023-01-01, rc-1.6)
 
@@ -82,6 +126,7 @@
 - Changed license to GNU GPLv3+ with exceptions for skins
 - Fixed mysql date format conversion in sql helper
 - Fixed checkbox colours in dark mode
+
 
 ## Version 1.4.10.2 (2021-01-27, rc-git-master)
 

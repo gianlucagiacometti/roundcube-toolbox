@@ -1,6 +1,6 @@
 #!/bin/bash
 
-list="tabstyles.less toolbox.less nopreview.less"
+list="tabstyles.less toolbox.less nopreview.less toolbox.tags.less"
 
 for file in $list
 do

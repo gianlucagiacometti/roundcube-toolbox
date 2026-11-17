@@ -12,6 +12,7 @@
 // 'vacation' [tool to manage postfixadmin vacation]
 // 'purge' [tool to periodically purge Trash and Junk folders]
 // 'preview' [tool to disable message previe]
+// 'tags' [tool to define personalised message tags, assign them to IMAP messages, display them and search by tag name or value]
 // 'customise' [tool to customise Blank Page and CSS per domain]
 // 'attachments' [tool to replace large attachments with a link in outgoing messages]
 // 'password_hashes' [background tool to store additional configurable password hashes after password changes]
@@ -22,6 +23,7 @@ $config['toolbox_tools'] = [
     'vacation',
     'purge',
     'preview',
+    'tags',
     'customise',
     'attachments',
 //    'password_hashes',
@@ -229,6 +231,7 @@ $config['toolbox_roundcube_db_persistent'] = false;
 // Existing aliases are always scoped to the authenticated mailbox for edits.
 $config['toolbox_aliases_multiple_domains'] = true;
 
+
 // FORWARD TOOL OPTIONS
 
 
@@ -244,6 +247,9 @@ $config['toolbox_purge_script_debug'] = true;
 
 
 // PREVIEW TOOL OPTIONS
+
+
+// TAGS TOOL OPTIONS
 
 
 // VACATION TOOL OPTIONS
@@ -409,4 +415,3 @@ $config['toolbox_script_logfile'] = 'toolbox.script';
 $config['toolbox_script_loglevel'] = 2;
 
 // END OF FILE
-

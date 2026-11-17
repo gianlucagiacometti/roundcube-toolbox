@@ -7,7 +7,7 @@ JavaScript module.
 
 ## Compatibility and requirements
 
-- **Toolbox release:** 1.7.6.
+- **Toolbox release:** 1.7.7.
 - **Roundcube:** 1.7.2 or newer (the recommended Composer minimum). Use the
   latest Roundcube 1.7 security release in production.
 - **PHP:** 8.1 or newer, as required by Roundcube 1.7.
@@ -15,8 +15,12 @@ JavaScript module.
   skin configuration; other skins are not included in this release.
 - **PostfixAdmin/SQL access:** required only for tools that manage mailbox,
   alias, forwarding, vacation or domain records, including password hashes.
-- **Roundcube `jqueryui` plugin:** required only when Vacation's optional
-  calendar datepickers are enabled.
+- **Roundcube `jqueryui` plugin:** Toolbox loads this plugin for its Settings
+  editor. Vacation's optional calendar datepickers also use it.
+- **Tags:** requires an IMAP server that accepts custom keywords and permission
+  to change message flags in the selected mailbox. The optional `contextmenu`
+  plugin provides the message-list context-menu entry; the toolbar and message
+  header controls are available independently.
 - **Password Hashes:** needs a writable SQL connection to the mailbox table and
   an integration that emits Roundcube's `password_change` hook. Roundcube's
   standard `password` plugin emits this event after a successful change, but
@@ -34,6 +38,7 @@ JavaScript module.
 | `preview` | Manage message preview preferences; native Roundcube settings control read/unread timing. |
 | `customise` | Configure per-domain Blank Page, CSS, logos and related options, including per-domain purge settings. |
 | `attachments` | Detach large attachments and replace them with download links. |
+| `tags` | Manage personal tag names and values, assign them to messages, display badges, and search by tag name or value. |
 | `password_hashes` | **Background only:** store configurable additional password hashes after a successful Roundcube password change. No Settings tab. |
 
 ## Installation
@@ -55,6 +60,8 @@ JavaScript module.
    enabled. `bin/initplugin.sh` can help prepare directories. For Roundcube
    1.7, review the Attachments storage path and web-server rules under
    `public_html/` as described in `config.inc.php.dist`.
+6. Before using Tags, [compile its LESS stylesheet](#compile-the-tags-stylesheet)
+   to the CSS path loaded by Roundcube.
 
 If downloading a GitHub archive, rename its extracted plugin directory to
 `toolbox`. Composer installations can use the Roundcube plugin installer.
@@ -64,6 +71,26 @@ If downloading a GitHub archive, rename its extracted plugin directory to
 Back up `config.inc.php` and your database before upgrading. Copy new options
 from `config.inc.php.dist` into your existing private configuration instead of
 replacing it wholesale. Review enabled tools and any new database permissions.
+
+To enable Tags in an existing installation, add `tags` to the existing
+`$config['toolbox_tools']` array in your private configuration, then compile its
+stylesheet and reload Roundcube. Tags stores definitions and display options in
+Roundcube user preferences and requires no new database tables or schema
+migration.
+
+### Compile the Tags stylesheet
+
+The repository supplies Tags styles as the standalone LESS source
+`skins/elastic/toolbox.tags.less`. Compile it before using Tags. From the plugin
+root, with `lessc` available, run:
+
+```sh
+lessc skins/elastic/toolbox.tags.less skins/elastic/toolbox.tags.css
+```
+
+The generated `skins/elastic/toolbox.tags.css` is the file loaded by Roundcube.
+You can use your own LESS compiler to produce this file; no automatic build
+step is required.
 
 ## Configuration
 
@@ -79,6 +106,7 @@ $config['toolbox_tools'] = [
     'preview',
     'customise',
     'attachments',
+    'tags',
     'password_hashes',
 ];
 ```
@@ -119,6 +147,62 @@ read-only DSN in a `_dsnr` setting only when you use a separate reader.
 
 Consult `config.inc.php.dist` for the remaining per-tool options, domain-admin
 configuration, vacation formatting, attachment limits and storage settings.
+
+### Personal message tags
+
+Enable `tags` in `toolbox_tools`, then open **Settings > Toolbox > Tags**.
+Create parent names, such as **Project**, and child values, such as
+**Graduation**. The tree editor provides New, Edit and Delete controls, with a
+colour for each value. Names, values and colours are personal preferences;
+message assignments use stable IMAP keywords. Renaming a definition preserves
+its assignments. Deleting a definition hides its existing message keywords
+from the Tags interface.
+
+Open the Tags dialog from the mail toolbar, the optional message-list context
+menu, or **Edit tags** beside an opened message's badges. The toolbar button is
+placed beside Thunderbird Labels when that plugin is present. The dialog has
+two views: **Message tags** for assignment and **Tag definitions** for editing
+the same definition tree without leaving the mail page. Applied tags remain
+visible in the message header outside the collapsed Details section.
+
+**Tag changes apply to one message at a time.** The context-menu action targets
+the clicked message. A collapsed thread row represents its own message; child
+messages keep their own assignments. The server's write result and confirmed
+flags determine whether a change succeeds. A rejected write is reported in the
+dialog rather than displayed as a successful assignment.
+
+#### Message-list display
+
+**Show tags in the message list** is a per-user checkbox in the Tags settings
+and the modal definition editor. It defaults to enabled when no preference has
+been saved. An existing saved opt-out remains disabled.
+
+Tagged rows show up to two compact badges below the subject, followed by `+N`
+for additional tags. Full names and values remain available in the tooltip and
+accessible row description. Untagged messages have no extra line. Turning off
+list badges leaves assignments, header badges and tag searches available.
+Saved names, colours and display preferences update the visible list directly.
+
+#### Search by a name or value
+
+Use Roundcube's normal search box:
+
+- `Project` includes messages with any active value under that parent name.
+- `Graduation` includes messages with that value under any active parent.
+- Matching uses the complete name or value and ignores case. Multiword names
+  work directly or as a single quoted phrase, such as `"Final Project"`.
+
+Results include the ordinary matches in the selected search fields **or**
+messages carrying a matching personal tag. Existing Type/Unread and Date
+filters apply to both branches. An unknown or partial name leaves normal text
+search unchanged. Explicit Roundcube search fields, Boolean operators and
+negative quoted terms retain their existing meaning. Tag searching works
+whether list badges are enabled or hidden.
+
+For a search submitted in the current mail view, a confirmed assignment or
+definition change can refresh the results when the dialog closes. That refresh
+uses the submitted search and returns to page one; unfinished edits in the
+search controls are preserved.
 
 ### Additional password hashes
 
@@ -228,6 +312,32 @@ Tool-specific PHP modules live in `tools/`, with shared preferences in
 `js/toolbox.customise.js`; `js/toolbox.js` retains shared functionality.
 Vacation's datepicker integration is part of its module. The old
 `toolbox.calendar.js` and `toolbox.doubleclick.js` are obsolete.
+
+Tags uses `tools/tags.php` for settings, mail actions and search integration,
+with its definition store in `tools/tags/definitions.php`. The settings editor
+uses `js/toolbox.tags.js`; message assignment, badges and search refresh use
+`js/toolbox.tags.message.js`.
+
+## Developer checks
+
+The optional test dependencies are separate from the plugin runtime. With
+Node.js 18 or newer, run `npm install` followed by `npm test` from `tests/`.
+The v1.7.7 Tags checks cover 76 JavaScript behaviors and PHP 8.1 syntax parsing.
+The JavaScript suite executes the actual mail script with isolated DOM and
+Roundcube fixtures.
+
+The separate PHP search suite loads the production classes and pinned
+Roundcube 1.7.2 parser sources. With PHP 8.1+, `mbstring`, and a local Roundcube
+1.7.2 checkout, run this from the plugin root:
+
+```sh
+TAGS_ROUNDCUBE_ROOT=/path/to/roundcubemail-1.7.2 php tests/mail-search-tests.php
+```
+
+It reports `SKIP` when its prerequisites are unavailable. The standalone PHP
+search suite was not executed as part of this release's local validation; Tags
+behavior was separately confirmed on the development installation. These test
+scripts are run manually and do not connect to a live IMAP server.
 
 ## License
 
