@@ -125,8 +125,8 @@ $config['toolbox_tools'] = [
     'customise',
     'attachments',
     'tags',
-    'folders', // Optional: Mail folder properties; no additional database tables.
-    'cloud', // Optional: requires Cloud tables and provider configuration.
+    'folders',
+    'cloud',
     'password_hashes',
 ];
 ```
