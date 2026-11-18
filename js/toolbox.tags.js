@@ -8,6 +8,13 @@
 "use strict";
 
 $(function () {
+    const labels = (window.rcmail && window.rcmail.env && window.rcmail.env.toolbox_tags_labels) || {};
+
+    // Use the strings exported by the server for the current Roundcube language.
+    function tagText(key) {
+        return Object.prototype.hasOwnProperty.call(labels, key) ? labels[key] : key;
+    }
+
     const manager = $('#toolbox-tags-manager');
     if (!manager.length) {
         return;
@@ -62,17 +69,17 @@ $(function () {
         colorInput.val(data.color || '#6478C4');
 
         if (action === 'create_group') {
-            title.text('New tag name');
+            title.text(tagText('tags-newname'));
         } else if (action === 'rename_group') {
-            title.text('Edit tag name');
+            title.text(tagText('tags-editnametitle'));
         } else if (action === 'create_value') {
-            title.text('New value');
+            title.text(tagText('tags-newvalue'));
         } else {
-            title.text('Edit value');
+            title.text(tagText('tags-editvalue'));
         }
 
         if (!isGroup) {
-            parentLabel.text('Tag: ' + (data.name || '')).prop('hidden', false);
+            parentLabel.text(tagText('tags-parentprefix') + (data.name || '')).prop('hidden', false);
         }
         editor.prop('hidden', false);
         (isGroup ? nameInput : valueInput).trigger('focus');
@@ -120,12 +127,15 @@ $(function () {
                 });
                 break;
             case 'delete-group':
-                if (window.confirm('Permanently delete "' + name + '" and all its values?\nThis cannot be undone.')) {
+                if (window.confirm(tagText('tags-confirmdeletegroup').replace('{name}', () => name)
+                    + '\n' + tagText('tags-deleteirreversible'))) {
                     submitAction('delete_group', id);
                 }
                 break;
             case 'delete-value':
-                if (window.confirm('Permanently delete "' + value + '" from "' + name + '"?\nThis cannot be undone.')) {
+                if (window.confirm(tagText('tags-confirmdeletevalue')
+                    .replace('{value}', () => value).replace('{name}', () => name)
+                    + '\n' + tagText('tags-deleteirreversible'))) {
                     submitAction('delete_value', id);
                 }
                 break;

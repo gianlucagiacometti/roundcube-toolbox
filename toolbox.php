@@ -29,6 +29,8 @@
  * along with Roundcube. If not, see https://www.gnu.org/licenses/.
  */
 
+require_once __DIR__ . '/lib/Toolbox/logger.php';
+
 class toolbox extends rcube_plugin
 {
     public $task = 'login|mail|settings|tasks|addressbook';
@@ -49,10 +51,8 @@ class toolbox extends rcube_plugin
         $this->loglevel = $this->rcube->config->get('toolbox_loglevel', 1);
         if ($this->loglevel > 0) {
             $this->logfile = $this->rcube->config->get('toolbox_logfile', 'toolbox.log');
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: initialise plugin");
-            }
         }
+        toolbox_logger::step('toolbox', 'init_start');
         $this->add_texts('localization/');
         $this->tools = $this->rcube->config->get('toolbox_tools');
         $this->cur_section = rcube_utils::get_input_value('_section', rcube_utils::INPUT_GPC);
@@ -79,24 +79,18 @@ class toolbox extends rcube_plugin
             $this->tools = array_values($this->tools);
 
             foreach ($this->tools as $tool) {
-                if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [function init]: load plugin tool {$tool}");
-                }
+                toolbox_logger::step('toolbox', 'init_register_tool');
                 $this->sections[$tool] = ['id' => $tool, 'class' => $tool, 'section' => rcmail::Q($this->gettext($tool))];
             }
 
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: create toolbox tab in the list of settings");
-            }
+            toolbox_logger::step('toolbox', 'init_prepare_settings_tab');
             // Do not show an empty Toolbox tab when only background modules
             // (such as password_hashes) are enabled.
             if ($this->tools) {
                 $this->add_hook('settings_actions', [$this, 'settings_tab']);
             }
 
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: register actions");
-            }
+            toolbox_logger::step('toolbox', 'init_register_actions');
             $this->register_action('plugin.toolbox', [$this, 'init_html']);
             $this->register_action('plugin.toolbox.edit', [$this, 'init_html']);
             $this->register_action('plugin.toolbox.check', [$this, 'check']);
@@ -129,31 +123,23 @@ class toolbox extends rcube_plugin
         if ($this->rcube->action == 'plugin.toolbox.edit') {
 
             // use jQuery for popup window
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init_html]: prepare html output for action edit");
-                rcube::write_log($this->logfile, "STEP in [function init_html]: load jquery plugin");
-            }
+            toolbox_logger::step('toolbox', 'edit_prepare_output');
+            toolbox_logger::step('toolbox', 'edit_load_jquery');
             $this->require_plugin('jqueryui');
             $this->rcube->output->include_script('list.js');
             $this->rcube->output->add_handler('toolbox', [$this, 'tool_render_form']);
             $this->rcube->output->add_handler('sectionname', [$this, 'tool_section_name']);
 
             // initialise html editor
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init_html]: initialise html editor");
-            }
+            toolbox_logger::step('toolbox', 'edit_init_editor');
             $this->rcube->html_editor('toolbox');
             $this->rcube->output->add_script(sprintf("window.rcmail_editor_settings = %s", $this->_config_editor()), 'head');
 
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init_html]: selected tool: {$this->cur_section}");
-            }
+            toolbox_logger::step('toolbox', 'edit_select_tool');
             $this->rcube->output->set_env('cur_section', $this->cur_section);
 
             // render template
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init_html]: render template for action {$this->rcube->action}");
-            }
+            toolbox_logger::step('toolbox', 'edit_render_template');
             $template = 'toolbox.tooledit';
             // Each enabled module declares its own editor assets.
             $module = $this->_get_module($this->cur_section);
@@ -164,15 +150,11 @@ class toolbox extends rcube_plugin
 
         }
         else {
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init_html]: prepare html output for the list of sections");
-            }
+            toolbox_logger::step('toolbox', 'section_list_prepare_output');
             $this->rcube->output->add_handler('tbsectionslist', [$this, 'tool_section_list']);
 
             // render template
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init_html]: render template for action {$this->rcube->action}");
-            }
+            toolbox_logger::step('toolbox', 'section_list_render_template');
             $this->rcube->output->send('toolbox.toolbox');
         }
 
@@ -180,9 +162,7 @@ class toolbox extends rcube_plugin
 
     public function tool_section_list($attrib)
     {
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function section_list]: prepare the list sections");
-        }
+        toolbox_logger::step('toolbox', 'section_list_prepare');
 
         // add id to message list table if not specified
         if (!strlen($attrib['id'])) {
@@ -204,18 +184,14 @@ class toolbox extends rcube_plugin
         $data = $this->rcube->plugins->exec_hook('toolbox_sections_list', ['list' => $this->sections, 'cols' => ['section']]);
         foreach ($data['list'] as $id => $block) {
             $sections[$id] = $block;
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function section_list]: add section {$block['id']}");
-            }
+            toolbox_logger::step('toolbox', 'section_list_add');
         }
 
         // create HTML table
         $out = $this->rcube->table_output($attrib, $sections, $data['cols'], 'id');
 
         // set client env
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function section_list]: generate the list of sections");
-        }
+        toolbox_logger::step('toolbox', 'section_list_render');
         $this->rcube->output->add_gui_object('sectionslist', $attrib['id']);
         $this->rcube->output->include_script('list.js');
 
@@ -224,9 +200,7 @@ class toolbox extends rcube_plugin
 
     public function tool_section_name()
     {
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function tool_section_name]: generate section title");
-        }
+        toolbox_logger::step('toolbox', 'section_name_render');
         $data = $this->rcube->plugins->exec_hook('toolbox_section_name', ['section' => $this->cur_section, 'title' => $this->sections[$this->cur_section]['section']]);
         return $data['title'];
     }
@@ -326,9 +300,7 @@ class toolbox extends rcube_plugin
         if (!is_string($section)
             || !in_array($section, $this->tools, true)
             || !isset($this->modules[$section])) {
-            if ($this->loglevel > 0) {
-                rcube::write_log($this->logfile, 'ERROR in [Toolbox dispatcher]: unknown or disabled section');
-            }
+            toolbox_logger::error('toolbox', 'dispatcher_lookup', 'section_unavailable');
             return null;
         }
 
@@ -368,9 +340,7 @@ class toolbox extends rcube_plugin
             if ($this->storage->save_tool_data($this->rcube->user->get_username(), $data)) {
                 $this->rcube->output->command('display_message', $message_success, 'confirmation');
             } else {
-                if ($this->loglevel > 0) {
-                    rcube::write_log($this->logfile, 'ERROR in [function save]: data not stored');
-                }
+                toolbox_logger::error('toolbox', 'settings_save', 'persistence_failed');
                 $this->rcube->output->command('display_message', $message_error, 'error');
             }
         } else {
@@ -463,8 +433,8 @@ class toolbox extends rcube_plugin
      */
     private function _load_modules(): void
     {
-        require_once __DIR__ . '/tools/preferences.php';
-        require_once __DIR__ . '/tools/tool.php';
+        require_once __DIR__ . '/lib/Toolbox/preferences.php';
+        require_once __DIR__ . '/lib/Toolbox/tool.php';
 
         $preferences = new toolbox_preferences($this->rcube);
 
@@ -529,9 +499,7 @@ class toolbox extends rcube_plugin
             }
             else {
                 // no storage found, raise error
-                if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "ERROR in [function _init_storage]: failed to find storage class {$class}");
-                }
+                toolbox_logger::error('toolbox', 'storage_init', 'adapter_missing');
                 rcube::raise_error([
                     'code' => 604,
                     'type' => 'toolbox',
@@ -548,4 +516,3 @@ class toolbox extends rcube_plugin
 }
 
 // END OF FILE
-

@@ -1,6 +1,64 @@
 # Roundcube Webmail Toolbox
 
 
+## Version 1.7.8 (Unreleased, rc-1.7)
+
+### New Cloud tool
+
+- Added optional `cloud` module to connect personal cloud accounts, browse
+  folders and attach selected remote files directly in Roundcube Compose.
+  Supported backends: Google Drive, OneDrive Business, OneDrive Personal,
+  Dropbox, Nextcloud/ownCloud and generic HTTPS WebDAV.
+- Added server-side OAuth authorization-code integrations for the four cloud
+  platforms, including separate Microsoft business and personal clients,
+  callbacks, state/PKCE verification and token refresh support. Provider
+  application verification and production approval remain separate tasks.
+- Added per-user vault creation, password/recovery-key unlock, encrypted
+  provider credential storage and automatic vault relocking. Added Cloud
+  account management, browsing UI and attachment picker.
+- Added `SQL/mysql.cloud.sql` and `SQL/postgres.cloud.sql` for the Cloud vault
+  and account tables, plus Cloud provider settings and WebDAV private-address
+  allowlisting in `config.inc.php.dist`.
+- Moved Cloud's Settings markup to a Roundcube HTML-helper-based view and
+  standardised its PHP formatting without changing the working controls.
+
+### Shared infrastructure and diagnostics
+
+- Consolidated diagnostic logging into a single component-aware
+  `toolbox_logger` with existing `toolbox_logfile`/`toolbox_loglevel` controls:
+  `0` disabled; `1` errors; `2` redacted SQL descriptions; `3` execution steps.
+- Integrated the dispatcher, Cloud, Tags, Aliases, Forward, Vacation, Purge,
+  Preview, Customise, Attachments, Password Hashes, preferences and SQL storage
+  with the common logger. Replaced legacy logs containing email addresses,
+  file paths, filenames, SQL values and other sensitive data with fixed stages.
+- Moved `tool.php`, `preferences.php` and `logger.php` from `tools/` to
+  `lib/Toolbox/`; updated all includes and removed Cloud's logging adapter.
+  Tool-specific code remains in `tools/`.
+
+### Localisation
+
+- Localised Tags Settings, definition editor, message dialogs, confirmations,
+  search interactions, backend validation and user-facing errors.
+- Localised Cloud Settings, dynamic browser controls, Compose attachment picker,
+  OAuth popup results and user-facing backend errors while retaining generic,
+  non-sensitive exception responses.
+- Updated all six language catalogues: `en_US`, `en_GB`, `it_IT`, `fr_FR`,
+  `de_DE` and `es_ES`. Non-English translations should receive ongoing
+  language review.
+
+### SQL fixes and compatibility
+
+- Retained the pre-release initial-SQL `created`-field addition and associated
+  query corrections.
+- Made storage write-failure detection independent of `toolbox_loglevel`, so
+  logging level 0 cannot turn a failed database operation into apparent success.
+- Parameterised Forward and Vacation SQL writes, removed logging-only SQL
+  value interpolation, restricted Vacation column selection to known fields
+  and validated input dates before SQL conversion.
+- Standardised parameterised SQL diagnostics, removed raw database-error
+  messages from Toolbox logging and corrected inconsistent PHP property
+  declarations in the storage adapter.
+
 ## Version 1.7.7 (2026-11-17, rc-1.7)
 
 ### New Tags tool

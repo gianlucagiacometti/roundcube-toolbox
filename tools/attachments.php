@@ -28,9 +28,7 @@ class toolbox_tool_attachments extends toolbox_tool_module
         $this->detach_total = $this->rcube->config->get('toolbox_detach_total', 1024 * 1024 * 50);
         $this->detach_single = $this->rcube->config->get('toolbox_detach_single', 1024 * 1024 * 25);
 
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function init]: 'attachments' tool active and loaded");
-        }
+        toolbox_logger::step('attachments', 'init_start');
 
         $this->plugin->add_hook('attachment_upload', [$this, 'detach_attachment']);
         $this->plugin->add_hook('message_compose', [$this, 'remove_session']);
@@ -38,9 +36,7 @@ class toolbox_tool_attachments extends toolbox_tool_module
         $this->plugin->add_hook('toolbox_attachment_label', [$this, 'attachment_label']);
 
         if (rcube_utils::get_input_value('_action', rcube_utils::INPUT_GPC) == 'compose') {
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, 'STEP in [function init]:modify hint in compose window');
-            }
+            toolbox_logger::step('attachments', 'compose_hint_register');
             $this->plugin->add_hook('template_object_composeattachmentform', [$this, 'update_hint']);
         }
     }
@@ -55,33 +51,23 @@ class toolbox_tool_attachments extends toolbox_tool_module
      */
     public function download_detached() {
         if (rcube_utils::get_input_value('_action', rcube_utils::INPUT_GPC) == 'plugin.toolbox.attachment') {
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function download_detached]: GET call received");
-            }
+            toolbox_logger::step('attachments', 'download_request');
             if ($file = rcube_utils::get_input_value('_filename', rcube_utils::INPUT_GPC)) {
-                if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [function download_detached]: file required: {$file}");
-                }
+                toolbox_logger::step('attachments', 'download_filename_received');
                 $path = $this->attachments . urlencode($file);
                 if (file_exists($path)) {
-                    if ($this->loglevel > 2) {
-                        rcube::write_log($this->logfile, "STEP in [function download_detached]: file found");
-                    }
+                    toolbox_logger::step('attachments', 'download_file_found');
                     $temp_dir = $this->rcube->config->get('temp_dir');
                     $tmpfname = tempnam($temp_dir, 'zip');
                     $zip = new ZipArchive();
                     $zip->open($tmpfname, ZIPARCHIVE::OVERWRITE);
                     $zip->addFile($path, preg_replace("/[^0-9A-Za-z_.]/", '_', substr($file, 33)));
                     $zip->close();
-                    if ($this->loglevel > 2) {
-                        rcube::write_log($this->logfile, "STEP in [function download_detached]: temporary zip file created");
-                    }
+                    toolbox_logger::step('attachments', 'download_zip_created');
                     $browser = new rcube_browser;
                     $this->rcube->output->nocacheing_headers();
                     // send download headers
-                    if ($this->loglevel > 2) {
-                        rcube::write_log($this->logfile, "STEP in [function download_detached]: sending download headers");
-                    }
+                    toolbox_logger::step('attachments', 'download_headers_send');
                     header("Content-Type: application/octet-stream");
                     if ($browser->ie)
                         header("Content-Type: application/force-download");
@@ -89,19 +75,13 @@ class toolbox_tool_attachments extends toolbox_tool_module
                     @set_time_limit(0);
                     header("Content-Disposition: attachment; filename=\"". substr($file, 33) .".zip\"");
                     header("Content-length: " . filesize($tmpfname));
-                    if ($this->loglevel > 2) {
-                        rcube::write_log($this->logfile, "STEP in [function download_detached]: sending file");
-                    }
+                    toolbox_logger::step('attachments', 'download_stream_start');
                     readfile($tmpfname);
-                    if ($this->loglevel > 2) {
-                        rcube::write_log($this->logfile, "STEP in [function download_detached]: delete temporary file");
-                    }
+                    toolbox_logger::step('attachments', 'download_temp_cleanup');
                     unlink($tmpfname);
                 }
                 else {
-                    if ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "ERROR in [function download_detached]: file not found: {$file}");
-                    }
+                    toolbox_logger::error('attachments', 'download_lookup', 'file_not_found');
                     rcube::raise_error([
                         'code' => 404,
                         'type' => 'php',
@@ -122,9 +102,7 @@ class toolbox_tool_attachments extends toolbox_tool_module
      * @return array Unmodified hook arguments.
      */
     public function remove_session($args) {
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function remove_session]: remove attachments_total value from session");
-        }
+        toolbox_logger::step('attachments', 'compose_session_reset');
         $this->rcube->session->remove('attachments_total');
         return $args;
     }
@@ -136,9 +114,7 @@ class toolbox_tool_attachments extends toolbox_tool_module
      * @return array Hook arguments with the label set.
      */
     public function attachment_label($args) {
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function attachment_label]: set the label in the html message");
-        }
+        toolbox_logger::step('attachments', 'detached_label_set');
         $args['label'] = rcmail::Q($this->plugin->gettext('attachment-expiry-date'));
         return $args;
     }
@@ -151,9 +127,7 @@ class toolbox_tool_attachments extends toolbox_tool_module
      */
     public function update_hint($args) {
         if ($args['mode'] == 'hint') {
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function upload_hint]: use hook to upload the content of the hint");
-            }
+            toolbox_logger::step('attachments', 'compose_hint_update');
             $args['content'] = $args['content'] . "<div class='hint'>" . rcmail::Q($this->plugin->gettext(['name' => 'attachment-maxuploadsize', 'vars' => ['totalsize' => round($this->detach_total/(1024 * 1024)), 'singlesize' => round($this->detach_single/(1024 * 1024)), 'lifespan' => $this->lifespan]])) . "</div>";
         }
         return $args;
@@ -167,13 +141,7 @@ class toolbox_tool_attachments extends toolbox_tool_module
      */
     static public function detach_attachment($args) {
         $rcmail = rcube::get_instance();
-        $loglevel = $rcmail->config->get('toolbox_loglevel', 1);
-        if ($loglevel > 0) {
-            $logfile = $rcmail->config->get('toolbox_logfile', 'toolbox.log');
-            if ($loglevel > 2) {
-                rcube::write_log($logfile, "STEP in [function detach_attachment]: load function");
-            }
-        }
+        toolbox_logger::step('attachments', 'upload_start');
         $file = $args['path'];
         $total = 0;
         if(isset($_SESSION['attachments_total'])){
@@ -183,8 +151,10 @@ class toolbox_tool_attachments extends toolbox_tool_module
         $total = $total + $size;
         $_SESSION['attachments_total'] = $total;
         if ($total >= $rcmail->config->get('toolbox_detach_total', 1024 * 1024 * 50) || $size >= $rcmail->config->get('toolbox_detach_single', 1024 * 1024 * 25)) {
+            toolbox_logger::step('attachments', 'detach_threshold_reached');
             $mime = strtolower($args['mimetype']);
             if ($mime == 'text/calendar' || $mime == 'text/ical' || $mime == 'application/ics') {
+                toolbox_logger::step('attachments', 'detach_calendar_skipped');
                 return $args;
             }
             $plugin = $rcmail->plugins->exec_hook('toolbox_attachment_label', ['label' => '']);
@@ -217,6 +187,10 @@ class toolbox_tool_attachments extends toolbox_tool_module
                 file_put_contents($file, $html);
                 $args['name'] = $args['name'] . '.html';
                 $args['mimetype'] = 'text/html';
+                toolbox_logger::step('attachments', 'detach_copy_complete');
+            }
+            else {
+                toolbox_logger::error('attachments', 'detach_copy', 'storage_failed');
             }
         }
         return $args;
@@ -224,4 +198,3 @@ class toolbox_tool_attachments extends toolbox_tool_module
 }
 
 // END OF FILE
-

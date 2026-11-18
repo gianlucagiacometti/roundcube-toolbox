@@ -19,9 +19,7 @@ class toolbox_tool_preview extends toolbox_tool_module
      */
     public function init(): void
     {
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function init]: 'preview' tool active and loaded");
-        }
+        toolbox_logger::step('preview', 'init_start');
 
         // Read preferences only on mail-list pages, not during login or settings.
         if (rcube_utils::get_input_value('_task', rcube_utils::INPUT_GPC) !== 'mail'
@@ -33,6 +31,8 @@ class toolbox_tool_preview extends toolbox_tool_module
             return;
         }
 
+        toolbox_logger::step('preview', 'mode_enabled');
+
         if (method_exists($this->rcube->output, 'include_css')) {
             $this->rcube->output->include_css(
                 'plugins' . DIRECTORY_SEPARATOR . $this->plugin->ID
@@ -42,6 +42,7 @@ class toolbox_tool_preview extends toolbox_tool_module
         }
 
         $this->plugin->include_script('js/toolbox.preview.js');
+        toolbox_logger::step('preview', 'assets_included');
     }
 
     /**
@@ -51,6 +52,8 @@ class toolbox_tool_preview extends toolbox_tool_module
      */
     public function render_form(): array
     {
+        toolbox_logger::step('preview', 'settings_render');
+
         $button_id = 'rcmfd_userpreview';
         $input = new html_checkbox([
             'name' => '_userpreview',
@@ -90,14 +93,18 @@ class toolbox_tool_preview extends toolbox_tool_module
      */
     public function save_preferences(): bool
     {
+        toolbox_logger::step('preview', 'settings_save_start');
+
         if (!$this->preferences->save([
             'toolbox_message_preview' => rcube_utils::get_input_value('_userpreview', rcube_utils::INPUT_POST) ?: false,
             'toolbox_markasread_doubleclick' => null,
         ])) {
+            toolbox_logger::error('preview', 'settings_save', 'persistence_failed');
             $this->rcube->display_server_error('errorsaving');
             return false;
         }
 
+        toolbox_logger::step('preview', 'settings_save_complete');
         return true;
     }
 
@@ -110,6 +117,8 @@ class toolbox_tool_preview extends toolbox_tool_module
      */
     public function prepare_save($storage): ?array
     {
+        toolbox_logger::step('preview', 'settings_prepare_save');
+
         if (!$this->save_preferences()) {
             return null;
         }
@@ -120,4 +129,3 @@ class toolbox_tool_preview extends toolbox_tool_module
 }
 
 // END OF FILE
-

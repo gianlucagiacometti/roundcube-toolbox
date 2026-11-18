@@ -1,0 +1,503 @@
+/*
+ * Toolbox Cloud for Roundcube Elastic.
+ * Source: toolbox.cloud.less (compiled by the existing skins/elastic/compile script).
+ * Settings sections, provider cards, connection dialog and vault controls.
+ */
+#toolbox-cloud-settings .tbx-cloud-vault-panel,
+#toolbox-cloud-settings .tbx-cloud-connections-panel {
+  padding: 1.25rem;
+  margin: 1rem 0;
+  border: 1px solid #c5cbd0;
+  border-radius: 0.65rem;
+}
+#toolbox-cloud-settings .tbx-cloud-provider-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1rem;
+  margin: 1.2rem 0 1.6rem;
+}
+#toolbox-cloud-settings button.tbx-cloud-provider-card {
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  min-height: 12.5rem;
+  margin: 0;
+  padding: 1.3rem;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.4;
+  font: inherit;
+  color: #27333b;
+  background: #fff;
+  border: 1px solid #c9d1d7;
+  border-radius: 0.8rem;
+  box-shadow: 0 2px 8px rgba(18, 34, 46, 0.06);
+  text-shadow: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+#toolbox-cloud-settings button.tbx-cloud-provider-card:hover {
+  border-color: #3584b9;
+  box-shadow: 0 4px 14px rgba(18, 56, 81, 0.16);
+  transform: translateY(-2px);
+}
+#toolbox-cloud-settings button.tbx-cloud-provider-card:focus-visible {
+  outline: 2px solid #3d91c8;
+  outline-offset: 3px;
+}
+#toolbox-cloud-settings button.tbx-cloud-provider-card:disabled {
+  opacity: 0.42;
+  filter: grayscale(1);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  pointer-events: none;
+}
+#toolbox-cloud-settings .tbx-cloud-provider-icon {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  flex: none;
+  color: #2879ad;
+}
+#toolbox-cloud-settings .tbx-cloud-provider-name {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+#toolbox-cloud-settings .tbx-cloud-provider-description {
+  display: block;
+  flex: 1;
+  font-weight: 400;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  opacity: 0.85;
+}
+#toolbox-cloud-settings .tbx-cloud-provider-action {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2879ad;
+}
+#toolbox-cloud-settings .tbx-cloud-account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding: 0.6rem 0.15rem;
+  border-bottom: 1px solid #c5cbd0;
+}
+#toolbox-cloud-settings .tbx-cloud-account-description {
+  flex: 1;
+  min-width: 8rem;
+  overflow-wrap: anywhere;
+}
+#toolbox-cloud-settings .tbx-cloud-account-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+#toolbox-cloud-settings button.tbx-cloud-account-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0.2rem;
+  border: 0;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+#toolbox-cloud-settings button.tbx-cloud-account-icon::before {
+  font-family: 'Icons';
+  font-weight: 900;
+  font-style: normal;
+  font-size: 1.1rem;
+}
+#toolbox-cloud-settings button.tbx-cloud-account-icon.edit::before {
+  content: "\f044";
+}
+#toolbox-cloud-settings button.tbx-cloud-account-icon.delete::before {
+  content: "\f2ed";
+}
+#toolbox-cloud-settings button.tbx-cloud-account-icon:hover,
+#toolbox-cloud-settings button.tbx-cloud-account-icon:focus-visible {
+  color: #2879ad;
+  background: rgba(60, 120, 165, 0.12);
+}
+#toolbox-cloud-settings .tbx-cloud-lock-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.9rem 0;
+  padding: 0.7rem 0;
+}
+#toolbox-cloud-settings .tbx-cloud-lock-status {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid #aebbc3;
+  border-radius: 0.8rem;
+  color: #53616a;
+}
+#toolbox-cloud-settings .tbx-cloud-lock-status.is-unlocked {
+  border-color: #35825a;
+  color: #28734f;
+}
+#toolbox-cloud-settings details.tbx-cloud-security-card {
+  margin: 1.5rem 0 0;
+  padding: 1rem;
+  border: 1px solid #c5cbd0;
+  border-radius: 0.65rem;
+}
+#toolbox-cloud-settings details.tbx-cloud-security-card summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+#toolbox-cloud-settings details.tbx-cloud-security-card summary span {
+  font-weight: 400;
+  opacity: 0.7;
+  margin-left: 0.45rem;
+}
+#toolbox-cloud-settings details.tbx-cloud-security-card[open] > p:first-of-type {
+  margin-top: 1.1rem;
+}
+#toolbox-cloud-settings .tbx-cloud-security-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+#toolbox-cloud-settings .tbx-cloud-security-actions > button {
+  margin: 0;
+  white-space: normal;
+}
+#toolbox-cloud-settings [hidden],
+#toolbox-cloud-settings button[hidden] {
+  display: none !important;
+}
+#tbx-cloud-provider-dialog {
+  position: fixed;
+  box-sizing: border-box;
+  width: 38rem;
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  padding: 1.5rem;
+  color: #263238;
+  background: #fff;
+  border: 1px solid #c5cbd0;
+  border-radius: 0.8rem;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.25);
+  color-scheme: light;
+}
+#tbx-cloud-provider-dialog::backdrop {
+  background: rgba(10, 16, 20, 0.7);
+}
+#tbx-cloud-provider-dialog .tbx-cloud-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+#tbx-cloud-provider-dialog .tbx-cloud-dialog-header h3 {
+  margin: 0;
+}
+#tbx-cloud-provider-dialog label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+#tbx-cloud-provider-dialog .form-control {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 0.35rem;
+}
+html.dark-mode #toolbox-cloud-settings .tbx-cloud-vault-panel,
+html.dark-mode #toolbox-cloud-settings .tbx-cloud-connections-panel,
+html.dark-mode #toolbox-cloud-settings details.tbx-cloud-security-card {
+  border-color: #46555e;
+}
+html.dark-mode #toolbox-cloud-settings button.tbx-cloud-provider-card {
+  color: #e2e9ed;
+  background: #293439;
+  border-color: #465860;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+html.dark-mode #toolbox-cloud-settings button.tbx-cloud-provider-card:hover {
+  border-color: #7ab4df;
+  background: #314047;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+html.dark-mode #toolbox-cloud-settings .tbx-cloud-provider-icon,
+html.dark-mode #toolbox-cloud-settings .tbx-cloud-provider-action {
+  color: #90c7ed;
+}
+html.dark-mode #toolbox-cloud-settings .tbx-cloud-lock-status {
+  color: #bbc7ce;
+  border-color: #687782;
+}
+html.dark-mode #toolbox-cloud-settings .tbx-cloud-lock-status.is-unlocked {
+  color: #a1dfb3;
+  border-color: #5c9b70;
+}
+html.dark-mode #tbx-cloud-provider-dialog {
+  color: #e2e9ed;
+  background: #222d32;
+  border-color: #52616b;
+  color-scheme: dark;
+}
+html.dark-mode #tbx-cloud-provider-dialog .form-control {
+  color: #e6edf1;
+  background: #1b252a;
+  border-color: #53636c;
+}
+html.dark-mode #tbx-cloud-provider-dialog .form-control::placeholder {
+  color: #9baeb9;
+}
+@media (max-width: 480px) {
+  #toolbox-cloud-settings .tbx-cloud-provider-grid {
+    grid-template-columns: 1fr;
+  }
+  #toolbox-cloud-settings button.tbx-cloud-provider-card {
+    min-height: 9rem;
+  }
+  #tbx-cloud-provider-dialog {
+    padding: 1rem;
+  }
+}
+@media (max-width: 560px) {
+  #toolbox-cloud-settings .tbx-cloud-security-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.9rem;
+  }
+  #toolbox-cloud-settings .tbx-cloud-security-actions > button {
+    width: 100%;
+  }
+}
+#toolbox-cloud-settings .tbx-cloud-account-icon.browse::before {
+  content: "\f07c";
+}
+.tbx-cloud-browse-dialog .tbx-cloud-browse-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+.tbx-cloud-browse-dialog .tbx-cloud-browse-path {
+  overflow-wrap: anywhere;
+  font-family: monospace;
+}
+.tbx-cloud-browse-dialog .tbx-cloud-file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+.tbx-cloud-browse-dialog .tbx-cloud-file-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #c5cbd0;
+  overflow-wrap: anywhere;
+}
+.tbx-cloud-browse-dialog .tbx-cloud-test-download {
+  margin-left: 0.75rem;
+  margin-top: 0.35rem;
+  vertical-align: middle;
+}
+.tbx-cloud-browse-dialog .tbx-cloud-file-folder {
+  padding: 0.15rem 0.3rem;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+#tbx-cloud-browse-dialog {
+  position: fixed;
+  box-sizing: border-box;
+  width: 44rem;
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  margin: auto;
+  padding: 1.5rem;
+  color: #27333b;
+  background: #fff;
+  border: 1px solid #c5cbd0;
+  border-radius: 0.8rem;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.25);
+  color-scheme: light;
+}
+#tbx-cloud-browse-dialog::backdrop {
+  background: rgba(10, 16, 20, 0.7);
+}
+#tbx-cloud-browse-dialog .tbx-cloud-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+#tbx-cloud-browse-dialog .tbx-cloud-dialog-header h3 {
+  margin: 0;
+}
+#tbx-cloud-browse-dialog .tbx-cloud-browse-results,
+#tbx-cloud-browse-dialog .tbx-cloud-file-list,
+#tbx-cloud-browse-dialog .tbx-cloud-file-list > li {
+  color: inherit;
+  background: transparent;
+}
+html.dark-mode #tbx-cloud-browse-dialog {
+  color: #e2e9ed;
+  background: #222d32;
+  border-color: #46555e;
+  color-scheme: dark;
+}
+html.dark-mode #tbx-cloud-browse-dialog .tbx-cloud-browse-results,
+html.dark-mode #tbx-cloud-browse-dialog .tbx-cloud-file-list,
+html.dark-mode #tbx-cloud-browse-dialog .tbx-cloud-file-list > li {
+  color: #e2e9ed;
+  background: transparent;
+}
+html.dark-mode #tbx-cloud-browse-dialog .tbx-cloud-file-list > li {
+  border-bottom-color: #46555e;
+}
+html.dark-mode #tbx-cloud-browse-dialog button.tbx-cloud-file-folder {
+  color: #e2e9ed;
+  background: transparent;
+}
+html.dark-mode #tbx-cloud-browse-dialog button.tbx-cloud-file-folder:hover,
+html.dark-mode #tbx-cloud-browse-dialog button.tbx-cloud-file-folder:focus-visible {
+  color: #90c7ed;
+}
+#compose-attachments .upload-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+#compose-attachments .upload-form #tbx-cloud-compose-open {
+  margin: 0;
+}
+.tbx-cloud-compose-dialog {
+  box-sizing: border-box;
+  width: 44rem;
+  max-height: min(80vh, 52rem);
+  overflow-y: auto;
+}
+.tbx-cloud-compose-dialog #tbx-cloud-compose-locked,
+.tbx-cloud-compose-dialog #tbx-cloud-compose-browser {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.tbx-cloud-compose-dialog #tbx-cloud-compose-locked[hidden],
+.tbx-cloud-compose-dialog #tbx-cloud-compose-browser[hidden] {
+  display: none;
+}
+.tbx-cloud-compose-dialog .tbx-cloud-compose-files {
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.tbx-cloud-compose-dialog .tbx-cloud-compose-entry {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.2rem;
+  border-bottom: 1px solid #c5cbd0;
+}
+.tbx-cloud-compose-dialog .tbx-cloud-compose-entry span {
+  overflow-wrap: anywhere;
+}
+html.dark-mode .tbx-cloud-compose-dialog .tbx-cloud-compose-files,
+html.dark-mode .tbx-cloud-compose-dialog .tbx-cloud-compose-entry {
+  color: #e2e9ed;
+  background: transparent;
+}
+html.dark-mode .tbx-cloud-compose-dialog .tbx-cloud-compose-entry {
+  border-color: #46555e;
+}
+#tbx-cloud-compose-dialog {
+  position: fixed;
+  margin: auto;
+  padding: 1.5rem;
+  color: #27333b;
+  background: #fff;
+  border: 1px solid #c5cbd0;
+  border-radius: 0.8rem;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.25);
+  color-scheme: light;
+}
+#tbx-cloud-compose-dialog::backdrop {
+  background: rgba(10, 16, 20, 0.7);
+}
+#tbx-cloud-compose-dialog .tbx-cloud-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+#tbx-cloud-compose-dialog .tbx-cloud-dialog-header h3 {
+  margin: 0;
+}
+#tbx-cloud-compose-dialog .tbx-cloud-compose-account-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0.6rem 0 0.85rem;
+}
+#tbx-cloud-compose-dialog .tbx-cloud-compose-account-field label {
+  display: block;
+  margin: 0;
+}
+#tbx-cloud-compose-dialog .tbx-cloud-compose-account-field select.form-control {
+  width: 100%;
+  margin: 0;
+}
+#tbx-cloud-compose-dialog label {
+  display: block;
+  margin: 0.45rem 0 0.3rem;
+}
+#tbx-cloud-compose-dialog .form-control {
+  box-sizing: border-box;
+  width: 100%;
+}
+#tbx-cloud-compose-dialog .tbx-cloud-browse-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin: 0.6rem 0 0.8rem;
+}
+html.dark-mode #tbx-cloud-compose-dialog {
+  color: #e2e9ed;
+  background: #222d32;
+  border-color: #52616b;
+  color-scheme: dark;
+}
+html.dark-mode #tbx-cloud-compose-dialog .form-control {
+  color: #e6edf1;
+  background: #1b252a;
+  border-color: #53636c;
+}
+html.dark-mode #tbx-cloud-compose-dialog .form-control::placeholder {
+  color: #9baeb9;
+}
+@media (max-width: 480px) {
+  #tbx-cloud-compose-dialog {
+    padding: 1rem;
+  }
+}
+/* END OF FILE */

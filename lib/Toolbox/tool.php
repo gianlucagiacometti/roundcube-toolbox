@@ -6,6 +6,9 @@
  * Every tool can access the host plugin, Roundcube instance and shared
  * preference service without relying on Toolbox's private implementation details.
  */
+
+require_once __DIR__ . '/logger.php';
+
 abstract class toolbox_tool_module
 {
     protected toolbox $plugin;
@@ -142,4 +145,5 @@ abstract class toolbox_tool_module
 }
 
 // END OF FILE
+
 

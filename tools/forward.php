@@ -29,6 +29,7 @@ class toolbox_tool_forward extends toolbox_tool_module
      */
     public function render_form($storage, $attrib): array
     {
+        toolbox_logger::step('forward', 'settings_render_start');
         $parts = explode('@', $this->rcube->user->get_username());
 
         // Add JS labels if needed
@@ -48,7 +49,13 @@ class toolbox_tool_forward extends toolbox_tool_module
 
         $tooldata = ['name' => rcmail::Q($this->plugin->gettext('forward-manage')), 'class' => 'toolbox-forwardtable', 'cols' => 2];
 
-        $settings = $storage->load_tool_data($this->rcube->user->get_username());
+        try {
+            $settings = $storage->load_tool_data($this->rcube->user->get_username());
+        } catch (Throwable $exception) {
+            toolbox_logger::error('forward', 'settings_load', 'storage_failed');
+            throw $exception;
+        }
+        toolbox_logger::step('forward', 'settings_loaded');
         $addresses = explode(',', $settings['goto']);
 
         // check user's address presence (keep copies in mailbox), remove from list and set $keepcopies to true
@@ -111,6 +118,7 @@ class toolbox_tool_forward extends toolbox_tool_module
 
         $tooldata['content'] = $table->show();
 
+        toolbox_logger::step('forward', 'settings_render_complete');
         return $tooldata;
     }
 
@@ -127,13 +135,9 @@ class toolbox_tool_forward extends toolbox_tool_module
         $new_settings = [];
 
         // save forward addresses
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function save]: save forward addresses");
-        }
+        toolbox_logger::step('forward', 'settings_save_prepare');
         $addresses = rcube_utils::get_input_value('_forwardaddresses', rcube_utils::INPUT_POST);
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function save]: new forward addresses = [" . implode(', ', $addresses) . "]");
-        }
+        toolbox_logger::step('forward', 'settings_save_addresses_read');
 
         foreach ($addresses as $ids => $address) {
             $new_settings['main']['addresses'][] = ['value' => mb_convert_case(trim($address), MB_CASE_LOWER, RCUBE_CHARSET)];
@@ -141,6 +145,7 @@ class toolbox_tool_forward extends toolbox_tool_module
 
         $new_settings['main']['keepcopies'] = rcube_utils::get_input_value('_forwardkeepcopies', rcube_utils::INPUT_POST) ?: false;
 
+        toolbox_logger::step('forward', 'settings_save_prepared');
         return $new_settings;
     }
 
@@ -179,3 +184,4 @@ class toolbox_tool_forward extends toolbox_tool_module
 }
 
 // END OF FILE
+

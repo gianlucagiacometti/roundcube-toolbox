@@ -7,7 +7,7 @@ JavaScript module.
 
 ## Compatibility and requirements
 
-- **Toolbox release:** 1.7.7.
+- **Toolbox release:** 1.7.8 (upcoming; not yet tagged).
 - **Roundcube:** 1.7.2 or newer (the recommended Composer minimum). Use the
   latest Roundcube 1.7 security release in production.
 - **PHP:** 8.1 or newer, as required by Roundcube 1.7.
@@ -21,6 +21,12 @@ JavaScript module.
   to change message flags in the selected mailbox. The optional `contextmenu`
   plugin provides the message-list context-menu entry; the toolbar and message
   header controls are available independently.
+- **Cloud:** optional; requires PHP `sodium`, `curl`, `mbstring` and XML/DOM
+  support, HTTPS, and write access to the Roundcube user database for the
+  Cloud-specific tables. Provider integrations also require separate OAuth
+  application registrations and permissions; WebDAV requires a reachable
+  HTTPS endpoint. Provider production approval is handled independently
+  of this plugin release.
 - **Password Hashes:** needs a writable SQL connection to the mailbox table and
   an integration that emits Roundcube's `password_change` hook. Roundcube's
   standard `password` plugin emits this event after a successful change, but
@@ -39,6 +45,7 @@ JavaScript module.
 | `customise` | Configure per-domain Blank Page, CSS, logos and related options, including per-domain purge settings. |
 | `attachments` | Detach large attachments and replace them with download links. |
 | `tags` | Manage personal tag names and values, assign them to messages, display badges, and search by tag name or value. |
+| `cloud` | Connect read-only cloud storage accounts, browse remote files and attach selected files to composed messages. |
 | `password_hashes` | **Background only:** store configurable additional password hashes after a successful Roundcube password change. No Settings tab. |
 
 ## Installation
@@ -62,6 +69,10 @@ JavaScript module.
    `public_html/` as described in `config.inc.php.dist`.
 6. Before using Tags, [compile its LESS stylesheet](#compile-the-tags-stylesheet)
    to the CSS path loaded by Roundcube.
+7. Before using Cloud, create its tables in the Roundcube database using
+   the applicable `SQL/mysql.cloud.sql` or `SQL/postgres.cloud.sql` script,
+   configure at least one provider or WebDAV, and verify HTTPS callbacks.
+   See [Cloud storage attachments](#cloud-storage-attachments).
 
 If downloading a GitHub archive, rename its extracted plugin directory to
 `toolbox`. Composer installations can use the Roundcube plugin installer.
@@ -71,6 +82,12 @@ If downloading a GitHub archive, rename its extracted plugin directory to
 Back up `config.inc.php` and your database before upgrading. Copy new options
 from `config.inc.php.dist` into your existing private configuration instead of
 replacing it wholesale. Review enabled tools and any new database permissions.
+
+Cloud is optional and introduces its own database tables; existing Toolbox
+installations do not need those tables unless the `cloud` tool is enabled.
+Back up the Roundcube database and review the Cloud SQL schema for your
+database engine before applying it. An upgrade does not create the Cloud
+tables automatically.
 
 To enable Tags in an existing installation, add `tags` to the existing
 `$config['toolbox_tools']` array in your private configuration, then compile its
@@ -107,6 +124,7 @@ $config['toolbox_tools'] = [
     'customise',
     'attachments',
     'tags',
+    'cloud', // Optional: requires Cloud tables and provider configuration.
     'password_hashes',
 ];
 ```
@@ -204,6 +222,78 @@ definition change can refresh the results when the dialog closes. That refresh
 uses the submitted search and returns to page one; unfinished edits in the
 search controls are preserved.
 
+### Cloud storage attachments
+
+Enable `cloud` in `$config['toolbox_tools']` to add a Cloud section under
+**Settings > Toolbox** and an **Attach from Cloud** picker in the mail composer.
+Users can connect multiple storage accounts, browse folders and import a
+selected remote file as a normal email attachment. The feature reads files;
+it does not provide remote editing, file deletion or share-link creation.
+
+Supported connections:
+
+| Connection | Setup and access |
+| --- | --- |
+| Google Drive | Google OAuth Web client, Drive API, `drive.readonly` scope. |
+| OneDrive Business | Microsoft Entra Web client for work/school accounts, delegated `Files.Read`, `User.Read` and `offline_access`. |
+| OneDrive Personal | Separate Microsoft Entra Web client for consumer accounts, with the same delegated permissions. |
+| Dropbox | Scoped Dropbox app with `account_info.read`, `files.metadata.read` and `files.content.read`. |
+| Nextcloud, ownCloud, generic WebDAV | HTTPS WebDAV URL and account-specific username/app password. |
+
+**Requirements and database setup**
+
+1. Enable PHP `sodium`, `curl`, `mbstring` and DOM/XML support. Cloud uses
+   libsodium to protect provider credentials at rest, and PHP cURL for remote
+   API requests. Use HTTPS for Roundcube and provider endpoints.
+2. In the **Roundcube user database**, create `toolbox_cloud_vaults` and
+   `toolbox_cloud_accounts` using the matching `SQL/mysql.cloud.sql` or
+   `SQL/postgres.cloud.sql` definitions. The Cloud tables are separate from
+   the plugin's earlier `*.initial.sql` schemas. Use your database's normal
+   backup, permissions and schema-review process; never re-run table-creation
+   SQL against tables that already exist.
+3. Add `cloud` to the enabled tools. For OAuth providers, populate the relevant
+   `toolbox_cloud_*` settings in your private `config.inc.php`. A provider's
+   connection card is available only when its required configuration is valid.
+   Unconfigured OAuth providers do not prevent WebDAV connections.
+4. Register the **exact HTTPS redirect URI** at each provider and ensure it
+   matches the corresponding Toolbox setting. Google, OneDrive Business and
+   Dropbox use their documented Roundcube Settings action callbacks; OneDrive
+   Personal uses a query-free HTTPS callback URL (typically the Roundcube
+   root). Consult the examples in `config.inc.php.dist`.
+5. Open **Settings > Toolbox > Cloud** to create a personal vault, then connect
+   accounts. Vault creation supports a password, a one-time recovery key, or
+   both. Keep the recovery key in a safe place; it is not shown again.
+
+**Credential and network handling**
+
+Each authenticated Roundcube user has a separate vault. Provider credentials
+and OAuth tokens are stored encrypted using a per-user vault key; the password
+or recovery key is used to unlock that key. Unlocks expire automatically and
+can be ended manually. Administrators still need to secure the Roundcube
+server, its database, HTTPS configuration and backups.
+
+WebDAV uses HTTPS and certificate validation, and rejects private/reserved
+network destinations by default. If an administrator genuinely needs an
+internal WebDAV server, `toolbox_cloud_trusted_webdav_hosts` allows explicit
+host-to-private-IPv4 mappings. Do not configure broad exceptions.
+
+**OAuth applications and production availability**
+
+Toolbox being released on GitHub does **not** mean an OAuth app is verified or
+approved by Google, Microsoft or Dropbox. Administrators must register their
+own appropriate client applications, configure permissions, comply with each
+provider's policies and complete any production or verification requirements.
+Google's current `drive.readonly` permission is restricted and may entail
+additional verification and security review. Never commit OAuth secrets or
+private `config.inc.php` values to the repository.
+
+**Language support**
+
+Cloud Settings, the Compose picker and user-facing backend/OAuth messages use
+Roundcube localisation for `en_US`, `en_GB`, `it_IT`, `fr_FR`, `de_DE` and
+`es_ES`. Translations other than English/Italian should be reviewed by fluent
+speakers before being treated as final.
+
 ### Additional password hashes
 
 `password_hashes` is a **background module**. Enabling it in `toolbox_tools`
@@ -289,55 +379,64 @@ $config['toolbox_password_additional_algorithms'] = [
 
 ### Logging and troubleshooting
 
-Toolbox uses `toolbox_logfile` and `toolbox_loglevel` in `config.inc.php`.
-For the Password Hashes module:
+Toolbox routes diagnostics from its dispatcher, tools and SQL adapter through
+`lib/Toolbox/logger.php`, using the existing `toolbox_logfile` and
+`toolbox_loglevel` settings in `config.inc.php`:
 
-| Log level | Output |
+| `toolbox_loglevel` | Output |
 | --- | --- |
-| `0` | No messages |
-| `1` | Errors |
-| `2` | Error stage and successful operation counts |
-| `3` or above | Execution steps, affected row counts, and SQL **templates** with `?` placeholders |
+| `0` | No Toolbox diagnostic messages. |
+| `1` | `[ERROR]` failure stages and categories. |
+| `2` | `[ERROR]` and `[SQL]` schematic query/operation descriptions. |
+| `3` | `[ERROR]`, `[SQL]` and `[STEP]` execution stages. |
 
-The Password Hashes module deliberately avoids logging plaintext passwords,
-generated hashes, usernames and SQL parameter values. Its SQL debug shows
-columns, table and query shape, not expanded parameters. Use level 3 only
-when troubleshooting, then restore your normal logging level.
+Messages have component names such as `[cloud]`, `[tags]`, `[attachments]`,
+`[password_hashes]` and `[storage.sql]`. The logger avoids passwords, provider
+tokens, hashes, usernames, file names, SQL parameter values and unfiltered
+exception messages. SQL entries are intentionally redacted descriptions, not
+replayable queries. Use level 3 for troubleshooting and restore your normal
+setting afterward. Logs are not a substitute for correct error handling: a
+failed database operation must fail regardless of the logging level.
 
 ## Code organisation
 
-Tool-specific PHP modules live in `tools/`, with shared preferences in
-`tools/preferences.php`. Tool-specific JavaScript is separated into
-`js/toolbox.aliases.js`, `js/toolbox.forward.js`, `js/toolbox.vacation.js` and
-`js/toolbox.customise.js`; `js/toolbox.js` retains shared functionality.
-Vacation's datepicker integration is part of its module. The old
-`toolbox.calendar.js` and `toolbox.doubleclick.js` are obsolete.
+Each enabled tool has a module in `tools/`; tool-specific implementation files
+remain in subdirectories such as `tools/cloud/` and `tools/tags/`. Shared
+Toolbox classes live in `lib/Toolbox/`:
 
-Tags uses `tools/tags.php` for settings, mail actions and search integration,
-with its definition store in `tools/tags/definitions.php`. The settings editor
-uses `js/toolbox.tags.js`; message assignment, badges and search refresh use
+- `tool.php`: common module contract.
+- `preferences.php`: Roundcube preference service.
+- `logger.php`: central component-aware logging.
+
+Database storage adapters remain in `lib/Roundcube/`. Tool-specific JavaScript
+resides in `js/toolbox.<tool>.js`, while `js/toolbox.js` retains shared
+functionality. Cloud uses `js/toolbox.cloud.js` for Settings and
+`js/toolbox.cloud.compose.js` for the Compose picker, with Elastic styling in
+`skins/elastic/toolbox.cloud.less` and its compiled CSS. Tags uses
+`tools/tags/definitions.php`, `js/toolbox.tags.js` and
 `js/toolbox.tags.message.js`.
+
+The Cloud Settings view uses Roundcube HTML helpers in `tools/cloud/view.php`;
+the standalone OAuth popup callbacks retain their minimal response pages.
+The old `tools/logger.php`, `tools/preferences.php`, `tools/tool.php` and
+`tools/cloud/logger.php` compatibility files are no longer used and should not
+be shipped alongside the relocated implementation.
 
 ## Developer checks
 
-The optional test dependencies are separate from the plugin runtime. With
-Node.js 18 or newer, run `npm install` followed by `npm test` from `tests/`.
-The v1.7.7 Tags checks cover 76 JavaScript behaviors and PHP 8.1 syntax parsing.
-The JavaScript suite executes the actual mail script with isolated DOM and
-Roundcube fixtures.
-
-The separate PHP search suite loads the production classes and pinned
-Roundcube 1.7.2 parser sources. With PHP 8.1+, `mbstring`, and a local Roundcube
-1.7.2 checkout, run this from the plugin root:
+The release archive does not include a `tests/` directory or an npm-based
+regression-test runner. Run the following syntax checks from the plugin root
+using PHP 8.1 or later and Node.js (for the JavaScript check):
 
 ```sh
-TAGS_ROUNDCUBE_ROOT=/path/to/roundcubemail-1.7.2 php tests/mail-search-tests.php
+find . -type f -name '*.php' -not -path './vendor/*' -exec php -l {} \;
+php -l config.inc.php.dist
+find js -maxdepth 1 -type f -name 'toolbox*.js' -exec node --check {} \;
 ```
 
-It reports `SKIP` when its prerequisites are unavailable. The standalone PHP
-search suite was not executed as part of this release's local validation; Tags
-behavior was separately confirmed on the development installation. These test
-scripts are run manually and do not connect to a live IMAP server.
+These commands check syntax only; they do not test Roundcube integration,
+provider OAuth callbacks, database schemas or IMAP behavior. Test each enabled
+tool on a staging Roundcube installation before upgrading production.
 
 ## License
 

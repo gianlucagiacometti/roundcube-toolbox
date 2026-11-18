@@ -11,6 +11,43 @@ final class toolbox_tool_tags extends toolbox_tool_module
 {
     private const LIST_PREFERENCE = 'toolbox_tags_show_in_list';
 
+    /** Stable translation identifiers for user-visible backend failures. */
+    private const ERROR_TRANSLATIONS = [
+        'Invalid tag request' => 'tags-error-invalidrequest',
+        'Message is not available in this mailbox' => 'tags-error-missingmessage',
+        'This tag definition no longer exists' => 'tags-error-missingtag',
+        'This mailbox does not allow custom tags' => 'tags-error-tagsnotallowed',
+        'The tag update was not confirmed by the mail server' => 'tags-error-updateunconfirmed',
+        'Could not verify the updated message tag' => 'tags-error-verifyfailed',
+        'Invalid tag operation' => 'tags-error-invalidoperation',
+        'Unknown tag operation' => 'tags-error-unknownoperation',
+        'Could not save the message-list display option' => 'tags-error-listsavefailed',
+        'Invalid message-list display option' => 'tags-error-invalidlistoption',
+        'Invalid tag form value' => 'tags-error-invalidformvalue',
+        'Too many tag names' => 'tags-error-toomanynames',
+        'Unknown tag name' => 'tags-error-unknownname',
+        'Unknown personal tag definition' => 'tags-error-unknowntag',
+        'Too many personal tag definitions' => 'tags-error-toomanyvalues',
+        'Restore the tag before editing it' => 'tags-error-restorefirst',
+        'Invalid personal tag definition store' => 'tags-error-invalidstore',
+        'Corrupted personal tag definition' => 'tags-error-corrupteddefinition',
+        'Corrupted personal tag text' => 'tags-error-corruptedtext',
+        'Duplicate tag group identifier' => 'tags-error-duplicategroupid',
+        'Corrupted tag groups' => 'tags-error-corruptedgroups',
+        'Corrupted tag group' => 'tags-error-corruptedgroup',
+        'Corrupted tag group name' => 'tags-error-corruptedgroupname',
+        'Duplicate tag group names' => 'tags-error-duplicategroupname',
+        'Tag value has no valid parent group' => 'tags-error-noparent',
+        'Could not save personal tag definitions' => 'tags-error-definitionssavefailed',
+        'Tag name is not active' => 'tags-error-inactive',
+        'Tag name already exists' => 'tags-error-nameexists',
+        'Tag value already exists' => 'tags-error-valueexists',
+        'Invalid tag identifier' => 'tags-error-invalidid',
+        'Tag name must contain valid, nonempty text' => 'tags-error-invalidname',
+        'Tag value must contain valid, nonempty text' => 'tags-error-invalidvalue',
+        'Invalid tag color' => 'tags-error-invalidcolor',
+    ];
+
     private ?toolbox_tag_definitions $definitions = null;
     private ?array $mail_definitions = null;
     private array $message_tag_states = [];
@@ -22,6 +59,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
      */
     public function init(): void
     {
+        toolbox_logger::step('tags', 'init_start');
         require_once __DIR__ . '/tags/definitions.php';
         $this->definitions = new toolbox_tag_definitions($this->preferences);
 
@@ -36,6 +74,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
                 try {
                     $definitions = $this->mail_tag_definitions();
                 } catch (LogicException | RuntimeException $exception) {
+                    toolbox_logger::error('tags', 'init_definitions', 'read_failed');
                     // A broken definition store must not prevent reading mail.
                     $definitions = [];
                 }
@@ -70,8 +109,8 @@ final class toolbox_tool_tags extends toolbox_tool_module
                     'type' => 'link',
                     'class' => 'toolbox-tags disabled',
                     'classact' => 'toolbox-tags',
-                    'aria-label' => 'Tags',
-                    'content' => html::tag('span', ['class' => 'inner'], rcmail::Q('Tags')),
+                    'aria-label' => $this->plugin->gettext('tags'),
+                    'content' => html::tag('span', ['class' => 'inner'], rcmail::Q($this->plugin->gettext('tags'))),
                 ], 'toolbar');
             }
         }
@@ -84,6 +123,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
      */
     public function include_edit_assets(): void
     {
+        toolbox_logger::step('tags', 'settings_assets');
         $this->export_tag_environment($this->definitions->all());
         $this->plugin->include_stylesheet('skins/elastic/toolbox.tags.css');
         $this->plugin->include_script('js/toolbox.tags.js');
@@ -106,6 +146,31 @@ final class toolbox_tool_tags extends toolbox_tool_module
         $this->rcube->output->set_env('toolbox_tags_definitions',
             self::public_tag_definitions($definitions));
         $this->rcube->output->set_env(self::LIST_PREFERENCE, $this->show_tags_in_list());
+        $this->rcube->output->set_env('toolbox_tags_labels', $this->client_labels());
+    }
+
+    /**
+     * Export only the Tags strings used by its Settings and mail scripts.
+     *
+     * @return array Localised client labels indexed by their stable key.
+     */
+    private function client_labels(): array
+    {
+        $keys = [
+            'tags', 'tags-newname', 'tags-editnametitle', 'tags-newvalue',
+            'tags-editvalue', 'tags-parentprefix', 'tags-confirmdeletegroup', 'tags-confirmdeletevalue',
+            'tags-deleteirreversible', 'tags-unavailable', 'tags-noneassigned', 'tags-listprefix',
+            'tags-edit', 'tags-editorfailed', 'tags-defssaving', 'tags-definitions',
+            'tags-defsloading', 'tags-opendefs', 'tags-loading', 'tags-saving',
+            'tags-saveunconfirmed', 'tags-loadfailed', 'tags-updated', 'tags-updateunconfirmed',
+            'tags-reloadhint', 'tags-selectone', 'tags-savepending', 'tags-options',
+            'tags-message', 'tags-reloadeditor', 'tags-reload', 'tags-defssavingclose',
+        ];
+        $labels = [];
+        foreach ($keys as $key) {
+            $labels[$key] = $this->plugin->gettext($key);
+        }
+        return $labels;
     }
 
     /**
@@ -176,6 +241,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
         try {
             $definitions = $this->mail_tag_definitions();
         } catch (LogicException | RuntimeException $exception) {
+            toolbox_logger::error('tags', 'search_definitions', 'read_failed');
             return $args;
         }
 
@@ -200,6 +266,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
         $tags = str_repeat('OR ', count($keywords) - 1) . implode(' ', $keywords);
         $args['search'] = trim($constraints . ' OR (' . $text . ') (' . $tags . ')');
         $this->rcube->output->set_env('toolbox_tags_search_expanded', true);
+        toolbox_logger::step('tags', 'search_expanded');
 
         return $args;
     }
@@ -237,6 +304,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
      */
     public function render_form(): array
     {
+        toolbox_logger::step('tags', 'settings_render');
         $groups = $this->definitions->groups();
         $items = $this->definitions->all();
         $children = [];
@@ -258,7 +326,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
 
         if ($active === '') {
             $active = html::tag('li', ['class' => 'toolbox-tags-empty'],
-                rcmail::Q('No tags yet. Select New tag to create one.'));
+                rcmail::Q($this->plugin->gettext('tags-empty')));
         }
 
         $manager = html::tag('div', ['id' => 'toolbox-tags-manager', 'class' => 'toolbox-tags-manager'],
@@ -267,7 +335,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
                 html::tag('button', [
                     'type' => 'button', 'class' => 'button primary',
                     'data-tags-action' => 'new-group',
-                ], self::icon('plus') . rcmail::Q('New tag'))
+                ], self::icon('plus') . rcmail::Q($this->plugin->gettext('tags-newtag')))
             )
             . html::tag('ul', ['class' => 'toolbox-tags-tree'], $active)
             . $this->render_editor()
@@ -275,7 +343,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
 
         return [
             'intro' => $manager,
-            'name' => rcmail::Q('Personal tags'),
+            'name' => rcmail::Q($this->plugin->gettext('tags-title')),
             'class' => 'toolbox-tagstable',
             'cols' => 1,
             'rows' => [],
@@ -304,10 +372,10 @@ final class toolbox_tool_tags extends toolbox_tool_module
                 'type' => 'hidden', 'name' => '_tags_options_present', 'value' => '1',
             ])
             . $input->show($this->show_tags_in_list() ? '1' : '')
-            . html::label('rcmfd_tags_show_in_list', rcmail::Q('Show tags in the message list'))
+            . html::label('rcmfd_tags_show_in_list', rcmail::Q($this->plugin->gettext('tags-showinlist')))
             . html::tag('p', [
                 'id' => 'toolbox-tags-preference-help', 'class' => 'toolbox-tags-preference-help',
-            ], rcmail::Q('Tagged messages use an extra line in the list.')));
+            ], rcmail::Q($this->plugin->gettext('tags-listhelp'))));
     }
 
     /**
@@ -327,6 +395,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
         try {
             $definitions = $this->mail_tag_definitions();
         } catch (LogicException | RuntimeException $exception) {
+            toolbox_logger::error('tags', 'list_definitions', 'read_failed');
             $definitions = [];
         }
 
@@ -370,16 +439,16 @@ final class toolbox_tool_tags extends toolbox_tool_module
         }
         if ($current === '') {
             $current = html::tag('li', ['class' => 'toolbox-tags-empty'],
-                rcmail::Q('No values. Select New value to add one.'));
+                rcmail::Q($this->plugin->gettext('tags-emptyvalues')));
         }
 
-        $actions = self::action_button('new-value', 'New value', 'plus', [
+        $actions = self::action_button('new-value', $this->plugin->gettext('tags-newvalue'), 'plus', [
             'data-tags-group' => $group['id'],
             'data-tags-group-name' => $group['name'],
-        ]) . self::action_button('edit-group', 'Edit name', 'pencil', [
+        ]) . self::action_button('edit-group', $this->plugin->gettext('tags-editname'), 'pencil', [
             'data-tags-id' => $group['id'],
             'data-tags-name' => $group['name'],
-        ]) . self::action_button('delete-group', 'Delete tag name', 'trash', [
+        ]) . self::action_button('delete-group', $this->plugin->gettext('tags-deletename'), 'trash', [
             'data-tags-id' => $group['id'],
             'data-tags-name' => $group['name'],
         ]);
@@ -402,12 +471,12 @@ final class toolbox_tool_tags extends toolbox_tool_module
      */
     private function render_value(array $value): string
     {
-        $actions = self::action_button('edit-value', 'Edit value', 'pencil', [
+        $actions = self::action_button('edit-value', $this->plugin->gettext('tags-editvalue'), 'pencil', [
             'data-tags-id' => $value['id'],
             'data-tags-name' => $value['name'],
             'data-tags-value' => $value['value'],
             'data-tags-color' => $value['color'],
-        ]) . self::action_button('delete-value', 'Delete value', 'trash', [
+        ]) . self::action_button('delete-value', $this->plugin->gettext('tags-deletevalue'), 'trash', [
             'data-tags-id' => $value['id'],
             'data-tags-name' => $value['name'],
             'data-tags-value' => $value['value'],
@@ -441,26 +510,26 @@ final class toolbox_tool_tags extends toolbox_tool_module
             'maxlength' => 255, 'autocomplete' => 'off',
         ]);
         $name_row = html::tag('div', ['id' => 'toolbox-tags-name-row', 'class' => 'toolbox-tags-field'],
-            html::label('rcmfd_tags_name', rcmail::Q('Tag name')) . $name->show(''));
+            html::label('rcmfd_tags_name', rcmail::Q($this->plugin->gettext('tags-name'))) . $name->show(''));
         $value_row = html::tag('div', ['id' => 'toolbox-tags-value-row', 'class' => 'toolbox-tags-field'],
-            html::label('rcmfd_tags_value', rcmail::Q('Value')) . $value->show(''));
+            html::label('rcmfd_tags_value', rcmail::Q($this->plugin->gettext('tags-value'))) . $value->show(''));
         $color_row = html::tag('div', ['id' => 'toolbox-tags-color-row', 'class' => 'toolbox-tags-field'],
-            html::label('rcmfd_tags_color', rcmail::Q('Color'))
+            html::label('rcmfd_tags_color', rcmail::Q($this->plugin->gettext('tags-color')))
             . html::tag('input', [
                 'type' => 'color', 'name' => '_tags_color', 'id' => 'rcmfd_tags_color',
-                'value' => '#6478C4', 'title' => 'Choose tag color',
+                'value' => '#6478C4', 'title' => $this->plugin->gettext('tags-choosecolor'),
             ]));
 
         return html::tag('div', ['id' => 'toolbox-tags-editor', 'class' => 'toolbox-tags-editor',
             'hidden' => 'hidden'],
             $hidden
-            . html::tag('h3', ['id' => 'toolbox-tags-editor-title'], rcmail::Q('New tag'))
+            . html::tag('h3', ['id' => 'toolbox-tags-editor-title'], rcmail::Q($this->plugin->gettext('tags-newtag')))
             . html::tag('p', ['id' => 'toolbox-tags-parent-label', 'class' => 'toolbox-tags-parent'], '')
             . $name_row . $value_row . $color_row
             . html::tag('div', ['class' => 'toolbox-tags-editor-actions'],
-                html::tag('button', ['type' => 'submit', 'class' => 'button primary'], rcmail::Q('Save'))
+                html::tag('button', ['type' => 'submit', 'class' => 'button primary'], rcmail::Q($this->plugin->gettext('tags-save')))
                 . html::tag('button', ['type' => 'button', 'class' => 'button',
-                    'data-tags-action' => 'cancel'], rcmail::Q('Cancel'))));
+                    'data-tags-action' => 'cancel'], rcmail::Q($this->plugin->gettext('tags-cancel')))));
     }
 
     /**
@@ -478,7 +547,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
         return html::tag('button', [
             'type' => 'button', 'class' => $class, 'data-tags-action' => $action,
             'title' => $label, 'aria-label' => $label,
-        ] + $extra, self::icon($icon) . ($action === 'new-value' ? rcmail::Q('New value') : ''));
+        ] + $extra, self::icon($icon) . ($action === 'new-value' ? rcmail::Q($label) : ''));
     }
 
     /**
@@ -540,7 +609,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
             'folder' => is_string($folder) ? $folder : '',
             'definitions' => [],
             'selected' => [],
-            'error' => 'Invalid tag request',
+            'error' => $this->plugin->gettext('tags-error-invalidrequest'),
         ];
 
         if (self::valid_message_reference($uid, $folder) && self::valid_request_token($request)) {
@@ -611,9 +680,10 @@ final class toolbox_tool_tags extends toolbox_tool_module
             $state['definitions'] = self::public_tag_definitions($definitions);
             $state['selected'] = self::selected_tag_ids($definitions, $flags[$uid]);
         } catch (LogicException | RuntimeException $exception) {
+            toolbox_logger::error('tags', 'message_state', 'read_failed');
             $state['definitions'] = [];
             $state['selected'] = [];
-            $state['error'] = $exception->getMessage();
+            $state['error'] = $this->localized_error($exception);
         }
 
         $this->message_tag_states[$key] = $state;
@@ -645,7 +715,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
             'success' => false,
             'wanted' => $wanted,
             'selected' => null,
-            'error' => 'Invalid tag request',
+            'error' => $this->plugin->gettext('tags-error-invalidrequest'),
         ];
         $valid = self::valid_message_reference($uid, $folder)
             && self::valid_request_token($request)
@@ -653,10 +723,12 @@ final class toolbox_tool_tags extends toolbox_tool_module
             && in_array($state, ['0', '1'], true);
 
         if (!$valid) {
+            toolbox_logger::error('tags', 'message_update', 'invalid_request');
             $this->send_message_tag_result($result);
             return;
         }
 
+        toolbox_logger::step('tags', 'message_update_start');
         try {
             $definitions = $this->mail_tag_definitions();
             $definition = null;
@@ -713,8 +785,10 @@ final class toolbox_tool_tags extends toolbox_tool_module
 
             $result['success'] = true;
             $result['error'] = '';
+            toolbox_logger::step('tags', 'message_update_complete');
         } catch (LogicException | RuntimeException $exception) {
-            $result['error'] = $exception->getMessage();
+            toolbox_logger::error('tags', 'message_update', 'operation_failed');
+            $result['error'] = $this->localized_error($exception);
         }
 
         $this->send_message_tag_result($result);
@@ -798,6 +872,7 @@ final class toolbox_tool_tags extends toolbox_tool_module
      */
     public function prepare_save($storage): ?array
     {
+        toolbox_logger::step('tags', 'settings_save_start');
         $operation = rcube_utils::get_input_value('_tags_action', rcube_utils::INPUT_POST);
         $id = rcube_utils::get_input_value('_tags_id', rcube_utils::INPUT_POST);
         $group_id = rcube_utils::get_input_value('_tags_group_id', rcube_utils::INPUT_POST);
@@ -844,11 +919,29 @@ final class toolbox_tool_tags extends toolbox_tool_module
             }
         } catch (InvalidArgumentException | LogicException | OutOfBoundsException
             | OverflowException | UnexpectedValueException | RuntimeException $exception) {
+            toolbox_logger::error('tags', 'settings_save', 'operation_failed');
             $this->rcube->output->command('display_message',
-                rcmail::Q($exception->getMessage()), 'error');
+                rcmail::Q($this->localized_error($exception)), 'error');
             return null;
         }
+        toolbox_logger::step('tags', 'settings_save_complete');
         return ['new_settings' => []];
+    }
+
+
+    /**
+     * Translate known Tags backend errors before they reach the browser.
+     *
+     * Definitions keep their original exception text for internal callers;
+     * unknown exception messages are never exposed to the user.
+     *
+     * @param Throwable $exception Failed Tags operation.
+     * @return string Localised, user-safe error message.
+     */
+    private function localized_error(Throwable $exception): string
+    {
+        $key = self::ERROR_TRANSLATIONS[$exception->getMessage()] ?? 'tags-error-unexpected';
+        return $this->plugin->gettext($key);
     }
 
     /**
@@ -885,4 +978,3 @@ final class toolbox_tool_tags extends toolbox_tool_module
 }
 
 // END OF FILE
-

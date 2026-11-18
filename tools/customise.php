@@ -80,6 +80,8 @@ class toolbox_tool_customise extends toolbox_tool_module
      */
     public function apply_config($storage, string $skin, string $plugin_id): void
     {
+        toolbox_logger::step('customise', 'runtime_apply_start');
+
         $mailbox_parts = explode('@', $this->rcube->user->get_username());
         if (!isset($mailbox_parts[1]) || $mailbox_parts[0] === '' || $mailbox_parts[1] === '') {
             // Domain-specific assets cannot be named without a domain.
@@ -90,34 +92,32 @@ class toolbox_tool_customise extends toolbox_tool_module
         $skin = $this->active_skin($skin);
 
         // load customised skin configuration from config
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function init]: skin: " . $skin);
-            rcube::write_log($this->logfile, "STEP in [function init]: load customised skin configuration from config");
-        }
+        toolbox_logger::step('customise', 'skin_resolved');
+        toolbox_logger::step('customise', 'defaults_load');
         $config = $this->rcube->config->get('toolbox_customise_skins', []);
         $config = isset($config[$skin]) ? $config[$skin] : (isset($config['default']) ? $config['default'] : []);
 
         // load customised skin configuration from database
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function init]: load customised skin configuration from database");
+        toolbox_logger::step('customise', 'storage_load_start');
+        try {
+            $customise = $storage->load_customised_config($this->rcube->user->get_username(), $skin);
+        } catch (Throwable $exception) {
+            toolbox_logger::error('customise', 'runtime_storage_load', 'storage_failed');
+            throw $exception;
         }
-        $customise = $storage->load_customised_config($this->rcube->user->get_username(), $skin);
+        toolbox_logger::step('customise', 'storage_load_complete');
         $parts = explode('@', $this->rcube->user->get_username());
 
         // customise blank page
         $options = ['blankpage_type', 'blankpage_url', 'blankpage_image', 'blankpage_custom'];
         if ($this->is_enabled($customise['customise_blankpage'] ?? false)) {
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: 'customise blank page' database option selected: override config");
-            }
+            toolbox_logger::step('customise', 'blankpage_override_enabled');
             foreach ($options as $option) {
                 $config[$option] = $customise[$option] ?? '';
             }
         }
         else {
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: 'customise blank page' database option not selected");
-            }
+            toolbox_logger::step('customise', 'blankpage_override_disabled');
             foreach ($options as $option) {
                 if (!isset($config[$option])) {
                     $config[$option] = '';
@@ -126,9 +126,7 @@ class toolbox_tool_customise extends toolbox_tool_module
         }
 
         if (isset($config['blankpage_type']) && (in_array($config['blankpage_type'], ['url', 'image', 'custom']))) {
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: customised blank page type: " . $config['blankpage_type']);
-            }
+            toolbox_logger::step('customise', 'blankpage_custom_type');
 
             switch ($config['blankpage_type']) {
                 case "url":
@@ -138,15 +136,11 @@ class toolbox_tool_customise extends toolbox_tool_module
                     break;
                 case "image":
                     if (isset($config['blankpage_image']) && ($config['blankpage_image'] != '')) {
-                        if ($this->loglevel > 2) {
-                            rcube::write_log($this->logfile, "STEP in [function init]: found customised image");
-                        }
+                        toolbox_logger::step('customise', 'blankpage_image_present');
                         $image = $config['blankpage_image'];
                         // we read the content of the file 'watermark.html' in the skin folder and change the url content with our cutomised image
                         if (file_exists(RCUBE_INSTALL_PATH . \DIRECTORY_SEPARATOR . 'skins' . \DIRECTORY_SEPARATOR . $skin . \DIRECTORY_SEPARATOR . 'watermark.html')) {
-                            if ($this->loglevel > 2) {
-                                rcube::write_log($this->logfile, "STEP in [function init]: found original watermark");
-                            }
+                            toolbox_logger::step('customise', 'blankpage_watermark_found');
                             $blankpage = file_get_contents(RCUBE_INSTALL_PATH . \DIRECTORY_SEPARATOR . 'skins' . \DIRECTORY_SEPARATOR . $skin . \DIRECTORY_SEPARATOR . 'watermark.html');
                             if ($blankpage != '') {
                                 // we need a file in a folder named 'tmp' in plugin/toolbox (temp cannot be used for .htaccess limitations)
@@ -154,9 +148,7 @@ class toolbox_tool_customise extends toolbox_tool_module
                                 // a file is needed since the 'blankpage' env variable needs a real file (loaded in apps.js)
                                 $tmp = RCUBE_INSTALL_PATH . \DIRECTORY_SEPARATOR . 'plugins' . \DIRECTORY_SEPARATOR . $plugin_id . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . 'blankpage.' . $parts[1] . '.html';
                                 file_put_contents($tmp, preg_replace('!url\(.*?\)!U', "url(" . $config['blankpage_image'] . ")", $blankpage));
-                                if ($this->loglevel > 2) {
-                                    rcube::write_log($this->logfile, "STEP in [function init]: write new watermark in folder tmp");
-                                }
+                                toolbox_logger::step('customise', 'blankpage_watermark_written');
                                 $this->rcube->output->set_env('blankpage', 'static.php' . \DIRECTORY_SEPARATOR . 'plugins' . \DIRECTORY_SEPARATOR . $plugin_id . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . basename($tmp));
                             }
                         }
@@ -174,15 +166,13 @@ class toolbox_tool_customise extends toolbox_tool_module
                     break;
             }
         }
-        elseif ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function init]: customised blank page type: Roundcube default");
+        else {
+            toolbox_logger::step('customise', 'blankpage_default_type');
         }
 
         // customise css
         if ($this->is_enabled($customise['customise_css'] ?? false) && !empty($customise['additional_css'])) {
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: 'customise additional css' database option selected: override config");
-            }
+            toolbox_logger::step('customise', 'css_override_enabled');
             // we need a file in a folder named 'tmp' in plugin/toolbox (temp cannot be used for .htaccess limitations)
             // filename must contain a dot for .htaccess limitations
             $tmp = RCUBE_INSTALL_PATH . \DIRECTORY_SEPARATOR . 'plugins' . \DIRECTORY_SEPARATOR . $plugin_id . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . 'stylesheet.' . $parts[1] . '.css';
@@ -191,46 +181,39 @@ class toolbox_tool_customise extends toolbox_tool_module
             if (method_exists($this->rcube->output, 'include_css')) {
                 $this->rcube->output->include_css('plugins' . \DIRECTORY_SEPARATOR . $plugin_id . \DIRECTORY_SEPARATOR . 'tmp' . \DIRECTORY_SEPARATOR . basename($tmp));
             }
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: customised additional css loaded");
-            }
+            toolbox_logger::step('customise', 'css_override_loaded');
         }
         else {
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: 'customise additional css' database option not selected: loading from config");
-            }
+            toolbox_logger::step('customise', 'css_override_disabled');
             $additional_css = $config['additional_css'] ?? null;
             if (is_string($additional_css) && $additional_css !== '' && is_file($additional_css)) {
-                if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [function init]: valid customised additional css file defined, found and loaded: {$additional_css}");
-                }
+                toolbox_logger::step('customise', 'css_config_file_found');
                 // css is loaded only under some circumstances (not when rcmail_output_json is called)
                 if (method_exists($this->rcube->output, 'include_css')) {
                     $this->rcube->output->include_css($additional_css);
                 }
             }
-            elseif ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: customised additional css file not found, empty or not defined");
+            else {
+                toolbox_logger::step('customise', 'css_config_file_unavailable');
             }
         }
 
         // customise logo
         if ($this->is_enabled($customise['customise_logo'] ?? false) && !empty($customise['customised_logo'])) {
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function init]: 'customise logo' database option selected: override config");
-            }
+            toolbox_logger::step('customise', 'logo_override_enabled');
             $logo = json_decode($customise['customised_logo'], true) ?: [];
-            if ((json_last_error() !== JSON_ERROR_NONE) && ($this->loglevel > 0)) {
-                rcube::write_log($this->logfile, "ERROR in [function init]: 'customised logo' database value has not a proper json format");
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                toolbox_logger::error('customise', 'logo_decode', 'invalid_json');
             }
             $logo = array_map('base64_decode', $logo);
             // Is it better to merge or replace?
             // $this->rcube->config->set('skin_logo', array_merge($this->rcube->config->get('skin_logo'), $logo));
             $this->rcube->config->set('skin_logo', $logo);
         }
-        elseif ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function init]: 'customise logo' database option not selected: loading from config");
+        else {
+            toolbox_logger::step('customise', 'logo_override_disabled');
         }
+        toolbox_logger::step('customise', 'runtime_apply_complete');
     }
 
     /**
@@ -243,6 +226,8 @@ class toolbox_tool_customise extends toolbox_tool_module
      */
     public function render_form($storage, array $attrib, callable $render_fieldset): string
     {
+        toolbox_logger::step('customise', 'settings_render_start');
+
         $parts = explode('@', $this->rcube->user->get_username());
         $form_content = '';
         if ($storage->is_domain_admin($this->rcube->user->get_username())) {
@@ -258,12 +243,17 @@ class toolbox_tool_customise extends toolbox_tool_module
                 'toolbox.customise-logo-customisedlogoexists'
                 );
 
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function tool_render_form]: user is domain admin");
-            }
+            toolbox_logger::step('customise', 'settings_domain_admin');
 
             // load data
-            $selected = $storage->load_tool_data($this->rcube->user->get_username());
+            toolbox_logger::step('customise', 'settings_storage_load_start');
+            try {
+                $selected = $storage->load_tool_data($this->rcube->user->get_username());
+            } catch (Throwable $exception) {
+                toolbox_logger::error('customise', 'settings_storage_load', 'storage_failed');
+                throw $exception;
+            }
+            toolbox_logger::step('customise', 'settings_storage_load_complete');
 
             $form_content .= html::div(['class' => 'tool-title'], rcmail::Q($this->plugin->gettext('customise-manage')) . ' ' . $parts[1]);
 
@@ -510,6 +500,7 @@ class toolbox_tool_customise extends toolbox_tool_module
             }
 
         }
+        toolbox_logger::step('customise', 'settings_render_complete');
         return $form_content;
     }
 
@@ -524,22 +515,17 @@ class toolbox_tool_customise extends toolbox_tool_module
      */
     public function prepare_settings($storage): array
     {
+        toolbox_logger::step('customise', 'settings_save_start');
         $new_settings = [];
         if ($storage->is_domain_admin($this->rcube->user->get_username())) {
 
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function save]: prepare domain settings");
-            }
+            toolbox_logger::step('customise', 'settings_save_domain_prepare');
             $new_settings['domain']['purge_trash'] = rcube_utils::get_input_value('_domaintrash', rcube_utils::INPUT_POST) ?: 0;
             $new_settings['domain']['purge_junk'] = rcube_utils::get_input_value('_domainjunk', rcube_utils::INPUT_POST) ?: 0;
 
-            if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [function save]: prepare skin settings");
-            }
+            toolbox_logger::step('customise', 'settings_save_skins_prepare');
             foreach ($this->get_skins() as $skin => $header) {
-                if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [function save]: processing skin " . $skin);
-                }
+                toolbox_logger::step('customise', 'settings_save_skin_prepare');
                 $new_settings['skins'][$skin]['customise_blankpage'] = rcube_utils::get_input_value('_blankpageselector_'.$skin, rcube_utils::INPUT_POST) ?: false;
                 $new_settings['skins'][$skin]['blankpage_type'] = rcube_utils::get_input_value('_blankpagetype_'.$skin, rcube_utils::INPUT_POST) ?: null;
                 $new_settings['skins'][$skin]['blankpage_url'] = rcube_utils::get_input_value('_blankpageurl_' . $skin, rcube_utils::INPUT_POST) ?: null;
@@ -575,17 +561,13 @@ class toolbox_tool_customise extends toolbox_tool_module
                 $new_settings['skins'][$skin]['additional_css'] = rcube_utils::get_input_value('_additionalcss_' . $skin, rcube_utils::INPUT_POST) ?: null;
                 $new_settings['skins'][$skin]['customise_logo'] = rcube_utils::get_input_value('_customiselogoselector_' . $skin, rcube_utils::INPUT_POST) ?: false;
 
-                if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [function save]: process customised logos");
-                }
+                toolbox_logger::step('customise', 'settings_save_logos_prepare');
                 $customised_logotemplates = [];
                 $input_logotemplate = rcube_utils::get_input_value('_customisedlogotemplate_' . $skin, rcube_utils::INPUT_POST) ?: [];
                 foreach($input_logotemplate as $template) {
                     $customised_logotemplates[] = $template;
                 }
-                if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [function save]: " . count($customised_logotemplates) . " customised logos found for skin " . $skin);
-                }
+                toolbox_logger::step('customise', 'settings_save_logos_collected');
                 $customised_logotypes = [];
                 $input_logotype = rcube_utils::get_input_value('_customisedlogotype_' . $skin, rcube_utils::INPUT_POST) ?: [];
                 foreach($input_logotype as $type) {
@@ -609,6 +591,7 @@ class toolbox_tool_customise extends toolbox_tool_module
             }
 
         }
+        toolbox_logger::step('customise', 'settings_save_prepared');
         return $new_settings;
     }
 
@@ -783,6 +766,7 @@ class toolbox_tool_customise extends toolbox_tool_module
      */
     public function include_edit_assets(): void
     {
+        toolbox_logger::step('customise', 'editor_assets');
         $this->plugin->include_stylesheet('js/codemirror/lib/codemirror.css');
         $this->plugin->include_script('js/codemirror/lib/codemirror.js');
         $this->plugin->include_script('js/codemirror/addon/selection/active-line.js');
@@ -793,4 +777,3 @@ class toolbox_tool_customise extends toolbox_tool_module
 }
 
 // END OF FILE
-

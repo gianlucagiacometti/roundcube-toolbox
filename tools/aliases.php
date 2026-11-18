@@ -26,6 +26,7 @@ class toolbox_tool_aliases extends toolbox_tool_module
      */
     public function render_form($storage, $attrib): array
     {
+        toolbox_logger::step('aliases', 'settings_render');
         // Add JS labels if needed
         $this->rcube->output->add_label(
             'toolbox.aliases-aliasupdated',
@@ -51,9 +52,6 @@ class toolbox_tool_aliases extends toolbox_tool_module
                 $address = trim($alias['address']);
                 // Multi-domain mode displays the complete address; single-domain mode hides its domain.
                 $elements = $this->rcube->config->get('toolbox_aliases_multiple_domains') ? [$address] : explode("@", $address, 2);
-                if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [function tool_render_form]: {$address} ({$elements[0]}@" . ($elements[1] ?? "") . ") valid:" . ($elements[0] != '' ? '✅' : '❎') . " active:" . ($active ? '✅' : '❎') );
-                }
                 if ($elements[0] != "") {
                     $aliases[] = [$address, 'name' => $elements[0], 'domain' => ($elements[1] ?? null), 'active' => $active];
                 }
@@ -114,14 +112,10 @@ class toolbox_tool_aliases extends toolbox_tool_module
         $new_settings = [];
 
         // save alias
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function save]: save alias");
-        }
+        toolbox_logger::step('aliases', 'settings_save_prepare');
         $new_settings['main']['aliasname'] = mb_convert_case(trim((string) rcube_utils::get_input_value('_newaliasname', rcube_utils::INPUT_POST)), MB_CASE_LOWER, RCUBE_CHARSET);
         $new_settings['main']['active'] = rcube_utils::get_input_value('_newaliasactive', rcube_utils::INPUT_POST);
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function save]: new alias name = '{$new_settings['main']['aliasname']}', new alias active = '{$new_settings['main']['active']}'");
-        }
+        toolbox_logger::step('aliases', 'settings_save_prepared');
 
         $message_success = rcmail::Q($this->plugin->gettext('aliases-aliascreated'));
         $message_error = rcmail::Q($this->plugin->gettext('aliases-aliascreatederror'));
@@ -149,17 +143,15 @@ class toolbox_tool_aliases extends toolbox_tool_module
 
         $this->plugin->api->output->add_label('toolbox.aliases-aliasupdated');
 
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function toggle]: ({$data['new_settings']['aliasname']}) initialise storage for tool aliases");
-        }
+        toolbox_logger::step('aliases', 'toggle_start');
 
         $success = $storage->toggle_tool_data($this->rcube->user->get_username(), $data);
         if (!$success) {
+            toolbox_logger::error('aliases', 'toggle', 'persistence_failed');
             $error = rcmail::Q($this->plugin->gettext('aliases-aliasupdatederror'));
         }
-
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function toggle]: alias status update result = " . ($success ? 'success' : 'error'));
+        else {
+            toolbox_logger::step('aliases', 'toggle_complete');
         }
 
         // A stable event name lets the client associate the result with its
@@ -185,6 +177,7 @@ class toolbox_tool_aliases extends toolbox_tool_module
 
         // Check the complete address globally, without listing other users' aliases.
         // Storage enforces the same validation again on INSERT (not just via AJAX).
+        toolbox_logger::step('aliases', 'check_start');
         $status = $storage->alias_creation_error($this->rcube->user->get_username(), $new_alias);
         if ($status === 'exists') {
             $error = rcmail::Q($this->plugin->gettext('aliases-aliasexistsindomain'));
@@ -197,6 +190,7 @@ class toolbox_tool_aliases extends toolbox_tool_module
             $error = '';
         }
 
+        toolbox_logger::step('aliases', $status === null ? 'check_accepted' : 'check_rejected');
         $rcmail->output->command('plugin.toolbox.check_alias', $error);
     }
 
@@ -216,12 +210,14 @@ class toolbox_tool_aliases extends toolbox_tool_module
 
         $this->plugin->api->output->add_label('toolbox.aliases-aliasdeleted');
 
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function delete]: initialise storage for tool aliases");
-        }
+        toolbox_logger::step('aliases', 'delete_start');
 
         if (!$storage->delete_tool_data($this->rcube->user->get_username(), $data)) {
+            toolbox_logger::error('aliases', 'delete', 'persistence_failed');
             $error = rcmail::Q($this->plugin->gettext('aliases-aliasdeletederror'));
+        }
+        else {
+            toolbox_logger::step('aliases', 'delete_complete');
         }
 
         $rcmail->output->command('plugin.toolbox.check_delete', $error);
@@ -311,4 +307,3 @@ class toolbox_tool_aliases extends toolbox_tool_module
 }
 
 // END OF FILE
-

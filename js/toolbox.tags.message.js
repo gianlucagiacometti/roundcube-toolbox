@@ -13,6 +13,12 @@
         return;
     }
 
+    /** Read a translated Tags string supplied by the current server session. */
+    function tagText(key) {
+        const labels = client.env.toolbox_tags_labels || {};
+        return Object.prototype.hasOwnProperty.call(labels, key) ? labels[key] : key;
+    }
+
     const command = 'plugin.toolbox.tags';
     const requests = new Map();
     const listActions = ['list', 'search', 'refresh', 'check-recent'];
@@ -99,7 +105,7 @@
 
     /** Place the standard toolbar entry immediately after Thunderbird Labels. */
     function positionToolbar() {
-        const button = $('#rcmbtntoolboxtags').attr('title', 'Tags');
+        const button = $('#rcmbtntoolboxtags').attr('title', tagText('tags'));
         const thunderbird = $('#tb-label-menulink');
         const item = button.closest('#toolbar-menu > li');
         const anchor = thunderbird.closest('#toolbar-menu > li');
@@ -164,7 +170,7 @@
 
         if (!container.children().length) {
             $('<span>', {'class': 'toolbox-tags-none'})
-                .text(state.error ? 'Tags are unavailable.' : 'No tags assigned')
+                .text(state.error ? tagText('tags-unavailable') : tagText('tags-noneassigned'))
                 .appendTo(container);
         }
     }
@@ -420,7 +426,7 @@
             return;
         }
 
-        const description = 'Tags: ' + definitions.map(function (definition) {
+        const description = tagText('tags-listprefix') + definitions.map(function (definition) {
             return definition.name + ': ' + definition.value;
         }).join('; ');
         const line = $('<span>', {'class': 'toolbox-tags-list-line', title: description});
@@ -582,12 +588,12 @@
             strip = $('<div>', {
                 id: 'toolbox-tags-message',
                 'class': 'toolbox-tags-summary',
-                'aria-label': 'Tags'
-            }).append($('<strong>', {'class': 'toolbox-tags-summary-label'}).text('Tags'));
+                'aria-label': tagText('tags')
+            }).append($('<strong>', {'class': 'toolbox-tags-summary-label'}).text(tagText('tags')));
 
             $('<div>', {'class': 'toolbox-tags-badges', 'aria-live': 'polite'}).appendTo(strip);
             $('<button>', {type: 'button', 'class': 'toolbox-tags-edit'})
-                .text('Edit tags').on('click', function () {
+                .text(tagText('tags-edit')).on('click', function () {
                     const target = targetOf(client.env.toolbox_tags_message);
                     if (!target) {
                         return;
@@ -675,7 +681,7 @@
             if (context.editorFrame) {
                 context.editorFrame.prop('hidden', true);
             }
-            context.editorStatus.text('The tag editor could not be loaded. Check your session, then reload the editor.')
+            context.editorStatus.text(tagText('tags-editorfailed'))
                 .addClass('is-error').attr('role', 'alert');
             context.editorReload.prop('hidden', false);
             updateControls(context);
@@ -691,7 +697,7 @@
             }
 
             context.editorSaving = true;
-            context.editorStatus.text('Saving tag definitions…').removeClass('is-error').attr('role', 'status');
+            context.editorStatus.text(tagText('tags-defssaving')).removeClass('is-error').attr('role', 'status');
             updateControls(context);
         };
 
@@ -775,7 +781,7 @@
             id: 'toolbox-tags-definition-frame',
             name: 'toolbox-tags-definitions-frame',
             'class': 'toolbox-tags-editor-frame',
-            title: 'Tag definitions'
+            title: tagText('tags-definitions')
         }).on('load', function () {
             if (context.editorFrame && context.editorFrame[0] === this) {
                 editorLoaded(context);
@@ -786,7 +792,7 @@
             }
         }).appendTo(context.definitionPanel);
 
-        context.editorStatus.text('Loading tag definitions…').removeClass('is-error').attr('role', 'status');
+        context.editorStatus.text(tagText('tags-defsloading')).removeClass('is-error').attr('role', 'status');
         context.editorReload.prop('hidden', true);
         context.editorFrame.attr('src', client.url('settings/plugin.toolbox.edit', {
             _section: 'tags', _framed: 1, _extwin: 0
@@ -849,7 +855,7 @@
         });
 
         if (!context.state.definitions.length) {
-            $('<p>').text('Open Tag definitions to create tag names and values.')
+            $('<p>').text(tagText('tags-opendefs'))
                 .appendTo(context.options);
         }
 
@@ -904,7 +910,7 @@
         requests.set(token, operation);
         context.pending = operation;
         updateControls(context);
-        showStatus(context, kind === 'get' ? 'Loading tags…' : 'Saving tag…', false);
+        showStatus(context, kind === 'get' ? tagText('tags-loading') : tagText('tags-saving'), false);
 
         const lock = client.set_busy(true, 'loading');
         let xhr;
@@ -915,8 +921,8 @@
         }
 
         const failure = kind === 'set'
-            ? 'The change could not be confirmed. Reload tags before trying again.'
-            : 'Tags could not be loaded. Please retry.';
+            ? tagText('tags-saveunconfirmed')
+            : tagText('tags-loadfailed');
 
         if (!xhr || typeof xhr.fail !== 'function' || typeof xhr.done !== 'function') {
             client.set_busy(false, null, lock);
@@ -1027,9 +1033,9 @@
 
         if (!context.closed) {
             renderChooser(context);
-            showStatus(context, payload.success ? 'Tags updated.'
-                : (payload.error || 'The tag change could not be confirmed.')
-                    + (context.uncertain ? ' Reload tags before trying again.' : ''), !payload.success);
+            showStatus(context, payload.success ? tagText('tags-updated')
+                : (payload.error || tagText('tags-updateunconfirmed'))
+                    + (context.uncertain ? ' ' + tagText('tags-reloadhint') : ''), !payload.success);
             updateControls(context);
         }
         flushDefinitionRefresh(context);
@@ -1082,7 +1088,7 @@
     function openChooser(value) {
         const target = targetOf(value);
         if (!target) {
-            client.display_message('Select one message to edit its tags.', 'notice');
+            client.display_message(tagText('tags-selectone'), 'notice');
             return false;
         }
 
@@ -1115,7 +1121,7 @@
                 if (!pendingWrite.context.closed) {
                     discardChooser(pendingWrite.context);
                 }
-                client.display_message('A tag change for this message is still being saved. Please wait.', 'notice');
+                client.display_message(tagText('tags-savepending'), 'notice');
             }
             return false;
         }
@@ -1136,16 +1142,16 @@
         }
 
         const root = $('<div>', {id: 'toolbox-tags-dialog', 'class': 'toolbox-tags-dialog'});
-        const navigation = $('<div>', {'class': 'toolbox-tags-views', role: 'group', 'aria-label': 'Tag options'})
+        const navigation = $('<div>', {'class': 'toolbox-tags-views', role: 'group', 'aria-label': tagText('tags-options')})
             .appendTo(root);
         $('<button>', {
             type: 'button', 'class': 'toolbox-tags-view', 'data-tags-view': 'message',
             'aria-pressed': 'true', 'aria-controls': 'toolbox-tags-assignment'
-        }).text('Message tags').appendTo(navigation);
+        }).text(tagText('tags-message')).appendTo(navigation);
         $('<button>', {
             type: 'button', 'class': 'toolbox-tags-view', 'data-tags-view': 'definitions',
             'aria-pressed': 'false', 'aria-controls': 'toolbox-tags-definition-panel'
-        }).text('Tag definitions').appendTo(navigation);
+        }).text(tagText('tags-definitions')).appendTo(navigation);
         const assignmentPanel = $('<div>', {
             id: 'toolbox-tags-assignment', 'class': 'toolbox-tags-assignment'
         }).appendTo(root);
@@ -1165,13 +1171,13 @@
             editorStatus: $('<p>', {'class': 'toolbox-tags-status', role: 'status', 'aria-live': 'polite'})
                 .appendTo(definitionPanel),
             editorReload: $('<button>', {type: 'button', 'class': 'button', 'data-tags-editor-reload': 'true', hidden: true})
-                .text('Reload editor').appendTo(definitionPanel),
+                .text(tagText('tags-reloadeditor')).appendTo(definitionPanel),
             definitionsRevision: 0,
             refreshQueued: false,
             options: $('<div>', {'class': 'toolbox-tags-options'}).appendTo(assignmentPanel),
             status: $('<p>', {'class': 'toolbox-tags-status', role: 'status', 'aria-live': 'polite'}).appendTo(assignmentPanel),
             reload: $('<button>', {type: 'button', 'class': 'button', 'data-tags-reload': 'true', hidden: true})
-                .text('Reload tags').appendTo(assignmentPanel),
+                .text(tagText('tags-reload')).appendTo(assignmentPanel),
             state: null,
             pending: null,
             uncertain: false,
@@ -1206,7 +1212,7 @@
         });
 
         active = context;
-        context.popup = client.show_popup_dialog(root, 'Tags', [{
+        context.popup = client.show_popup_dialog(root, tagText('tags'), [{
             text: client.get_label('close'),
             'class': 'cancel mainaction',
             click: function () { this.jqref(this).dialog('close'); }
@@ -1217,7 +1223,7 @@
             beforeClose: function () {
                 if (context.editorSaving) {
                     context.closeAfterEditorSave = true;
-                    context.editorStatus.text('Saving tag definitions… The dialog will close when saving finishes.');
+                    context.editorStatus.text(tagText('tags-defssavingclose'));
                     return false;
                 }
                 return true;

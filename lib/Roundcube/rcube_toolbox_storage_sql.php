@@ -25,6 +25,8 @@
  * along with Roundcube. If not, see https://www.gnu.org/licenses/.
  */
 
+require_once __DIR__ . '/../Toolbox/logger.php';
+
 class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 {
     private $db;
@@ -47,8 +49,8 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
     private $postfix_sql_activefrom_field_in_vacation;
     private $postfix_sql_activeuntil_field_in_vacation;
     private $postfix_sql_interval_time_field_in_vacation;
-    private $postfix_sql_modified_in_vacation;
-    private $postfix_sql_vacation_notification;
+    private $postfix_sql_modified_field_in_vacation;
+    private $postfix_sql_vacation_notification_table_name;
     private $postfix_sql_on_vacation_field_in_vacation_notification;
     private $postfix_sql_mailbox_table_name;
     private $postfix_sql_username_field_in_mailbox;
@@ -135,19 +137,19 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
         if ($this->use_postfixadmin_domain_admins) {
 
             if ($this->loglevel > 2) {
-                rcube::write_log($this->logfile, "STEP in [storage].[sql].[function is_domain_admin]: connecting to postfix database in read mode");
+                toolbox_logger::step('storage.sql', 'domain_admins_db_connect');
             }
             $this->_db_connect('postfix', 'r');
 
             if ($this->loglevel > 1) {
-                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function is_domain_admin]: execute query [SELECT `{$this->postfix_sql_domain_field_in_domain_admins}` FROM `{$this->postfix_sql_domain_admins_table_name}` WHERE `{$this->postfix_sql_username_field_in_domain_admins}` = '{$user}';]");
+                toolbox_logger::sql('storage.sql', 'SELECT configured_domain FROM configured_domain_admins WHERE configured_username = ?');
             }
             $sql_result = $this->db->query(
                 "SELECT `{$this->postfix_sql_domain_field_in_domain_admins}` FROM `{$this->postfix_sql_domain_admins_table_name}` WHERE `{$this->postfix_sql_username_field_in_domain_admins}` = ?;",
                 $user);
             if ($this->loglevel > 0) {
                 if ($err_str = $this->db->is_error()) {
-                    rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function is_domain_admin]: cannot read domain admins from database: " . $err_str);
+                    toolbox_logger::error('storage.sql', 'domain_admins_load', 'query_failed');
                 }
             }
 
@@ -155,7 +157,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 $domains[] = $sql_arr[$this->postfix_sql_domain_field_in_domain_admins];
             }
             if ($this->loglevel > 1) {
-                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function is_domain_admin]: found " . count($domains) . " domains (" .  implode(', ', $domains) . ")");
+                toolbox_logger::step('storage.sql', 'domain_admins_load_complete');
             }
 
         }
@@ -189,12 +191,12 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
         }
 
         if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [storage].[sql].[function load_customised_config]: connecting to roundcube database in read mode");
+            toolbox_logger::step('storage.sql', 'customise_config_db_connect');
         }
         $this->_db_connect('roundcube', 'r');
 
         if ($this->loglevel > 1) {
-            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_customised_config]: execute query [SELECT domain_name`, `skin`, `customise_blankpage`, `blankpage_type`, `blankpage_image` `blankpage_url`, `blankpage_custom`, `customise_css`, `additional_css`, `customise_logo`, `customised_logo` FROM `toolbox_customise_skins_view` WHERE `domain_name` = '{$parts[1]}' AND `skin` = '{$skin}';]");
+            toolbox_logger::sql('storage.sql', 'SELECT configured_skin_fields FROM toolbox_customise_skins_view WHERE domain_name = ? AND skin = ?');
         }
         $sql_result = $this->db->query(
             "SELECT
@@ -216,10 +218,10 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
             $skin);
         if ($this->loglevel > 0) {
             if ($err_str = $this->db->is_error()) {
-                rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_customised_config]: cannot read customise skins from database: " . $err_str);
+                toolbox_logger::error('storage.sql', 'customise_config_load', 'query_failed');
             }
             elseif ($this->loglevel > 1) {
-                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_customised_config]: {$this->db->affected_rows()} rows matching");
+                toolbox_logger::step('storage.sql', 'customise_config_load_complete');
             }
         }
 
@@ -251,14 +253,14 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
         }
 
         if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [storage].[sql].[function load_tool_data]: enter {$this->tool} section");
+            toolbox_logger::step('storage.sql', 'load_start');
         }
         switch ($this->tool) {
 
             case 'aliases':
 
                 if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function load_tool_data]: connecting to postfix database in read mode");
+                    toolbox_logger::step('storage.sql', 'aliases_db_connect');
                 }
                 $this->_db_connect('postfix', 'r');
 
@@ -268,7 +270,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                         // The SQL query used to select all domain aliases but user's.
                         // Need to avoid alias duplicates in the domain.
                         if ($this->loglevel > 1) {
-                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: execute query [SELECT `{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_domain_field_in_alias}` = '{$parts[1]}' AND `{$this->postfix_sql_goto_field_in_alias}` != '{$user}';]");
+                            toolbox_logger::sql('storage.sql', 'SELECT configured_alias_fields FROM configured_aliases WHERE domain = ? AND destination != ?');
                         }
                         $sql_result = $this->db->query(
                             "SELECT `{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_domain_field_in_alias}` = ? AND `{$this->postfix_sql_goto_field_in_alias}` != ?;",
@@ -276,10 +278,10 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                             $user);
                         if ($this->loglevel > 0) {
                             if ($err_str = $this->db->is_error()) {
-                                rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_tool_data]: cannot read all aliases from database: " . $err_str);
+                                toolbox_logger::error('storage.sql', 'aliases_load_domain', 'query_failed');
                             }
                             elseif ($this->loglevel > 1) {
-                                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: {$this->db->affected_rows()} rows matching");
+                                toolbox_logger::step('storage.sql', 'aliases_load_domain_complete');
                             }
                         }
                         break;
@@ -288,7 +290,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                         // The SQL query used to select all mailbox aliases
                         // default mailbox alias to itself is excluded and managed by forward tool
                         if ($this->loglevel > 1) {
-                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: execute query [SELECT `{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_goto_field_in_alias}` = '{$user}' AND `{$this->postfix_sql_domain_field_in_alias}` = '{$parts[1]}' AND `{$this->postfix_sql_address_field_in_alias}` != '{$user}';]");
+                            toolbox_logger::sql('storage.sql', 'SELECT configured_alias_fields FROM configured_aliases WHERE destination = ? AND domain = ? AND address != ?');
                         }
                         if (rcube::get_instance()->config->get('toolbox_aliases_multiple_domains')) {
                             $sql_result = $this->db->query(
@@ -304,10 +306,10 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                         }
                         if ($this->loglevel > 0) {
                             if ($err_str = $this->db->is_error()) {
-                                rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_tool_data]: cannot read alias from database: " . $err_str);
+                                toolbox_logger::error('storage.sql', 'aliases_load_user', 'query_failed');
                             }
                             elseif ($this->loglevel > 1) {
-                                rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: {$this->db->affected_rows()} rows matching");
+                                toolbox_logger::step('storage.sql', 'aliases_load_user_complete');
                             }
                         }
                         break;
@@ -325,22 +327,22 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
             case 'forward':
 
                 if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function load_tool_data]: connecting to postfix database in read mode");
+                    toolbox_logger::step('storage.sql', 'forward_db_connect');
                 }
                 $this->_db_connect('postfix', 'r');
 
                 if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: execute query [SELECT `{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_address_field_in_alias}` = '{$user}';]");
+                    toolbox_logger::sql('storage.sql', 'SELECT configured_alias_fields FROM configured_aliases WHERE address = ?');
                 }
                 $sql_result = $this->db->query(
                     "SELECT `{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_address_field_in_alias}` = ?;",
                     $user);
                 if ($this->loglevel > 0) {
                     if ($err_str = $this->db->is_error()) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_tool_data]: cannot read alias from database: " . $err_str);
+                        toolbox_logger::error('storage.sql', 'forward_load', 'query_failed');
                     }
                     elseif ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: {$this->db->affected_rows()} rows matching");
+                        toolbox_logger::step('storage.sql', 'forward_load_complete');
                     }
                 }
 
@@ -356,18 +358,18 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
             case 'vacation':
 
                 if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function load_tool_data]: connecting to postfix database in read mode");
+                    toolbox_logger::step('storage.sql', 'vacation_db_connect');
                 }
                 $this->_db_connect('postfix', 'r');
 
                 if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function load_tool_data]: call helper->to_char()");
+                    toolbox_logger::step('storage.sql', 'vacation_date_format_prepare');
                 }
                 $activefrom = $this->helper->to_char($this->postfix_sql_activefrom_field_in_vacation, $this->vacation_dateformat);
                 $activeuntil = $this->helper->to_char($this->postfix_sql_activeuntil_field_in_vacation, $this->vacation_dateformat);
 
                 if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: execute query [SELECT `{$this->postfix_sql_subject_field_in_vacation}`, `{$this->postfix_sql_body_field_in_vacation}`, `{$this->postfix_sql_active_field_in_vacation}`, $activefrom, $activeuntil, `{$this->postfix_sql_interval_time_field_in_vacation}` FROM `{$this->postfix_sql_vacation_table_name}` WHERE `{$this->postfix_sql_email_field_in_vacation}` = '{$user}' AND `{$this->postfix_sql_domain_field_in_vacation}` = '{$parts[1]}';]");
+                    toolbox_logger::sql('storage.sql', 'SELECT configured_vacation_fields FROM configured_vacation WHERE email = ? AND domain = ?');
                 }
                 $sql_result = $this->db->query(
                     "SELECT `{$this->postfix_sql_subject_field_in_vacation}`, `{$this->postfix_sql_body_field_in_vacation}`, `{$this->postfix_sql_active_field_in_vacation}`, $activefrom, $activeuntil, `{$this->postfix_sql_interval_time_field_in_vacation}` FROM `{$this->postfix_sql_vacation_table_name}` WHERE `{$this->postfix_sql_email_field_in_vacation}` = ? AND `{$this->postfix_sql_domain_field_in_vacation}` = ?;",
@@ -375,10 +377,10 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                     $parts[1]);
                 if ($this->loglevel > 0) {
                     if ($err_str = $this->db->is_error()) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_tool_data]: cannot read vacation from database: " . $err_str);
+                        toolbox_logger::error('storage.sql', 'vacation_load', 'query_failed');
                     }
                     elseif ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function load_tool_data]: {$this->db->affected_rows()} rows matching");
+                        toolbox_logger::step('storage.sql', 'vacation_load_complete');
                     }
                 }
 
@@ -407,7 +409,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 
                 if (!$sql_result || ($err_str = $this->db->is_error())) {
                     if ($this->loglevel > 0) {
-                        rcube::write_log($this->logfile, "ERROR loading Customise domain settings: " . ($err_str ?? 'query failed'));
+                        toolbox_logger::error('storage.sql', 'customise_domain_load', 'query_failed');
                     }
                     $settings['trash'] = 0;
                     $settings['junk'] = 0;
@@ -431,7 +433,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 $settings['skins'] = [];
                 if (!$sql_result || ($err_str = $this->db->is_error())) {
                     if ($this->loglevel > 0) {
-                        rcube::write_log($this->logfile, "ERROR loading Customise skin settings: " . ($err_str ?? 'query failed'));
+                        toolbox_logger::error('storage.sql', 'customise_skin_load', 'query_failed');
                     }
                 } else {
                     while ($sql_arr = $this->db->fetch_assoc($sql_result)) {
@@ -468,14 +470,14 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
         }
 
         if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [storage].[sql].[function delete_tool_data]: enter {$data['section']} section");
+            toolbox_logger::step('storage.sql', 'delete_start');
         }
         switch ($data['section']) {
 
             case 'aliases':
 
                 if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function delete_tool_data]: connecting to postfix database in write mode");
+                    toolbox_logger::step('storage.sql', 'aliases_delete_db_connect');
                 }
                 $this->_db_connect('postfix', 'w');
 
@@ -486,28 +488,23 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 }
 
                 if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function delete_tool_data]: execute query [DELETE FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_address_field_in_alias}` = '{$address}' AND `{$this->postfix_sql_goto_field_in_alias}` = '{$user}';]");
+                    toolbox_logger::sql('storage.sql', 'DELETE FROM configured_aliases WHERE address = ? AND destination = ?');
                 }
-                $this->db->query(
+                $sql_result = $this->db->query(
                     "DELETE FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_goto_field_in_alias}` = ?;",
                     $address,
                     $user);
-                if ($this->loglevel > 0) {
-                    if ($err_str = $this->db->is_error()) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function delete_tool_data]: cannot delete from alias: " . $err_str);
-                        $result = false;
-                        break;
-                    }
-                    $sql_result = $this->db->affected_rows();
-                    if (!$sql_result) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function delete_tool_data]: no record deleted in alias [values: {$this->postfix_sql_address_field_in_alias} = '{$address}', {$this->postfix_sql_goto_field_in_alias} = '{$user}']");
-                        $result = false;
-                        break;
-                    }
-                    elseif ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function delete_tool_data]: {$this->db->affected_rows()} rows deleted");
-                    }
+                if (!$sql_result || $this->db->is_error()) {
+                    toolbox_logger::error('storage.sql', 'aliases_delete', 'query_failed');
+                    $result = false;
+                    break;
                 }
+                if (!$this->db->affected_rows()) {
+                    toolbox_logger::error('storage.sql', 'aliases_delete', 'no_rows_changed');
+                    $result = false;
+                    break;
+                }
+                toolbox_logger::step('storage.sql', 'aliases_delete_complete');
 
                 break;
 
@@ -529,14 +526,14 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
         }
 
         if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [storage].[sql].[function toggle_tool_data]: enter {$data['section']} section");
+            toolbox_logger::step('storage.sql', 'toggle_start');
         }
         switch ($data['section']) {
 
             case 'aliases':
 
                 if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function toggle_tool_data]: connecting to postfix database in write mode");
+                    toolbox_logger::step('storage.sql', 'aliases_toggle_db_connect');
                 }
                 $this->_db_connect('postfix', 'w');
 
@@ -547,28 +544,23 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 }
 
                 if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function toggle_tool_data]: execute query [UPDATE `{$this->postfix_sql_alias_table_name}` SET `{$this->postfix_sql_active_field_in_alias}` = NOT `{$this->postfix_sql_active_field_in_alias}` WHERE `{$this->postfix_sql_address_field_in_alias}` = '{$address}' AND `{$this->postfix_sql_goto_field_in_alias}` = '{$user}';]");
+                    toolbox_logger::sql('storage.sql', 'UPDATE configured_aliases SET enabled = NOT enabled WHERE address = ? AND destination = ?');
                 }
-                $this->db->query(
+                $sql_result = $this->db->query(
                     "UPDATE `{$this->postfix_sql_alias_table_name}` SET `{$this->postfix_sql_active_field_in_alias}` = NOT `{$this->postfix_sql_active_field_in_alias}` WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_goto_field_in_alias}` = ?;",
                     $address,
                     $user);
-                if ($this->loglevel > 0) {
-                    if ($err_str = $this->db->is_error()) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function toggle_tool_data]: cannot toggle alias activation: " . $err_str);
-                        $result = false;
-                        break;
-                    }
-                    $sql_result = $this->db->affected_rows();
-                    if (!$sql_result) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function toggle_tool_data]: no activation toggled in alias [values: {$this->postfix_sql_address_field_in_alias} = '{$address}', {$this->postfix_sql_goto_field_in_alias} = '{$user}']");
-                        $result = false;
-                        break;
-                    }
-                    elseif ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function toggle_tool_data]: {$this->db->affected_rows()} rows deleted");
-                    }
+                if (!$sql_result || $this->db->is_error()) {
+                    toolbox_logger::error('storage.sql', 'aliases_toggle', 'query_failed');
+                    $result = false;
+                    break;
                 }
+                if (!$this->db->affected_rows()) {
+                    toolbox_logger::error('storage.sql', 'aliases_toggle', 'no_rows_changed');
+                    $result = false;
+                    break;
+                }
+                toolbox_logger::step('storage.sql', 'aliases_toggle_complete');
 
                 break;
 
@@ -592,7 +584,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
         }
 
         if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: enter {$data['section']} section");
+            toolbox_logger::step('storage.sql', 'save_start');
         }
         switch ($data['section']) {
 
@@ -609,7 +601,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 $status = $this->alias_creation_error($user, $aliasname, 'w');
                 if ($status !== null) {
                     if ($this->loglevel > 0) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: alias creation rejected ({$status})");
+                        toolbox_logger::error('storage.sql', 'aliases_create', 'request_rejected');
                     }
                     $result = false;
                     break;
@@ -618,36 +610,32 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 $address_domain = substr(strrchr($address, '@'), 1);
 
                 if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [INSERT INTO `{$this->postfix_sql_alias_table_name}` (`{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_domain_field_in_alias}`, `{$this->postfix_sql_created_field_in_alias}`, `{$this->postfix_sql_modified_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}`) VALUES ('{$address}', '{$user}', '{$address_domain}', {$this->db->now()}, {$this->db->now()}, '{$settings['main']['active']}');]");
+                    toolbox_logger::sql('storage.sql', 'INSERT INTO configured_aliases VALUES (?, ?, ?, ...)');
                 }
-                $this->db->query(
-                    "INSERT INTO `{$this->postfix_sql_alias_table_name}` (`{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_domain_field_in_alias}`, `{$this->postfix_sql_created_field_in_alias}`, `{$this->postfix_sql_modified_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}`) VALUES (?, ?, ?, {$this->db->now()}, {$this->db->now()}, {$settings['main']['active']});",
+                // Boolean literal is strictly allowlisted above; other values are bound.
+                $sql_result = $this->db->query(
+                    "INSERT INTO `{$this->postfix_sql_alias_table_name}` (`{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}`, `{$this->postfix_sql_domain_field_in_alias}`, `{$this->postfix_sql_created_field_in_alias}`, `{$this->postfix_sql_modified_field_in_alias}`, `{$this->postfix_sql_active_field_in_alias}`) VALUES (?, ?, ?, {$this->db->now()}, {$this->db->now()}, {$active});",
                     $address,
                     $user,
                     $address_domain);
-                if ($this->loglevel > 0) {
-                    if ($err_str = $this->db->is_error()) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot insert into alias: " . $err_str);
-                        $result = false;
-                        break;
-                    }
-                    $sql_result = $this->db->affected_rows();
-                    if (!$sql_result) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: record not inserted in alias [values: {$this->postfix_sql_address_field_in_alias} = '{$address}', {$this->postfix_sql_goto_field_in_alias} = '{$user}', {$this->postfix_sql_domain_field_in_alias} = '{$address_domain}', created = '{$this->db->now()}', modified = '{$this->db->now()}', {$this->postfix_sql_active_field_in_alias} = '{$settings['main']['active']}']");
-                        $result = false;
-                        break;
-                    }
-                    elseif ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows inserted");
-                    }
+                if (!$sql_result || $this->db->is_error()) {
+                    toolbox_logger::error('storage.sql', 'aliases_create', 'query_failed');
+                    $result = false;
+                    break;
                 }
+                if (!$this->db->affected_rows()) {
+                    toolbox_logger::error('storage.sql', 'aliases_create', 'no_rows_changed');
+                    $result = false;
+                    break;
+                }
+                toolbox_logger::step('storage.sql', 'aliases_create_complete');
 
                 break;
 
             case 'forward':
 
                 if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: connecting to postfix database in write mode");
+                    toolbox_logger::step('storage.sql', 'forward_save_db_connect');
                 }
                 $this->_db_connect('postfix', 'w');
 
@@ -665,7 +653,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 // check if keepcopies is set and add user address to the goto addresses
                 if (($settings['main']['keepcopies'] !== false) && !in_array($user, $addresses)) {
                     if ($this->loglevel > 2) {
-                        rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: Found keepcopies option, user address added: {$user}");
+                        toolbox_logger::step('storage.sql', 'forward_keep_copies_enabled');
                     }
                     $addresses[] = $user;
                 }
@@ -676,21 +664,17 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 
                 // check if autoreply is set and add it to the goto addresses
                 if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [SELECT `{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_address_field_in_alias}` = '{$user}';]");
+                    toolbox_logger::sql('storage.sql', 'SELECT configured_alias_fields FROM configured_aliases WHERE address = ?');
                 }
                 $sql_result = $this->db->query(
                     "SELECT `{$this->postfix_sql_address_field_in_alias}`, `{$this->postfix_sql_goto_field_in_alias}` FROM `{$this->postfix_sql_alias_table_name}` WHERE `{$this->postfix_sql_address_field_in_alias}` = ?;",
                     $user);
-                if ($this->loglevel > 0) {
-                    if ($err_str = $this->db->is_error()) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_tool_data]: cannot read alias from database: " . $err_str);
-                        $result = false;
-                        break;
-                    }
-                    elseif ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows matching");
-                    }
+                if (!$sql_result || $this->db->is_error()) {
+                    toolbox_logger::error('storage.sql', 'forward_save_read', 'query_failed');
+                    $result = false;
+                    break;
                 }
+                toolbox_logger::step('storage.sql', 'forward_save_read_complete');
 
                 if ($this->db->affected_rows() > 0) {
                     while ($sql_result && ($sql_arr = $this->db->fetch_assoc($sql_result))) {
@@ -699,7 +683,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                     }
                     if (strpos($goto, $autoreply) !== false) {
                         if ($this->loglevel > 2) {
-                            rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: found autoreply address {$autoreply}");
+                            toolbox_logger::step('storage.sql', 'forward_autoreply_found');
                         }
                         $addresses[] = $autoreply;
                     }
@@ -708,7 +692,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 // double check to avoid messing up the database
                 if (empty($addresses)) {
                     if ($this->loglevel > 0) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: {$this->postfix_sql_goto_field_in_alias} cannot be empty");
+                        toolbox_logger::error('storage.sql', 'forward_save', 'invalid_destinations');
                     }
                     $result = false;
                     break;
@@ -716,80 +700,100 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
 
                 // update alias table
                 if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = " . implode(',', $addresses) . ", `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = '{$user}' AND `{$this->postfix_sql_domain_field_in_alias}` = '{$parts[1]}';]");
+                    toolbox_logger::sql('storage.sql', 'UPDATE configured_aliases SET destination = ? WHERE address = ? AND domain = ?');
                 }
                 $sql_result = $this->db->query(
-                    "UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = '" . implode(',', $addresses) . "', `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ?;",
+                    "UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = ?, `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ?;",
+                    implode(',', $addresses),
                     $user,
                     $parts[1]);
-                if ($this->loglevel > 0) {
-                    if ($err_str = $this->db->is_error()) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function load_tool_data]: cannot update table alias: " . $err_str);
-                        $result = false;
-                        break;
-                    }
-                    elseif ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows matching");
-                    }
+                if (!$sql_result || $this->db->is_error()) {
+                    toolbox_logger::error('storage.sql', 'forward_save_write', 'query_failed');
+                    $result = false;
+                    break;
                 }
+                toolbox_logger::step('storage.sql', 'forward_save_write_complete');
 
                 break;
 
             case 'vacation':
 
                 if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: connecting to postfix database in write mode");
+                    toolbox_logger::step('storage.sql', 'vacation_save_db_connect');
                 }
                 $this->_db_connect('postfix', 'w');
 
                 $queries = [];
 
-                $settings['main']['active'] = $settings['main']['active'] == 1 ? 'true' : 'false';
-                $settings['main']['modified'] = $this->db->now();
-                $settings['main']['subject'] = $this->db->quote($settings['main']['subject']);
-                $settings['main']['body'] = $this->db->quote($settings['main']['body']);
-
-                if ($this->loglevel > 2) {
-                    rcube::write_log($this->logfile, "STEP in [storage].[sql].[function save_tool_data]: call helper->to_timestamp");
+                // The boolean expression is a strictly whitelisted SQL literal.
+                $active = $settings['main']['active'] == 1 ? 'true' : 'false';
+                toolbox_logger::step('storage.sql', 'vacation_date_prepare');
+                $activefrom = $this->vacation_date_parameter((string) $settings['main']['activefrom']);
+                $activeuntil = $this->vacation_date_parameter((string) $settings['main']['activeuntil']);
+                if ($activefrom === null || $activeuntil === null) {
+                    toolbox_logger::error('storage.sql', 'vacation_save', 'invalid_date');
+                    $result = false;
+                    break;
                 }
-                $settings['main']['activefrom'] = $this->helper->to_timestamp($settings['main']['activefrom'], $this->vacation_dateformat);
-                $settings['main']['activeuntil'] = $this->helper->to_timestamp($settings['main']['activeuntil'], $this->vacation_dateformat);
 
                 // check if vacation record already exists for user and domain
                 if ($this->loglevel > 1) {
-                    rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query [SELECT `{$this->postfix_sql_email_field_in_vacation}` FROM `{$this->postfix_sql_vacation_table_name}` WHERE `{$this->postfix_sql_email_field_in_vacation}` = '{$user}' AND `{$this->postfix_sql_domain_field_in_vacation}` = '{$parts[1]}';]");
+                    toolbox_logger::sql('storage.sql', 'SELECT configured_vacation_fields FROM configured_vacation WHERE email = ? AND domain = ?');
                 }
-                $this->db->query("SELECT `{$this->postfix_sql_email_field_in_vacation}` FROM `{$this->postfix_sql_vacation_table_name}` WHERE `{$this->postfix_sql_email_field_in_vacation}` = ? AND `{$this->postfix_sql_domain_field_in_vacation}` = ?;",
+                $sql_result = $this->db->query(
+                    "SELECT `{$this->postfix_sql_email_field_in_vacation}` FROM `{$this->postfix_sql_vacation_table_name}` WHERE `{$this->postfix_sql_email_field_in_vacation}` = ? AND `{$this->postfix_sql_domain_field_in_vacation}` = ?;",
                     $user,
                     $parts[1]);
-                if ($this->loglevel > 0) {
-                    if ($err_str = $this->db->is_error()) {
-                        rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot read vacation from database: " . $err_str);
-                        $result = false;
-                        break;
-                    }
-                    elseif ($this->loglevel > 1) {
-                        rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows matching");
-                    }
+                if (!$sql_result || $this->db->is_error()) {
+                    toolbox_logger::error('storage.sql', 'vacation_save_lookup', 'query_failed');
+                    $result = false;
+                    break;
                 }
-                // if exists update else insert
+                toolbox_logger::step('storage.sql', 'vacation_save_lookup_complete');
+
+                // Only trusted configured identifiers and fixed SQL expressions enter
+                // the statement. User-submitted dates, content and intervals are bound.
+                $columns = [
+                    $this->postfix_sql_active_field_in_vacation,
+                    $this->postfix_sql_activefrom_field_in_vacation,
+                    $this->postfix_sql_activeuntil_field_in_vacation,
+                    $this->postfix_sql_interval_time_field_in_vacation,
+                    $this->postfix_sql_subject_field_in_vacation,
+                    $this->postfix_sql_body_field_in_vacation,
+                    $this->postfix_sql_modified_field_in_vacation,
+                ];
+                $expressions = [
+                    $active,
+                    $activefrom['expression'],
+                    $activeuntil['expression'],
+                    '?',
+                    '?',
+                    '?',
+                    $this->db->now(),
+                ];
+                $values = array_merge(
+                    $activefrom['values'],
+                    $activeuntil['values'],
+                    [(int) $settings['main']['interval_time'], (string) $settings['main']['subject'], (string) $settings['main']['body']]
+                );
+
                 if ($this->db->affected_rows() > 0) {
-                    $set = [];
-                    foreach ($settings['main'] as $field => $value) {
-                        $set[] = "`{$field}` = {$value}";
+                    $assignments = [];
+                    foreach ($columns as $index => $column) {
+                        $assignments[] = "`{$column}` = {$expressions[$index]}";
                     }
                     $queries[] = [
-                                'sql' => "UPDATE {$this->postfix_sql_vacation_table_name} SET "  . implode(', ', $set) .  " WHERE `{$this->postfix_sql_email_field_in_vacation}` = ? AND `{$this->postfix_sql_domain_field_in_vacation}` = ?;",
-                                'data' => [$user, $parts[1]],
-                                'type' => 'update'
+                        'sql' => "UPDATE `{$this->postfix_sql_vacation_table_name}` SET " . implode(', ', $assignments)
+                            . " WHERE `{$this->postfix_sql_email_field_in_vacation}` = ? AND `{$this->postfix_sql_domain_field_in_vacation}` = ?;",
+                        'data' => array_merge($values, [$user, $parts[1]]),
                     ];
-                }
-                else {
-                    $settings['main']['created'] = $this->db->now();
+                } else {
+                    $quoted_columns = array_map(static fn($column) => "`{$column}`", $columns);
                     $queries[] = [
-                                'sql' => "INSERT INTO {$this->postfix_sql_vacation_table_name} (email, domain, " . implode(', ', array_keys($settings['main'])) . ") VALUES ('" . $user . "','" . $parts[1] . "'," . implode(',',array_values($settings['main'])) . ");",
-                                'data' => [],
-                                'type' => 'insert'
+                        'sql' => "INSERT INTO `{$this->postfix_sql_vacation_table_name}` (`{$this->postfix_sql_email_field_in_vacation}`, `{$this->postfix_sql_domain_field_in_vacation}`, "
+                            . implode(', ', $quoted_columns) . ", `created`) VALUES (?, ?, "
+                            . implode(', ', $expressions) . ", {$this->db->now()});",
+                        'data' => array_merge([$user, $parts[1]], $values),
                     ];
                 }
 
@@ -801,39 +805,32 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 ];
 
                 //remove autoreply address from alias list, but keep custom aliases
-                $concat = $this->db->concat($this->db->quote(","),$this->db->quote($parts[0]),$this->db->quote('#'),$this->db->quote($parts[1]),$this->db->quote('@'),$this->db->quote($this->postfixadmin_vacation_domain));
+                $concat = $this->db->concat('?', '?', '?', '?', '?', '?');
                 $queries[] = [
-                                'sql' => "UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = replace({$this->postfix_sql_goto_field_in_alias}, {$concat}, ''), `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ?;",
-                                'data' => [$user, $parts[1]],
-                                'type' => 'update'
+                    'sql' => "UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = replace({$this->postfix_sql_goto_field_in_alias}, {$concat}, ''), `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ?;",
+                    'data' => [',', $parts[0], '#', $parts[1], '@', $this->postfixadmin_vacation_domain, $user, $parts[1]],
                 ];
 
                 //add autoreply address as alias
                 if ($settings['main']['active'] == 'true') {
-                    $concat = $this->db->concat($this->postfix_sql_goto_field_in_alias,$this->db->quote(","),$this->db->quote($parts[0]),$this->db->quote('#'),$this->db->quote($parts[1]),$this->db->quote('@'),$this->db->quote($this->postfixadmin_vacation_domain));
+                    $concat = $this->db->concat($this->postfix_sql_goto_field_in_alias, '?', '?', '?', '?', '?', '?');
                     $queries[] = [
-                                    'sql' => "UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = {$concat}, `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ? AND `{$this->postfix_sql_active_field_in_alias}` = true;",
-                                    'data' => [$user, $parts[1]],
-                                    'type' => 'update'
+                        'sql' => "UPDATE {$this->postfix_sql_alias_table_name} SET `{$this->postfix_sql_goto_field_in_alias}` = {$concat}, `{$this->postfix_sql_modified_field_in_alias}` = {$this->db->now()} WHERE `{$this->postfix_sql_address_field_in_alias}` = ? AND `{$this->postfix_sql_domain_field_in_alias}` = ? AND `{$this->postfix_sql_active_field_in_alias}` = true;",
+                        'data' => [',', $parts[0], '#', $parts[1], '@', $this->postfixadmin_vacation_domain, $user, $parts[1]],
                     ];
                 }
 
                 foreach ($queries as $query) {
 
-                    $this->db->query($query['sql'], $query['data']);
+                    $sql_result = $this->db->query($query['sql'], ...$query['data']);
 
-                    if ($this->loglevel > 0) {
-                        $query['sql'] = vsprintf(str_replace('?', "'%s'", $query['sql']), $query['data']);
-                        if ($err_str = $this->db->is_error()) {
-                            rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function save_tool_data]: cannot execute query [{$query['sql']}] - " . $err_str);
-                            $result = false;
-                            break;
-                        }
-                        elseif ($this->loglevel > 1) {
-                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: execute query: [{$query['sql']}]");
-                            rcube::write_log($this->logfile, "SQL in [storage].[sql].[function save_tool_data]: {$this->db->affected_rows()} rows matching");
-                        }
+                    if (!$sql_result || $this->db->is_error()) {
+                        toolbox_logger::error('storage.sql', 'vacation_save_query', 'query_failed');
+                        $result = false;
+                        break;
                     }
+                    toolbox_logger::sql('storage.sql', 'statement_withheld_vacation_dml');
+                    toolbox_logger::step('storage.sql', 'vacation_save_query_complete');
 
                 }
 
@@ -854,7 +851,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                 );
                 if (!$sql_result || ($err_str = $this->db->is_error())) {
                     if ($this->loglevel > 0) {
-                        rcube::write_log($this->logfile, "ERROR finding Customise domain: " . ($err_str ?? 'query failed'));
+                        toolbox_logger::error('storage.sql', 'customise_domain_lookup', 'query_failed');
                     }
                     return false;
                 }
@@ -874,7 +871,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                     );
                     if (!$sql_result || ($err_str = $this->db->is_error())) {
                         if ($this->loglevel > 0) {
-                            rcube::write_log($this->logfile, "ERROR inserting Customise domain: " . ($err_str ?? 'query failed'));
+                            toolbox_logger::error('storage.sql', 'customise_domain_insert', 'query_failed');
                         }
                         return false;
                     }
@@ -887,7 +884,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                     $domain_row = $sql_result ? $this->db->fetch_assoc($sql_result) : false;
                     if (!$domain_row || $this->db->is_error()) {
                         if ($this->loglevel > 0) {
-                            rcube::write_log($this->logfile, 'ERROR retrieving newly inserted Customise domain ID');
+                            toolbox_logger::error('storage.sql', 'customise_domain_insert', 'missing_insert_id');
                         }
                         return false;
                     }
@@ -906,7 +903,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                     );
                     if (!$sql_result || ($err_str = $this->db->is_error())) {
                         if ($this->loglevel > 0) {
-                            rcube::write_log($this->logfile, "ERROR updating Customise domain: " . ($err_str ?? 'query failed'));
+                            toolbox_logger::error('storage.sql', 'customise_domain_update', 'query_failed');
                         }
                         return false;
                     }
@@ -926,7 +923,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                     );
                     if (!$sql_result || ($err_str = $this->db->is_error())) {
                         if ($this->loglevel > 0) {
-                            rcube::write_log($this->logfile, "ERROR finding Customise skin: " . ($err_str ?? 'query failed'));
+                            toolbox_logger::error('storage.sql', 'customise_skin_lookup', 'query_failed');
                         }
                         return false;
                     }
@@ -955,7 +952,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                         );
                         if (!$sql_result || ($err_str = $this->db->is_error())) {
                             if ($this->loglevel > 0) {
-                                rcube::write_log($this->logfile, "ERROR inserting Customise skin: " . ($err_str ?? 'query failed'));
+                                toolbox_logger::error('storage.sql', 'customise_skin_insert', 'query_failed');
                             }
                             return false;
                         }
@@ -966,6 +963,8 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                             'blankpage_url', 'blankpage_custom', 'customise_css',
                             'additional_css', 'customise_logo', 'customised_logo',
                         ];
+                        $updates = [];
+                        $parameters = [];
                         foreach ($allowed_fields as $field) {
                             if (!array_key_exists($field, $values)) {
                                 continue;
@@ -974,16 +973,27 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
                                 && ($values['blankpage_image_control'] ?? null) == '1') {
                                 continue;
                             }
+                            // Column names come exclusively from the fixed allowlist.
+                            $updates[] = "`{$field}` = ?";
+                            $parameters[] = $values[$field];
+                        }
+
+                        // A skin with no submitted fields has not been modified.
+                        if ($updates) {
+                            $updates[] = '`modified` = CURRENT_TIMESTAMP';
+                            $updates[] = '`modified_by` = ?';
+                            $parameters[] = $user;
+                            $parameters[] = $domain_id;
+                            $parameters[] = $skin;
+
                             $sql_result = $this->db->query(
-                                "UPDATE `toolbox_customise_skins` SET `{$field}` = ?
-                                 WHERE `toolbox_customise_domain_id` = ? AND `skin` = ?;",
-                                $values[$field],
-                                $domain_id,
-                                $skin
+                                "UPDATE `toolbox_customise_skins` SET " . implode(', ', $updates)
+                                . " WHERE `toolbox_customise_domain_id` = ? AND `skin` = ?;",
+                                ...$parameters
                             );
                             if (!$sql_result || ($err_str = $this->db->is_error())) {
                                 if ($this->loglevel > 0) {
-                                    rcube::write_log($this->logfile, "ERROR updating Customise skin field {$field}: " . ($err_str ?? 'query failed'));
+                                    toolbox_logger::error('storage.sql', 'customise_skin_update', 'query_failed');
                                 }
                                 return false;
                             }
@@ -1119,6 +1129,49 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
         return $this->db->fetch_assoc($sql_result) ? 'exists' : null;
     }
 
+    /**
+     * Convert a configured Vacation date into a safe, parameterized SQL expression.
+     *
+     * PostgreSQL and Oracle require an explicit timestamp conversion, while the
+     * other supported engines accept a normalized datetime bound as a value.
+     * Return null for an invalid date instead of incorporating user text in SQL.
+     *
+     * @param string $value Date submitted in the configured PHP date format.
+     * @return ?array SQL expression and its ordered bind parameters, or null.
+     */
+    private function vacation_date_parameter(string $value): ?array
+    {
+        $format = (string) ($this->vacation_dateformat['php'] ?? '');
+        if ($format === '') {
+            return null;
+        }
+
+        $date = DateTimeImmutable::createFromFormat('!' . $format, $value);
+        if (!$date || $date->format($format) !== $value) {
+            return null;
+        }
+
+        $dsn = rcube_db::parse_dsn($this->postfix_dsnw);
+        $driver = $dsn['phptype'] ?? '';
+        if ($driver === 'pgsql' || $driver === 'oracle') {
+            $sql_format = $this->vacation_dateformat[$driver] ?? null;
+            if (!is_string($sql_format) || $sql_format === '') {
+                return null;
+            }
+            return ['expression' => 'to_timestamp(?, ?)', 'values' => [$value, $sql_format]];
+        }
+
+        // Date values are normalized before binding, not interpolated into SQL.
+        if (in_array($driver, ['mysql', 'mysqli', 'sqlite', 'mssql', 'sqlsrv'], true)) {
+            $normalized_format = $driver === 'mssql' || $driver === 'sqlsrv'
+                ? 'Y-m-d\TH:i:s'
+                : 'Y-m-d H:i:s';
+            return ['expression' => '?', 'values' => [$date->format($normalized_format)]];
+        }
+
+        return null;
+    }
+
     private function _db_connect($type, $mode)
     {
         $dsnw = $type . '_dsnw';
@@ -1153,7 +1206,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
         // check DB connections and exit on failure
         if ($err_str = $this->db->is_error()) {
             if ($this->loglevel > 0) {
-                rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function _db_connect]: connection failed: " . $err_str);
+                toolbox_logger::error('storage.sql', 'db_connect', 'connection_failed');
             }
             rcube::raise_error([
                 'code' => 603,
@@ -1170,7 +1223,7 @@ class rcube_toolbox_storage_sql extends rcube_toolbox_storage
             else {
                 // no storage found, raise error
                 if ($this->loglevel > 0) {
-                    rcube::write_log($this->logfile, "ERROR in [storage].[sql].[function _db_connect]: failed to find storage helper class: {$class}");
+                    toolbox_logger::error('storage.sql', 'db_connect', 'helper_not_found');
                 }
                 rcube::raise_error(['code' => 604, 'type' => 'toolbox',
                     'line' => __LINE__, 'file' => __FILE__,

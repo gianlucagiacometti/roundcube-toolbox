@@ -29,8 +29,16 @@ class toolbox_tool_purge extends toolbox_tool_module
      */
     public function render_form($storage): array
     {
+        toolbox_logger::step('purge', 'settings_render_start');
+
         // load data
-        $selected = $storage->load_tool_data($this->rcube->user->get_username());
+        try {
+            $selected = $storage->load_tool_data($this->rcube->user->get_username());
+        } catch (Throwable $exception) {
+            toolbox_logger::error('purge', 'settings_load', 'storage_failed');
+            throw $exception;
+        }
+        toolbox_logger::step('purge', 'settings_loaded');
 
         $folders = ["trash", "junk"];
 
@@ -72,6 +80,7 @@ class toolbox_tool_purge extends toolbox_tool_module
 
         }
 
+        toolbox_logger::step('purge', 'settings_render_complete');
         return $tooldata;
     }
 
@@ -82,18 +91,20 @@ class toolbox_tool_purge extends toolbox_tool_module
      */
     public function save_preferences(): bool
     {
+        toolbox_logger::step('purge', 'settings_save_start');
+
         // save user's preferences
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function save]: save user's preferences");
-        }
+        toolbox_logger::step('purge', 'settings_save_preferences');
         if (!$this->preferences->save([
             'toolbox_purge_trash' => rcube_utils::get_input_value('_usertrash', rcube_utils::INPUT_POST),
             'toolbox_purge_junk' => rcube_utils::get_input_value('_userjunk', rcube_utils::INPUT_POST),
         ])) {
+            toolbox_logger::error('purge', 'settings_save_preferences', 'persistence_failed');
             $this->rcube->display_server_error('errorsaving');
             return false;
         }
 
+        toolbox_logger::step('purge', 'settings_save_complete');
         return true;
     }
     /**
@@ -115,4 +126,3 @@ class toolbox_tool_purge extends toolbox_tool_module
 }
 
 // END OF FILE
-

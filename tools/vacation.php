@@ -29,6 +29,8 @@ class toolbox_tool_vacation extends toolbox_tool_module
      */
     public function render_form($storage): array
     {
+        toolbox_logger::step('vacation', 'settings_render_start');
+
         // Add JS labels if needed
         $this->rcube->output->add_label(
             'editorwarning'
@@ -36,7 +38,13 @@ class toolbox_tool_vacation extends toolbox_tool_module
 
         $tooldata = ['intro' => '', 'name' => rcmail::Q($this->plugin->gettext('vacation-manage')), 'class' => 'toolbox-vacationtable', 'cols' => 2];
 
-        $selected = $storage->load_tool_data($this->rcube->user->get_username());
+        try {
+            $selected = $storage->load_tool_data($this->rcube->user->get_username());
+        } catch (Throwable $exception) {
+            toolbox_logger::error('vacation', 'settings_load', 'storage_failed');
+            throw $exception;
+        }
+        toolbox_logger::step('vacation', 'settings_loaded');
 
         // Normalize values: Roundcube's html_select compares options strictly.
         $options = (array) $this->rcube->config->get('toolbox_vacation_interval_time', []);
@@ -115,6 +123,7 @@ class toolbox_tool_vacation extends toolbox_tool_module
             'content' => $input_vacationbody->show($selected['body'] ?? '')
         ];
 
+        toolbox_logger::step('vacation', 'settings_render_complete');
         return $tooldata;
     }
 
@@ -129,23 +138,21 @@ class toolbox_tool_vacation extends toolbox_tool_module
      */
     public function prepare_settings(): ?array
     {
+        toolbox_logger::step('vacation', 'settings_save_start');
         $new_settings = [];
 
         // save user's preferences
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function save]: save user's preferences");
-        }
+        toolbox_logger::step('vacation', 'settings_save_preferences');
         if (!$this->preferences->save([
             'toolbox_vacation_html_editor' => rcube_utils::get_input_value('_vacationhtmleditor', rcube_utils::INPUT_POST),
         ])) {
+            toolbox_logger::error('vacation', 'settings_save_preferences', 'persistence_failed');
             $this->rcube->display_server_error('errorsaving');
             return null;
         }
 
         // save vacation settings
-        if ($this->loglevel > 2) {
-            rcube::write_log($this->logfile, "STEP in [function save]: prepare vacation settings");
-        }
+        toolbox_logger::step('vacation', 'settings_save_payload_prepare');
         $new_settings['main']['active'] = rcube_utils::get_input_value('_vacationactive', rcube_utils::INPUT_POST) ?: false;
         $new_settings['main']['activefrom'] = rcube_utils::get_input_value('_vacationactivefrom', rcube_utils::INPUT_POST) ?: date("Y-m-d H:i:s");
         $new_settings['main']['activeuntil'] = rcube_utils::get_input_value('_vacationactiveuntil', rcube_utils::INPUT_POST) ?: date('"Y-m-d H:i:s"', strtotime("+1 week"));
@@ -163,6 +170,7 @@ class toolbox_tool_vacation extends toolbox_tool_module
         $new_settings['main']['subject'] = rcube_utils::get_input_value('_vacationsubject', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_subject');
         $new_settings['main']['body'] = rcube_utils::get_input_value('_vacationbody', rcube_utils::INPUT_POST) ?: $this->rcube->config->get('toolbox_vacation_body');
 
+        toolbox_logger::step('vacation', 'settings_save_prepared');
         return $new_settings;
     }
     /**
@@ -175,6 +183,7 @@ class toolbox_tool_vacation extends toolbox_tool_module
      */
     public function include_edit_assets(): void
     {
+        toolbox_logger::step('vacation', 'editor_assets');
         $this->plugin->include_script('js/toolbox.vacation.js');
 
         if ($this->rcube->config->get('toolbox_vacation_jquery_calendar', false)) {
@@ -198,4 +207,3 @@ class toolbox_tool_vacation extends toolbox_tool_module
 }
 
 // END OF FILE
-

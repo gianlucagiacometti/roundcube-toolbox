@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * Roundcube Toolbox preference access and shared diagnostic integration.
+ */
+require_once __DIR__ . '/logger.php';
+
+/**
  * Read and write current Roundcube user preferences for Toolbox modules.
  *
  * This service intentionally keeps no snapshot: after Roundcube saves a
@@ -33,7 +38,15 @@ final class toolbox_preferences
      */
     public function get(string $name, $default = null)
     {
-        $current = $this->rcube->user->get_prefs();
+        toolbox_logger::step('preferences', 'get_start');
+        try {
+            $current = $this->rcube->user->get_prefs();
+        } catch (\Throwable $e) {
+            toolbox_logger::error('preferences', 'get', 'read_exception');
+            throw $e;
+        }
+
+        toolbox_logger::step('preferences', 'get_complete');
         return $current[$name] ?? $default;
     }
 
@@ -48,9 +61,22 @@ final class toolbox_preferences
      */
     public function save(array $changes): bool
     {
-        return $this->rcube->user->save_prefs($changes);
+        toolbox_logger::step('preferences', 'save_start');
+        try {
+            $saved = $this->rcube->user->save_prefs($changes);
+        } catch (\Throwable $e) {
+            toolbox_logger::error('preferences', 'save', 'write_exception');
+            throw $e;
+        }
+
+        if (!$saved) {
+            toolbox_logger::error('preferences', 'save', 'persistence_failed');
+            return false;
+        }
+
+        toolbox_logger::step('preferences', 'save_complete');
+        return true;
     }
 }
 
 // END OF FILE
-

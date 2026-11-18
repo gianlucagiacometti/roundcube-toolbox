@@ -15,6 +15,7 @@
 // 'tags' [tool to define personalised message tags, assign them to IMAP messages, display them and search by tag name or value]
 // 'customise' [tool to customise Blank Page and CSS per domain]
 // 'attachments' [tool to replace large attachments with a link in outgoing messages]
+// 'cloud' [tool to connect personal cloud storage accounts, browse files and attach them to email messages]
 // 'password_hashes' [background tool to store additional configurable password hashes after password changes]
 
 $config['toolbox_tools'] = [
@@ -347,6 +348,69 @@ $config['toolbox_detach_lifespan'] = 30;
 //       RewriteCond %{REQUEST_URI} !^/attachments/$
 // default value: 'attachments'
 $config['toolbox_detach_storage'] = 'attachments';
+
+
+// CLOUD TOOL OPTIONS
+
+// WebDAV (Nextcloud, ownCloud and generic WebDAV).
+// HTTPS and TLS certificate validation are always required.
+// Private and reserved IP addresses are blocked by default to prevent SSRF.
+// To allow a trusted internal WebDAV server, map its exact DNS hostname to
+// the specific private IPv4 addresses it may resolve to; no wildcards or CIDR.
+// Example: ['cloud.example.org' => ['10.0.0.10', '10.0.0.11']]
+// Keep this administrator-controlled; an empty array permits no exceptions.
+$config['toolbox_cloud_trusted_webdav_hosts'] = [];
+
+// Google Drive OAuth 2.0 (read-only).
+// Create a Google OAuth Web application and enable the Drive API.
+// Request drive.readonly; its external-app verification may be required.
+// Register the exact HTTPS redirect URI in Google Cloud.
+// Example: https://YOUR_ROUNDCUBE_DOMAIN/?_task=settings&_action=plugin.toolbox.cloud.google.callback
+// Set all three values to enable the Google Drive connection card.
+// Never publish the client secret or commit it to version control.
+$config['toolbox_cloud_google_client_id'] = '';
+$config['toolbox_cloud_google_client_secret'] = '';
+$config['toolbox_cloud_google_redirect_uri'] = '';
+
+// OneDrive Business OAuth 2.0 (Microsoft work or school accounts).
+// Register a Microsoft Entra Web application with delegated User.Read and
+// Files.Read permissions; Toolbox requests offline_access for token refresh.
+// Set tenant_id to the directory GUID for a single-tenant application, or
+// 'organizations' for a multitenant application. Configure the application's
+// supported account types accordingly; 'common' and 'consumers' are not valid.
+// Use the client secret VALUE, not its Secret ID or the application Object ID.
+// Register the exact HTTPS redirect URI under Web in Microsoft Entra.
+// Example: https://YOUR_ROUNDCUBE_DOMAIN/?_task=settings&_action=plugin.toolbox.cloud.microsoft.callback
+// Set all four values to enable the OneDrive Business connection card.
+$config['toolbox_cloud_microsoft_business_client_id'] = '';
+$config['toolbox_cloud_microsoft_business_client_secret'] = '';
+$config['toolbox_cloud_microsoft_business_tenant_id'] = '';
+$config['toolbox_cloud_microsoft_business_redirect_uri'] = '';
+
+// OneDrive Personal OAuth 2.0 (personal Microsoft accounts).
+// Use a separate Microsoft Entra Web application registered for personal
+// Microsoft accounts (for example Outlook.com, Hotmail or live.com).
+// Use its Application (client) ID and the VALUE of its client secret.
+// Toolbox will use the 'consumers' authority and delegated Files.Read,
+// User.Read and offline_access permissions; no tenant GUID is required.
+// Personal-account applications prohibit query strings in registered redirect
+// URIs. The callback must therefore be an HTTPS URL without ?_task or _action.
+// Example: https://YOUR_ROUNDCUBE_DOMAIN/
+$config['toolbox_cloud_microsoft_personal_client_id'] = '';
+$config['toolbox_cloud_microsoft_personal_client_secret'] = '';
+$config['toolbox_cloud_microsoft_personal_redirect_uri'] = '';
+
+// Dropbox OAuth 2.0 (read-only).
+// Create a Dropbox Scoped Access application with Full Dropbox access and
+// account_info.read, files.metadata.read and files.content.read permissions.
+// Use its App Key and App Secret; Toolbox requests offline access for refresh.
+// Register the exact HTTPS redirect URI in the Dropbox App Console.
+// Example: https://YOUR_ROUNDCUBE_DOMAIN/?_task=settings&_action=plugin.toolbox.cloud.dropbox.callback
+// Set all three values to enable the Dropbox connection card.
+// Never publish the App Secret or commit it to version control.
+$config['toolbox_cloud_dropbox_app_key'] = '';
+$config['toolbox_cloud_dropbox_app_secret'] = '';
+$config['toolbox_cloud_dropbox_redirect_uri'] = '';
 
 
 // PASSWORD HASHES TOOL OPTIONS

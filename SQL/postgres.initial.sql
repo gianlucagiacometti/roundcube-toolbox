@@ -9,6 +9,7 @@ CREATE TABLE public.toolbox_customise_domains
     domain_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     purge_trash integer NOT NULL DEFAULT 0,
     purge_junk integer NOT NULL DEFAULT 0,
+    created timestamp with time zone NOT NULL DEFAULT now(),
     modified timestamp with time zone NOT NULL DEFAULT now(),
     modified_by character varying(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT toolbox_customise_domains_pkey PRIMARY KEY (id),
@@ -21,6 +22,9 @@ TABLESPACE pg_default;
 
 ALTER TABLE public.toolbox_customise_domains
     OWNER to roundcube;
+
+ALTER SEQUENCE public.toolbox_customise_domains_seq
+    OWNED BY public.toolbox_customise_domains.id;
 
 CREATE SEQUENCE public.toolbox_customise_skins_seq;
 
@@ -43,6 +47,7 @@ CREATE TABLE public.toolbox_customise_skins
     favicon text COLLATE pg_catalog."default",
     customise_logo boolean NOT NULL DEFAULT false,
     customised_logo text COLLATE pg_catalog."default",
+    created timestamp with time zone NOT NULL DEFAULT now(),
     modified timestamp with time zone NOT NULL DEFAULT now(),
     modified_by character varying(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT toolbox_customise_skins_pkey PRIMARY KEY (id),
@@ -55,6 +60,9 @@ TABLESPACE pg_default;
 
 ALTER TABLE public.toolbox_customise_skins
     OWNER to roundcube;
+
+ALTER SEQUENCE public.toolbox_customise_skins_seq
+    OWNED BY public.toolbox_customise_skins.id;
 
 CREATE OR REPLACE VIEW public.toolbox_customise_skins_view AS
   SELECT

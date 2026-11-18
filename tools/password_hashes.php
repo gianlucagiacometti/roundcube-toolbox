@@ -24,6 +24,7 @@ final class toolbox_tool_password_hashes extends toolbox_tool_module
 
         $this->plugin->add_hook('password_change', [$this, 'password_change']);
         $this->hook_registered = true;
+        toolbox_logger::step('password_hashes', 'hook_registered');
     }
 
     /**
@@ -55,8 +56,8 @@ final class toolbox_tool_password_hashes extends toolbox_tool_module
             return $args;
         }
 
-        $stage = 'configuration validation';
-        $this->log_message(3, 'STEP in [function password_change]: password change hook triggered');
+        $stage = 'configuration_validation';
+        toolbox_logger::step('password_hashes', 'password_change_started');
 
         try {
             if (!is_array($entries)) {
@@ -73,7 +74,7 @@ final class toolbox_tool_password_hashes extends toolbox_tool_module
 
             $storage = $this->parse_storage();
 
-            $stage = 'hash definition validation';
+            $stage = 'hash_definition_validation';
             $specifications = [];
             foreach ($entries as $entry) {
                 $specification = $this->parse_algorithm_entry($entry, $storage);
@@ -84,26 +85,23 @@ final class toolbox_tool_password_hashes extends toolbox_tool_module
                 $specifications[$column] = $specification;
             }
 
-            $stage = 'hash generation';
-            $this->log_message(3, 'STEP in [function password_change]: validated '
-                . count($specifications) . ' additional hash definition(s)');
+            $stage = 'hash_generation';
+            toolbox_logger::step('password_hashes', 'hash_definitions_validated');
 
             $hashes = [];
             foreach ($specifications as $column => $specification) {
                 $hashes[$column] = $this->make_hash($password, $specification);
             }
 
-            $stage = 'database update';
-            $this->log_message(3, 'STEP in [function password_change]: generated '
-                . count($hashes) . ' additional hash(es)');
+            $stage = 'database_update';
+            toolbox_logger::step('password_hashes', 'hash_generation_complete');
             $this->save_hashes($storage, $username, $hashes, $dsn);
-            $this->log_message(2, 'INFO in [function password_change]: stored '
-                . count($hashes) . ' additional hash(es)');
+            toolbox_logger::step('password_hashes', 'password_change_complete');
         } catch (Throwable $exception) {
             // Never log exception messages or traces: driver errors may embed
             // actual SQL values, including generated password hashes.
-            $this->log_message(1, 'ERROR in [function password_change]: additional hash collection failed');
-            $this->log_message(2, 'ERROR in [function password_change]: failed during ' . $stage);
+            // Stage comes exclusively from the fixed identifiers above.
+            toolbox_logger::error('password_hashes', 'password_change_' . $stage, 'failed');
         }
 
         return $args;
@@ -305,11 +303,12 @@ final class toolbox_tool_password_hashes extends toolbox_tool_module
         $sql = 'UPDATE ' . $storage['table_sql'] . ' SET ' . implode(', ', $assignments)
             . ' WHERE `' . $storage['username_field'] . '` = ?';
 
-        // Log the exact SQL template, not Roundcube's parameter-expanded SQL.
-        // This reveals the targeted table, columns and placeholders, but none
-        // of the password hashes or the mailbox username.
-        $this->log_message(3, 'SQL in [function save_hashes]: ' . $sql);
-        $this->log_message(3, 'STEP in [function save_hashes]: connecting to mailbox database');
+        // Log only a fixed, redacted SQL-operation shape. The actual statement
+        // includes configured table/column identifiers and bound hash values;
+        // neither are included in Toolbox diagnostic output.
+        toolbox_logger::sql('password_hashes',
+            'UPDATE configured_mailbox SET configured_hash_fields = ? WHERE configured_username = ?');
+        toolbox_logger::step('password_hashes', 'database_connection_started');
 
         $db = rcube_db::factory($dsn, $dsn, false);
         // Roundcube expands query parameters before SQL execution. Suppress
@@ -328,33 +327,11 @@ final class toolbox_tool_password_hashes extends toolbox_tool_module
             throw new RuntimeException('Additional password-hash update failed');
         }
         $affected = $db->affected_rows($result);
-        $this->log_message(3, 'STEP in [function save_hashes]: SQL affected rows: ' . $affected);
+        toolbox_logger::step('password_hashes', 'database_update_executed');
         if ($affected !== 1) {
             throw new RuntimeException('Additional hash update did not match exactly one mailbox');
-        }
-    }
-
-    /**
-     * Write safe diagnostic events at the configured Toolbox log level.
-     *
-     * Level 1: failures. Level 2: failure stage and success counts.
-     * Level 3: execution steps and parameterized SQL templates. Neither
-     * passwords, generated hashes, SQL parameters nor usernames are logged.
-     *
-     * @param int $level Minimum logging level required for this message.
-     * @param string $message Sanitized, non-sensitive diagnostic text.
-     * @return void
-     */
-    private function log_message(int $level, string $message): void
-    {
-        if ((int) $this->rcube->config->get('toolbox_loglevel', 1) >= $level) {
-            rcube::write_log(
-                (string) $this->rcube->config->get('toolbox_logfile', 'toolbox.log'),
-                'Toolbox password hashes: ' . $message
-            );
         }
     }
 }
 
 // END OF FILE
-
