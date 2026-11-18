@@ -1,8 +1,8 @@
 <?php
 
 
-$labels = array();
-$messages = array();
+$labels = [];
+$messages = [];
 
 
 /* TOOLBOX */
@@ -467,6 +467,29 @@ $labels['cloud-backend-personal-success'] = 'OneDrive Personal-Konto verbunden. 
 $labels['cloud-backend-personal-failed'] = 'OneDrive Personal-Autorisierung fehlgeschlagen oder Tresorentsperrung abgelaufen. Du kannst dieses Fenster schließen.';
 $labels['cloud-backend-dropbox-success'] = 'Dropbox-Konto verbunden. Du kannst dieses Fenster schließen.';
 $labels['cloud-backend-dropbox-failed'] = 'Dropbox-Autorisierung fehlgeschlagen oder Tresorentsperrung abgelaufen. Du kannst dieses Fenster schließen.';
+
+/* Folders: read-only IMAP folder properties */
+$labels['folders-properties'] = 'Ordnereigenschaften';
+$labels['folders-folder'] = 'Ordner';
+$labels['folders-total'] = 'Nachrichten';
+$labels['folders-unread'] = 'Ungelesen';
+$labels['folders-read'] = 'Gelesen';
+$labels['folders-size'] = 'Ordnergröße';
+$labels['folders-calculate'] = 'Größe berechnen';
+$labels['folders-notcalculated'] = 'Nicht berechnet';
+$labels['folders-calculating'] = 'Berechnung läuft…';
+$labels['folders-sizewarning'] = 'Auf manchen Servern kann die Größenberechnung bei großen Ordnern länger dauern.';
+$labels['folders-namespace'] = 'Namensraum';
+$labels['folders-special'] = 'Spezialordner';
+$labels['folders-yes'] = 'Ja';
+$labels['folders-no'] = 'Nein';
+$labels['folders-loading'] = 'Ordnerinformationen werden geladen…';
+$labels['folders-loadfailed'] = 'Ordnereigenschaften konnten nicht geladen werden.';
+$labels['folders-sizefailed'] = 'Ordnergröße konnte nicht berechnet werden.';
+$labels['folders-namespace-personal'] = 'Persönlich';
+$labels['folders-namespace-other'] = 'Andere Benutzer';
+$labels['folders-namespace-shared'] = 'Freigegeben';
+$labels['folders-namespace-unknown'] = 'Unbekannt';
 
 // END OF FILE
 

@@ -1,7 +1,7 @@
 # Roundcube Webmail Toolbox
 
 
-## Version 1.7.8 (Unreleased, rc-1.7)
+## Version 1.7.8 (2026-11-18, rc-1.7)
 
 ### New Cloud tool
 
@@ -21,6 +21,14 @@
   allowlisting in `config.inc.php.dist`.
 - Moved Cloud's Settings markup to a Roundcube HTML-helper-based view and
   standardised its PHP formatting without changing the working controls.
+
+### New Folders tool
+
+- Added optional read-only `folders` module with a Mail toolbar button and
+  an optional folder-list ContextMenu entry. Displays total, unread and read
+  message counts, folder metadata and on-demand folder-size calculation.
+  Size calculation is explicit because some IMAP servers need to enumerate
+  message headers. Uses the shared logger and all six localisation files.
 
 ### Shared infrastructure and diagnostics
 

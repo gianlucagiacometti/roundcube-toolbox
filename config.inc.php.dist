@@ -13,6 +13,7 @@
 // 'purge' [tool to periodically purge Trash and Junk folders]
 // 'preview' [tool to disable message previe]
 // 'tags' [tool to define personalised message tags, assign them to IMAP messages, display them and search by tag name or value]
+// 'folders' [mail toolbar and optional folder context menu for IMAP folder statistics]
 // 'customise' [tool to customise Blank Page and CSS per domain]
 // 'attachments' [tool to replace large attachments with a link in outgoing messages]
 // 'cloud' [tool to connect personal cloud storage accounts, browse files and attach them to email messages]
@@ -25,6 +26,7 @@ $config['toolbox_tools'] = [
     'purge',
     'preview',
     'tags',
+    'folders',
     'customise',
     'attachments',
 //    'password_hashes',
@@ -251,6 +253,9 @@ $config['toolbox_purge_script_debug'] = true;
 
 
 // TAGS TOOL OPTIONS
+
+
+// FOLDERS TOOL OPTIONS
 
 
 // VACATION TOOL OPTIONS

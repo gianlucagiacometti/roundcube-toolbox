@@ -1,8 +1,8 @@
 <?php
 
 
-$labels = array();
-$messages = array();
+$labels = [];
+$messages = [];
 
 
 /* TOOLBOX */
@@ -463,6 +463,29 @@ $labels['cloud-backend-personal-success'] = 'Account OneDrive Personal collegato
 $labels['cloud-backend-personal-failed'] = 'Autorizzazione OneDrive Personal non riuscita o sblocco del vault scaduto. Puoi chiudere questa finestra.';
 $labels['cloud-backend-dropbox-success'] = 'Account Dropbox collegato. Puoi chiudere questa finestra.';
 $labels['cloud-backend-dropbox-failed'] = 'Autorizzazione Dropbox non riuscita o sblocco del vault scaduto. Puoi chiudere questa finestra.';
+
+/* Folders: read-only IMAP folder properties */
+$labels['folders-properties'] = 'Proprietà cartella';
+$labels['folders-folder'] = 'Cartella';
+$labels['folders-total'] = 'Messaggi';
+$labels['folders-unread'] = 'Non letti';
+$labels['folders-read'] = 'Letti';
+$labels['folders-size'] = 'Dimensione cartella';
+$labels['folders-calculate'] = 'Calcola dimensione';
+$labels['folders-notcalculated'] = 'Non calcolata';
+$labels['folders-calculating'] = 'Calcolo in corso…';
+$labels['folders-sizewarning'] = 'Su alcuni server il calcolo della dimensione può richiedere tempo per cartelle molto grandi.';
+$labels['folders-namespace'] = 'Spazio dei nomi';
+$labels['folders-special'] = 'Cartella speciale';
+$labels['folders-yes'] = 'Sì';
+$labels['folders-no'] = 'No';
+$labels['folders-loading'] = 'Caricamento informazioni cartella…';
+$labels['folders-loadfailed'] = 'Impossibile caricare le proprietà della cartella.';
+$labels['folders-sizefailed'] = 'Impossibile calcolare la dimensione della cartella.';
+$labels['folders-namespace-personal'] = 'Personale';
+$labels['folders-namespace-other'] = 'Altri utenti';
+$labels['folders-namespace-shared'] = 'Condiviso';
+$labels['folders-namespace-unknown'] = 'Sconosciuto';
 
 // END OF FILE
 

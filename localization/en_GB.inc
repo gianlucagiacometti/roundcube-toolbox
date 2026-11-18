@@ -1,8 +1,8 @@
 <?php
 
 
-$labels = array();
-$messages = array();
+$labels = [];
+$messages = [];
 
 
 /* TOOLBOX */
@@ -464,6 +464,29 @@ $labels['cloud-backend-personal-success'] = 'OneDrive Personal account connected
 $labels['cloud-backend-personal-failed'] = 'OneDrive Personal authorization failed or vault unlock expired. You may close this window.';
 $labels['cloud-backend-dropbox-success'] = 'Dropbox account connected. You may close this window.';
 $labels['cloud-backend-dropbox-failed'] = 'Dropbox authorization failed or the vault unlock expired. You may close this window.';
+
+/* Folders: read-only IMAP folder properties */
+$labels['folders-properties'] = 'Folder properties';
+$labels['folders-folder'] = 'Folder';
+$labels['folders-total'] = 'Messages';
+$labels['folders-unread'] = 'Unread';
+$labels['folders-read'] = 'Read';
+$labels['folders-size'] = 'Folder size';
+$labels['folders-calculate'] = 'Calculate size';
+$labels['folders-notcalculated'] = 'Not calculated';
+$labels['folders-calculating'] = 'Calculating…';
+$labels['folders-sizewarning'] = 'On some servers, calculating size may take time for large folders.';
+$labels['folders-namespace'] = 'Namespace';
+$labels['folders-special'] = 'Special folder';
+$labels['folders-yes'] = 'Yes';
+$labels['folders-no'] = 'No';
+$labels['folders-loading'] = 'Loading folder information…';
+$labels['folders-loadfailed'] = 'Could not load folder properties.';
+$labels['folders-sizefailed'] = 'Could not calculate folder size.';
+$labels['folders-namespace-personal'] = 'Personal';
+$labels['folders-namespace-other'] = 'Other users';
+$labels['folders-namespace-shared'] = 'Shared';
+$labels['folders-namespace-unknown'] = 'Unknown';
 
 // END OF FILE
 

@@ -7,7 +7,7 @@ JavaScript module.
 
 ## Compatibility and requirements
 
-- **Toolbox release:** 1.7.8 (upcoming; not yet tagged).
+- **Toolbox release:** 1.7.8.
 - **Roundcube:** 1.7.2 or newer (the recommended Composer minimum). Use the
   latest Roundcube 1.7 security release in production.
 - **PHP:** 8.1 or newer, as required by Roundcube 1.7.
@@ -45,6 +45,7 @@ JavaScript module.
 | `customise` | Configure per-domain Blank Page, CSS, logos and related options, including per-domain purge settings. |
 | `attachments` | Detach large attachments and replace them with download links. |
 | `tags` | Manage personal tag names and values, assign them to messages, display badges, and search by tag name or value. |
+| `folders` | View read-only IMAP folder properties, message counts and on-demand folder size. |
 | `cloud` | Connect read-only cloud storage accounts, browse remote files and attach selected files to composed messages. |
 | `password_hashes` | **Background only:** store configurable additional password hashes after a successful Roundcube password change. No Settings tab. |
 
@@ -124,6 +125,7 @@ $config['toolbox_tools'] = [
     'customise',
     'attachments',
     'tags',
+    'folders', // Optional: Mail folder properties; no additional database tables.
     'cloud', // Optional: requires Cloud tables and provider configuration.
     'password_hashes',
 ];
@@ -221,6 +223,25 @@ For a search submitted in the current mail view, a confirmed assignment or
 definition change can refresh the results when the dialog closes. That refresh
 uses the submitted search and returns to page one; unfinished edits in the
 search controls are preserved.
+
+### IMAP folder properties
+
+Enable `folders` in `toolbox_tools`. In the **Mail** interface, select a
+mailbox and choose **Folder properties** from the mail toolbar. If the optional
+`contextmenu` plugin is installed, the same action also appears in the
+folder-list right-click menu and targets the folder you clicked.
+
+The dialog shows the folder name, total messages, unread and read counts,
+whether the mailbox is a special folder, and its IMAP namespace. The
+**Calculate size** button performs a separate, explicit server request.
+On IMAP servers without `STATUS=SIZE` (or a fast vendor-specific metadata
+implementation), Roundcube may need to examine message-size headers for the
+whole folder. This can take time for very large folders.
+
+Folders is read-only: it does not modify messages or folder subscriptions,
+does not use the Toolbox SQL storage adapter and requires no database schema.
+It has no Settings form. Styling is supplied by
+`skins/elastic/toolbox.folders.less` and its compiled CSS.
 
 ### Cloud storage attachments
 

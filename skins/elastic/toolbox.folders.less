@@ -1,0 +1,99 @@
+/**
+ * Toolbox Folders: Elastic toolbar icon and read-only property dialog.
+ */
+
+// Keep the toolbar's native icon font. ContextMenu builds a separate menu
+// anchor, so use an SVG background that does not rely on its icon-font rules.
+a.toolbox-folders:before {
+    font-family: Icons;
+    font-style: normal;
+    font-weight: 900;
+    content: "\f07c";
+}
+
+div.contextmenu a.toolbox-folders-menuentry,
+div.contextmenu a.cmd_plugin-toolbox-folders {
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%235f6368%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M3%206a2%202%200%200%201%202-2h5l2%203h7a2%202%200%200%201%202%202v3%27%2F%3E%3Cpath%20d%3D%27M3%206v12a2%202%200%200%200%202%202h13a2%202%200%200%200%202-1.6L22%2012H8l-3%203%27%2F%3E%3C%2Fsvg%3E");
+    background-position: .75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.1rem 1.1rem;
+    padding-left: 2.3rem !important;
+}
+
+div.contextmenu a.toolbox-folders-menuentry::before,
+div.contextmenu a.cmd_plugin-toolbox-folders::before {
+    content: none !important;
+    display: none !important;
+}
+
+html.dark-mode div.contextmenu a.toolbox-folders-menuentry,
+html.dark-mode div.contextmenu a.cmd_plugin-toolbox-folders {
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%23d3d9e2%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M3%206a2%202%200%200%201%202-2h5l2%203h7a2%202%200%200%201%202%202v3%27%2F%3E%3Cpath%20d%3D%27M3%206v12a2%202%200%200%200%202%202h13a2%202%200%200%200%202-1.6L22%2012H8l-3%203%27%2F%3E%3C%2Fsvg%3E");
+}
+
+// Allow the entire property grid to remain reachable even in compact layouts.
+div.toolbox-folders-popup .ui-dialog-content {
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    max-height: calc(100vh - 7rem);
+}
+
+.toolbox-folders-properties {
+    min-width: 0;
+    padding: .3rem;
+}
+
+.toolbox-folders-grid {
+    display: grid;
+    grid-template-columns: minmax(9rem, 42%) minmax(0, 1fr);
+    column-gap: 1rem;
+    row-gap: .65rem;
+    margin: 0 0 1rem;
+
+    dt {
+        font-weight: 600;
+    }
+
+    dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+}
+
+.toolbox-folders-size-panel {
+    border-top: 1px solid var(--color-border, #d1d5db);
+    padding-top: 1rem;
+}
+
+.toolbox-folders-size-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-bottom: .7rem;
+}
+
+.toolbox-folders-size-note {
+    margin: .7rem 0 0;
+    color: var(--color-text-muted, #737373);
+    font-size: .9rem;
+}
+
+.toolbox-folders-status {
+    margin: .6rem 0;
+}
+
+.toolbox-folders-status:empty {
+    display: none;
+}
+
+.toolbox-folders-status.error {
+    color: #b42318;
+}
+
+html.dark-mode .toolbox-folders-status.error {
+    color: #ffb4ab;
+}
+
+/* END OF FILE */
