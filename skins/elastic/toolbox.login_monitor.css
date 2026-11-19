@@ -192,7 +192,7 @@
   margin: 1rem 0;
 }
 .toolbox-login-monitor-dialog {
-  width: 650px;
+  width: min(650px, calc(100vw - 2rem));
   max-height: min(80vh, 800px);
   overflow-y: auto;
   padding: 1.5rem;
