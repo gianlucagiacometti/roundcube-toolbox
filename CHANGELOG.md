@@ -1,7 +1,7 @@
 # Roundcube Webmail Toolbox
 
 
-## Version 1.7.9 (2026-11-19, rc-1.7)
+## Version 1.7.9 (pre-relelease, rc-1.7)
 
 ### New Login Monitor tool
 
