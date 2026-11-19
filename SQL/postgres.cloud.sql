@@ -1,5 +1,5 @@
 CREATE TABLE toolbox_cloud_vaults (
-    user_id INTEGER NOT NULL PRIMARY KEY REFERENCES users(user_id),
+    user_id INTEGER NOT NULL PRIMARY KEY,
     password_salt VARCHAR(64) COLLATE pg_catalog."default",
     password_ops INTEGER,
     password_memory BIGINT,
@@ -21,7 +21,7 @@ ALTER SEQUENCE public.toolbox_cloud_accounts_seq
 CREATE TABLE toolbox_cloud_accounts (
     id BIGINT NOT NULL DEFAULT nextval('toolbox_cloud_accounts_seq') PRIMARY KEY,
     crypto_id CHAR(32) COLLATE pg_catalog."default" NOT NULL UNIQUE,
-    user_id INTEGER NOT NULL REFERENCES toolbox_cloud_vaults(user_id),
+    user_id INTEGER NOT NULL,
     provider VARCHAR(32) COLLATE pg_catalog."default" NOT NULL,
     display_name VARCHAR(255) COLLATE pg_catalog."default" NOT NULL,
     endpoint VARCHAR(2048) COLLATE pg_catalog."default",

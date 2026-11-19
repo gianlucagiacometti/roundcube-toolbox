@@ -17,7 +17,7 @@
 // 'customise' [tool to customise Blank Page and CSS per domain]
 // 'attachments' [tool to replace large attachments with a link in outgoing messages]
 // 'cloud' [tool to connect personal cloud storage accounts, browse files and attach them to email messages]
-// 'login_monitor' [tool to visualise the last login and save the login history per device]
+// 'login_monitor' [tool to record and review successful login history]
 // 'password_hashes' [background tool to store additional configurable password hashes after password changes]
 
 $config['toolbox_tools'] = [

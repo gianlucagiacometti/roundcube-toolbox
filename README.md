@@ -338,7 +338,7 @@ Neither flags nor GeoIP lookups require external requests from the browser.
 
 #### Installation
 
-1. Install the Login Monitor tables in the **Roundcube user database**, using `SQL/mysql.login_monitor.sql` or `SQL/postgres.login_monitor.sql`, as appropriate. Login Monitor does not use the PostfixAdmin database. When upgrading an existing Login Monitor installation, apply the SQL migrations supplied for that version rather than running the initial schema again.
+1. Install the Login Monitor history table in the **Roundcube user database**, using `SQL/mysql.login_monitor.sql` or `SQL/postgres.login_monitor.sql`, as appropriate. Login Monitor does not use the PostfixAdmin database. When upgrading an existing Login Monitor installation, apply the SQL migrations supplied for that version rather than running the initial schema again.
 2. Enable `login_monitor` in the `toolbox_tools` array in `plugins/toolbox/config.inc.php`:
 
    ```php
@@ -520,9 +520,9 @@ visibility preferences. Turning off collection does not conceal previously
 stored data while visibility remains enabled.
 
 Pagination reloads only the requested page from the Roundcube database. All
-history requests are scoped to the signed-in Roundcube account. No additional
-database tables, device-identification cookies, cleanup jobs or deletion
-controls are introduced by this read-only history view.
+history requests are scoped to the signed-in Roundcube account. This release
+does not maintain a persistent device registry or device-identification cookies,
+and introduces no automated cleanup jobs or history-deletion controls.
 
 #### Interpreting login history
 

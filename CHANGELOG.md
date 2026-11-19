@@ -9,7 +9,7 @@
 - Added browser, operating system and device detection using Matomo Device Detector.
 - Added optional offline IP geolocation using MaxMind GeoLite2 databases.
 - Added per-user preferences to independently control collection and visibility of login information.
-- Added MySQL and PostgreSQL schemas for login history and device records.
+- Added MySQL and PostgreSQL schemas for successful login history.
 - Added a previous successful login summary, paginated history and detailed login information dialog.
 - Added a welcome notification using Roundcube's native success toast, displaying the user's name, previous login timestamp and approximate location when available.
 - Integrated country flags using the Composer-managed `lipis/flag-icons` package.
