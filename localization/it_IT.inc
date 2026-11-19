@@ -162,6 +162,7 @@ $messages['customise-logo-nocustomisedlogo'] = 'Nessun logo personalizzato trova
 $labels['attachment-expiry-date'] = 'Scadenza download';
 $labels['attachment-maxuploadsize'] = 'NOTA: Se un singolo allegato supera $singlesize MB o l\'insieme degli allegati supera $totalsize MB verrà inviato al destinatario un collegamento ad un file .zip salvato localmente nel server valido per $lifespan giorno(i)';
 
+
 /* Tags */
 /* Author: Gianluca Giacometti */
 
@@ -216,8 +217,6 @@ $labels['tags-reloadeditor'] = 'Ricarica editor';
 $labels['tags-reload'] = 'Ricarica etichette';
 $labels['tags-defssavingclose'] = 'Salvataggio delle definizioni delle etichette… La finestra si chiuderà al termine.';
 
-/* Tags backend errors */
-/* Localised only at the user-facing response boundary. */
 $messages['tags-error-invalidrequest'] = 'Richiesta relativa alle etichette non valida';
 $messages['tags-error-missingmessage'] = 'Il messaggio non è disponibile in questa cartella';
 $messages['tags-error-missingtag'] = 'Questa definizione di etichetta non esiste più';
@@ -253,6 +252,7 @@ $messages['tags-error-invalidvalue'] = 'Il valore dell’etichetta deve contener
 $messages['tags-error-invalidcolor'] = 'Colore dell’etichetta non valido';
 $messages['tags-error-unexpected'] = 'Impossibile completare l’operazione sulle etichette';
 
+
 /* Cloud */
 /* Author: Gianluca Giacometti */
 
@@ -263,7 +263,6 @@ $labels['cloud-onedrive'] = 'Microsoft OneDrive';
 $labels['cloud-insertlink'] = 'Inserisci un collegamento al file';
 $labels['cloud-insertfile'] = 'Allega un file';
 
-/* Cloud Settings (PHP view) */
 $labels['cloud-ui-generate-recovery'] = 'Genera una chiave di recupero';
 $labels['cloud-ui-create-title'] = 'Crea la tua cassaforte Cloud personale';
 $labels['cloud-ui-create-explanation'] = 'Scegli una password per la cassaforte (almeno 12 caratteri), una chiave di recupero generata o entrambe. La chiave di recupero viene mostrata una sola volta.';
@@ -327,11 +326,6 @@ $labels['cloud-ui-next-entries'] = 'Altre 100 voci';
 $labels['cloud-ui-save-recovery-title'] = 'Salva ora la tua chiave di recupero';
 $labels['cloud-ui-recovery-once-help'] = 'La chiave di recupero non può essere mostrata di nuovo. Copiala in un luogo sicuro fuori da questo account webmail.';
 $labels['cloud-ui-recovery-saved'] = 'L\'ho salvata — nascondi la chiave';
-
-
-/* Cloud JavaScript interface */
-/* Author: Gianluca Giacometti */
-
 $labels['cloud-ui-unlocked'] = 'Sbloccato';
 $labels['cloud-ui-automatic-lock-in'] = 'Blocco automatico tra %s';
 $labels['cloud-ui-unlock-expired'] = 'Sblocco scaduto.';
@@ -431,28 +425,6 @@ $labels['cloud-ui-compose-picker-unsupported'] = 'Il browser non supporta il sel
 $labels['cloud-ui-compose-secret-required'] = 'Inserisci la password del vault o la chiave di recupero.';
 $labels['cloud-ui-compose-importing'] = 'Importazione allegato Cloud…';
 
-/* Safe login */
-/* Author: Gianluca Giacometti */
-
-$labels['safelogin'] = 'Accesso sicuro';
-$labels['safelogin-continent'] = 'Continente';
-$labels['safelogin-countryisocode'] = 'Codice Nazione';
-$labels['safelogin-countryname'] = 'Nazione';
-$labels['safelogin-cityname'] = 'Città';
-$labels['safelogin-location'] = 'Indirizzo';
-$labels['safelogin-lastlogin'] = 'Ultimo accesso';
-$labels['safelogin-history'] = 'Storico Accessi';
-$labels['safelogin-browser'] = 'Programma di navigazione';
-$labels['safelogin-os'] = 'Sistema operativo';
-
-
-/* Folders */
-/* Author: Gianluca Giacometti */
-
-$labels['folders'] = 'Riepilogo cartelle';
-$labels['folders-numberoffiles'] = 'Numero file';
-
-/* Cloud backend responses: translated only at user-facing boundaries */
 $labels['cloud-backend-unlock-failed'] = 'Impossibile sbloccare il vault. Controlla la password o la chiave di recupero.';
 $labels['cloud-backend-operation-failed'] = 'Operazione Cloud non riuscita. Controlla i dettagli e i log del server.';
 $labels['cloud-backend-google-success'] = 'Account Google Drive collegato. Puoi chiudere questa finestra.';
@@ -464,7 +436,12 @@ $labels['cloud-backend-personal-failed'] = 'Autorizzazione OneDrive Personal non
 $labels['cloud-backend-dropbox-success'] = 'Account Dropbox collegato. Puoi chiudere questa finestra.';
 $labels['cloud-backend-dropbox-failed'] = 'Autorizzazione Dropbox non riuscita o sblocco del vault scaduto. Puoi chiudere questa finestra.';
 
-/* Folders: read-only IMAP folder properties */
+
+/* Folders */
+/* Author: Gianluca Giacometti */
+
+$labels['folders'] = 'Riepilogo cartelle';
+$labels['folders-numberoffiles'] = 'Numero file';
 $labels['folders-properties'] = 'Proprietà cartella';
 $labels['folders-folder'] = 'Cartella';
 $labels['folders-total'] = 'Messaggi';
@@ -487,5 +464,56 @@ $labels['folders-namespace-other'] = 'Altri utenti';
 $labels['folders-namespace-shared'] = 'Condiviso';
 $labels['folders-namespace-unknown'] = 'Sconosciuto';
 
-// END OF FILE
 
+/* Login Monitor */
+/* Author: Gianluca Giacometti */
+
+$labels['login_monitor'] = 'Attività di accesso';
+$labels['login-monitor-manage'] = 'Preferenze attività di accesso';
+$labels['login-monitor-intro'] = 'Scegli quali dati registrare per i prossimi accessi e quali informazioni salvate mostrare nella cronologia. Data e ora di accesso vengono sempre registrate.';
+$labels['login-monitor-collect'] = 'Registra';
+$labels['login-monitor-visible'] = 'Mostra nella cronologia';
+$labels['login-monitor-field-browser_name'] = 'Browser';
+$labels['login-monitor-field-browser_version'] = 'Versione del browser';
+$labels['login-monitor-field-os_name'] = 'Sistema operativo';
+$labels['login-monitor-field-os_version'] = 'Versione del sistema operativo';
+$labels['login-monitor-field-device_type'] = 'Tipo di dispositivo';
+$labels['login-monitor-field-device_brand'] = 'Marca del dispositivo';
+$labels['login-monitor-field-device_model'] = 'Modello del dispositivo';
+$labels['login-monitor-field-city'] = 'Città (approssimativa)';
+$labels['login-monitor-field-country'] = 'Paese (approssimativo)';
+$labels['login-monitor-field-ip_address'] = 'Indirizzo IP';
+$labels['login-monitor-field-user_agent'] = 'User-Agent originale';
+$labels['login-monitor-field-browser_engine'] = 'Motore del browser';
+$labels['login-monitor-field-bot_detection'] = 'Rilevamento dei bot';
+$labels['login-monitor-tab-history'] = 'Cronologia accessi';
+$labels['login-monitor-tab-preferences'] = 'Preferenze';
+$labels['login-monitor-column-information'] = 'Informazioni';
+$labels['login-monitor-unavailable'] = 'Non disponibile';
+$labels['login-monitor-history-pending'] = 'La cronologia degli accessi non è ancora disponibile in questa versione.';
+$labels['login-monitor-history-intro'] = 'Gli accessi riusciti sono elencati qui sotto. Seleziona Dettagli per consultare le informazioni salvate per ogni accesso.';
+$labels['login-monitor-previous-title'] = 'Ultimo accesso precedente';
+$labels['login-monitor-previous-unavailable'] = 'L’accesso precedente sarà visibile dopo il prossimo accesso.';
+$labels['login-monitor-previous-none'] = 'Non risultano accessi riusciti precedenti.';
+$labels['login-monitor-history-error'] = 'Impossibile caricare la cronologia degli accessi. Riprova più tardi.';
+$labels['login-monitor-history-title'] = 'Cronologia degli accessi riusciti';
+$labels['login-monitor-history-empty'] = 'Non sono stati registrati accessi riusciti.';
+$labels['login-monitor-column-date'] = 'Data e ora';
+$labels['login-monitor-column-summary'] = 'Informazioni di accesso';
+$labels['login-monitor-column-details'] = 'Dettagli';
+$labels['login-monitor-current'] = 'Sessione corrente';
+$labels['login-monitor-details-open'] = 'Dettagli';
+$labels['login-monitor-no-details'] = 'Non registrato';
+$labels['login-monitor-page-previous'] = 'Precedente';
+$labels['login-monitor-page-next'] = 'Successiva';
+$labels['login-monitor-page-number'] = 'Pagina %s';
+$labels['login-monitor-pagination'] = 'Pagine della cronologia accessi';
+$labels['login-monitor-details-title'] = 'Dettagli dell’accesso';
+$labels['login-monitor-details-close'] = 'Chiudi';
+
+$labels['login-monitor-toast-hello'] = 'Ciao';
+$labels['login-monitor-toast-last'] = 'Ultimo accesso';
+$labels['login-monitor-toast-from'] = 'Da';
+$labels['login-monitor-toast-none'] = 'Nessun accesso precedente registrato';
+
+// END OF FILE

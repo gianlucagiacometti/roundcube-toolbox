@@ -62,6 +62,9 @@ input[type=radio]:checked + label:before {
 .listing.iconized tr.safelogin > td.section::before {
   content: "\f023";
 }
+.listing.iconized tr.login_monitor > td.section::before {
+  content: "\f1da";
+}
 .listing.iconized tr.folders > td.section::before {
   content: "\f07c";
 }
@@ -414,3 +417,4 @@ html.dark-mode input[type=radio]:checked + label:before {
 html.dark-mode .toolbox-customisetable .CodeMirror-activeline-background {
   background-color: #e9ecef;
 }
+/* END OF FILE */

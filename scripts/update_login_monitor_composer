@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Update Login Monitor's Composer dependencies without development packages.
+# Resolve the plugin directory relative to this script, regardless of where
+# the command is launched.
+#
+
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+cd -- "$SCRIPT_DIR/../tools/login_monitor"
+
+# Support a hosting-specific composer-update executable, if installed.
+# Otherwise use the standard Composer CLI.
+if command -v composer-update >/dev/null 2>&1; then
+    exec composer-update --no-dev
+fi
+
+exec composer update --no-dev

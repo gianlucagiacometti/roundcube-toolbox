@@ -17,6 +17,7 @@
 // 'customise' [tool to customise Blank Page and CSS per domain]
 // 'attachments' [tool to replace large attachments with a link in outgoing messages]
 // 'cloud' [tool to connect personal cloud storage accounts, browse files and attach them to email messages]
+// 'login_monitor' [tool to visualise the last login and save the login history per device]
 // 'password_hashes' [background tool to store additional configurable password hashes after password changes]
 
 $config['toolbox_tools'] = [
@@ -29,6 +30,7 @@ $config['toolbox_tools'] = [
     'folders',
     'customise',
     'attachments',
+    'login_monitor',
 //    'password_hashes',
 ];
 
@@ -416,6 +418,62 @@ $config['toolbox_cloud_microsoft_personal_redirect_uri'] = '';
 $config['toolbox_cloud_dropbox_app_key'] = '';
 $config['toolbox_cloud_dropbox_app_secret'] = '';
 $config['toolbox_cloud_dropbox_redirect_uri'] = '';
+
+
+// LOGIN_MONITOR TOOL OPTIONS
+
+// Information collected for each successful login and displayed in login history.
+// Each field has two independent options:
+//   collect = true: store the information when the login occurs
+//   visible = true: allow the user to see the stored information
+// A field is displayed only when both options are enabled.
+// Disabling collection does not delete information recorded previously.
+// City and country require a configured GeoIP database.
+$config['toolbox_login_monitor_fields'] = [
+    'browser_name'    => ['collect' => true, 'visible' => true],
+    'browser_version' => ['collect' => true, 'visible' => true],
+    'os_name'         => ['collect' => true, 'visible' => true],
+    'os_version'      => ['collect' => true, 'visible' => true],
+    'device_type'     => ['collect' => true, 'visible' => true],
+    'device_brand'    => ['collect' => true, 'visible' => true],
+    'device_model'    => ['collect' => true, 'visible' => true],
+    'city'            => ['collect' => true, 'visible' => true],
+    'country'         => ['collect' => true, 'visible' => true],
+    'ip_address'      => ['collect' => false, 'visible' => false],
+    'user_agent'      => ['collect' => false, 'visible' => false],
+    'browser_engine'  => ['collect' => false, 'visible' => false],
+    'bot_detection'   => ['collect' => false, 'visible' => false],
+];
+
+// Absolute path to a City MMDB database used for approximate login locations.
+// Supports GeoLite2 City, GeoIP2 City and compatible MaxMind-format databases.
+// The optional scripts/install_login_monitor_geoip installer downloads a
+// suitable file to tools/login_monitor/GeoLite.mmdb/ by default.
+// Example for that installation:
+// __DIR__ . '/tools/login_monitor/GeoLite.mmdb/GeoLite2-City.mmdb'
+// Leave empty to disable city lookup.
+$config['toolbox_login_monitor_geoip_city_database'] = '';
+
+// Absolute path to an optional Country MMDB database.
+// Supports GeoLite2 Country, GeoIP2 Country and compatible MaxMind-format files.
+// Example for the default installation:
+// __DIR__ . '/tools/login_monitor/GeoLite.mmdb/GeoLite2-Country.mmdb'
+// Leave empty to obtain country information from the City database instead.
+// If neither database is configured, country lookup is disabled.
+$config['toolbox_login_monitor_geoip_country_database'] = '';
+
+// Default collection and visibility values are set using
+// toolbox_login_monitor_fields. Each user can override those values in
+// Toolbox > Login Activity unless an administrator prohibits the option.
+// Omitted fields and flags are permitted by default.
+// An explicit false prevents that information being collected or shown,
+// irrespective of the user's saved preference or the initial default.
+// City and country additionally require a readable configured GeoIP database.
+$config['toolbox_login_monitor_user_permissions'] = [
+    // Examples: uncomment to disallow user opt-in for sensitive fields.
+    // 'ip_address' => ['collect' => false, 'visible' => false],
+    // 'user_agent' => ['collect' => false, 'visible' => false],
+];
 
 
 // PASSWORD HASHES TOOL OPTIONS

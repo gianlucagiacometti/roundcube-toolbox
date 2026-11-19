@@ -170,7 +170,6 @@ $labels['attachment-maxuploadsize'] = 'NOTE: If one attachment is greater than $
 $labels['tags'] = 'Étiquettes';
 $labels['tags-label'] = 'Étiquette';
 $labels['tags-labels'] = 'Étiquettes';
-
 $labels['tags-title'] = 'Étiquettes personnelles';
 $labels['tags-empty'] = 'Aucune étiquette. Sélectionnez Nouvelle étiquette pour en créer une.';
 $labels['tags-newtag'] = 'Nouvelle étiquette';
@@ -218,8 +217,6 @@ $labels['tags-reloadeditor'] = 'Recharger l’éditeur';
 $labels['tags-reload'] = 'Recharger les étiquettes';
 $labels['tags-defssavingclose'] = 'Enregistrement des définitions d’étiquettes… La fenêtre se fermera à la fin.';
 
-/* Tags backend errors */
-/* Localised only at the user-facing response boundary. */
 $messages['tags-error-invalidrequest'] = 'Requête d’étiquette non valide';
 $messages['tags-error-missingmessage'] = 'Ce message n’est pas disponible dans ce dossier';
 $messages['tags-error-missingtag'] = 'Cette définition d’étiquette n’existe plus';
@@ -255,6 +252,7 @@ $messages['tags-error-invalidvalue'] = 'La valeur de l’étiquette doit conteni
 $messages['tags-error-invalidcolor'] = 'Couleur d’étiquette non valide';
 $messages['tags-error-unexpected'] = 'Impossible de terminer l’opération sur les étiquettes';
 
+
 /* Cloud */
 /* Author: Helena Branch */
 
@@ -265,7 +263,6 @@ $labels['cloud-onedrive'] = 'Microsoft OneDrive';
 $labels['cloud-insertlink'] = 'Insérez un lien au fichier';
 $labels['cloud-insertfile'] = 'Insérez un fichier';
 
-/* Cloud Settings (PHP view) */
 $labels['cloud-ui-generate-recovery'] = 'Générer une clé de récupération';
 $labels['cloud-ui-create-title'] = 'Créer votre coffre-fort Cloud personnel';
 $labels['cloud-ui-create-explanation'] = 'Choisissez un mot de passe pour le coffre-fort (au moins 12 caractères), une clé de récupération générée, ou les deux. La clé ne s\'affiche qu\'une seule fois.';
@@ -329,11 +326,6 @@ $labels['cloud-ui-next-entries'] = '100 entrées suivantes';
 $labels['cloud-ui-save-recovery-title'] = 'Enregistrez votre clé de récupération maintenant';
 $labels['cloud-ui-recovery-once-help'] = 'La clé de récupération ne pourra plus être affichée. Copiez-la dans un endroit sûr en dehors de ce compte webmail.';
 $labels['cloud-ui-recovery-saved'] = 'Je l\'ai enregistrée — masquer la clé';
-
-
-/* Cloud JavaScript interface */
-/* Author: Gianluca Giacometti */
-
 $labels['cloud-ui-unlocked'] = 'Déverrouillé';
 $labels['cloud-ui-automatic-lock-in'] = 'Verrouillage automatique dans %s';
 $labels['cloud-ui-unlock-expired'] = 'Déverrouillage expiré.';
@@ -433,28 +425,6 @@ $labels['cloud-ui-compose-picker-unsupported'] = 'Votre navigateur ne prend pas 
 $labels['cloud-ui-compose-secret-required'] = 'Saisissez le mot de passe du coffre ou la clé de récupération.';
 $labels['cloud-ui-compose-importing'] = 'Importation de la pièce jointe Cloud…';
 
-/* Safe login */
-/* Author: Helena Branch */
-
-$labels['safelogin'] = 'Ouvrir une session en sécurité';
-$labels['safelogin-continent'] = 'Continent';
-$labels['safelogin-countryisocode'] = 'Code Nation';
-$labels['safelogin-countryname'] = 'Nation';
-$labels['safelogin-cityname'] = 'Ville';
-$labels['safelogin-location'] = 'Adresse';
-$labels['safelogin-lastlogin'] = 'Dernière connexion';
-$labels['safelogin-history'] = 'Accéder à Historique';
-$labels['safelogin-browser'] = 'Navigateur';
-$labels['safelogin-os'] = 'Systeme d’exploitation';
-
-
-/* Folders */
-/* Author: Helena Branch */
-
-$labels['folders'] = 'Riepilogo cartelle';
-$labels['folders-numberoffiles'] = 'Numero file';
-
-/* Cloud backend responses: translated only at user-facing boundaries */
 $labels['cloud-backend-unlock-failed'] = 'Impossible de déverrouiller le coffre. Vérifiez votre mot de passe ou votre clé de récupération.';
 $labels['cloud-backend-operation-failed'] = 'Échec de l’opération Cloud. Consultez les détails et les journaux du serveur.';
 $labels['cloud-backend-google-success'] = 'Compte Google Drive connecté. Vous pouvez fermer cette fenêtre.';
@@ -466,7 +436,12 @@ $labels['cloud-backend-personal-failed'] = 'Échec de l’autorisation OneDrive 
 $labels['cloud-backend-dropbox-success'] = 'Compte Dropbox connecté. Vous pouvez fermer cette fenêtre.';
 $labels['cloud-backend-dropbox-failed'] = 'Échec de l’autorisation Dropbox ou expiration du déverrouillage du coffre. Vous pouvez fermer cette fenêtre.';
 
-/* Folders: read-only IMAP folder properties */
+
+/* Folders */
+/* Author: Helena Branch */
+
+$labels['folders'] = 'Riepilogo cartelle';
+$labels['folders-numberoffiles'] = 'Numero file';
 $labels['folders-properties'] = 'Propriétés du dossier';
 $labels['folders-folder'] = 'Dossier';
 $labels['folders-total'] = 'Messages';
@@ -489,5 +464,56 @@ $labels['folders-namespace-other'] = 'Autres utilisateurs';
 $labels['folders-namespace-shared'] = 'Partagé';
 $labels['folders-namespace-unknown'] = 'Inconnu';
 
-// END OF FILE
 
+/* Login Monitor */
+/* Author: Helena Branch */
+
+$labels['login_monitor'] = 'Activité de connexion';
+$labels['login-monitor-manage'] = 'Préférences des connexions';
+$labels['login-monitor-intro'] = 'Choisissez les informations à enregistrer lors des prochaines connexions et celles à afficher dans votre historique. La date et l\'heure de connexion sont toujours enregistrées.';
+$labels['login-monitor-collect'] = 'Enregistrer';
+$labels['login-monitor-visible'] = 'Afficher dans l’historique';
+$labels['login-monitor-field-browser_name'] = 'Navigateur';
+$labels['login-monitor-field-browser_version'] = 'Version du navigateur';
+$labels['login-monitor-field-os_name'] = 'Système d’exploitation';
+$labels['login-monitor-field-os_version'] = 'Version du système';
+$labels['login-monitor-field-device_type'] = 'Type d’appareil';
+$labels['login-monitor-field-device_brand'] = 'Marque de l’appareil';
+$labels['login-monitor-field-device_model'] = 'Modèle de l’appareil';
+$labels['login-monitor-field-city'] = 'Ville (approximative)';
+$labels['login-monitor-field-country'] = 'Pays (approximatif)';
+$labels['login-monitor-field-ip_address'] = 'Adresse IP';
+$labels['login-monitor-field-user_agent'] = 'User-Agent brut';
+$labels['login-monitor-field-browser_engine'] = 'Moteur du navigateur';
+$labels['login-monitor-field-bot_detection'] = 'Détection des robots';
+$labels['login-monitor-tab-history'] = 'Historique des connexions';
+$labels['login-monitor-tab-preferences'] = 'Préférences';
+$labels['login-monitor-column-information'] = 'Informations';
+$labels['login-monitor-unavailable'] = 'Indisponible';
+$labels['login-monitor-history-pending'] = 'L’historique des connexions n’est pas encore disponible dans cette version.';
+$labels['login-monitor-history-intro'] = 'Vos connexions réussies figurent ci-dessous. Sélectionnez Détails pour consulter les informations enregistrées pour chaque connexion.';
+$labels['login-monitor-previous-title'] = 'Connexion réussie précédente';
+$labels['login-monitor-previous-unavailable'] = 'La connexion précédente sera affichée après votre prochaine connexion.';
+$labels['login-monitor-previous-none'] = 'Aucune connexion réussie antérieure n’a été enregistrée.';
+$labels['login-monitor-history-error'] = 'Impossible de charger l’historique des connexions. Réessayez plus tard.';
+$labels['login-monitor-history-title'] = 'Historique des connexions réussies';
+$labels['login-monitor-history-empty'] = 'Aucune connexion réussie enregistrée.';
+$labels['login-monitor-column-date'] = 'Date et heure';
+$labels['login-monitor-column-summary'] = 'Informations de connexion';
+$labels['login-monitor-column-details'] = 'Détails';
+$labels['login-monitor-current'] = 'Session actuelle';
+$labels['login-monitor-details-open'] = 'Détails';
+$labels['login-monitor-no-details'] = 'Non enregistré';
+$labels['login-monitor-page-previous'] = 'Précédent';
+$labels['login-monitor-page-next'] = 'Suivant';
+$labels['login-monitor-page-number'] = 'Page %s';
+$labels['login-monitor-pagination'] = 'Pages de l’historique des connexions';
+$labels['login-monitor-details-title'] = 'Détails de la connexion';
+$labels['login-monitor-details-close'] = 'Fermer';
+
+$labels['login-monitor-toast-hello'] = 'Bonjour';
+$labels['login-monitor-toast-last'] = 'Dernière connexion';
+$labels['login-monitor-toast-from'] = 'Depuis';
+$labels['login-monitor-toast-none'] = 'Aucune connexion précédente enregistrée';
+
+// END OF FILE

@@ -1,6 +1,22 @@
 # Roundcube Webmail Toolbox
 
 
+## Version 1.7.9 (2026-11-19, rc-1.7)
+
+### New Login Monitor tool
+
+- Added optional `login_monitor` module to record successful Roundcube logins.
+- Added browser, operating system and device detection using Matomo Device Detector.
+- Added optional offline IP geolocation using MaxMind GeoLite2 databases.
+- Added per-user preferences to independently control collection and visibility of login information.
+- Added MySQL and PostgreSQL schemas for login history and device records.
+- Added a previous successful login summary, paginated history and detailed login information dialog.
+- Added a welcome notification using Roundcube's native success toast, displaying the user's name, previous login timestamp and approximate location when available.
+- Integrated country flags using the Composer-managed `lipis/flag-icons` package.
+- Added Elastic light- and dark-mode support for the history interface and details dialog.
+- Added translations for all six supported languages: `en_US`, `en_GB`, `it_IT`, `fr_FR`, `de_DE` and `es_ES`.
+
+
 ## Version 1.7.8 (2026-11-18, rc-1.7)
 
 ### New Cloud tool

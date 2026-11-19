@@ -220,8 +220,6 @@ $labels['tags-reloadeditor'] = 'Editor neu laden';
 $labels['tags-reload'] = 'Tags neu laden';
 $labels['tags-defssavingclose'] = 'Tag-Definitionen werden gespeichert… Das Dialogfenster wird anschließend geschlossen.';
 
-/* Tags backend errors */
-/* Localised only at the user-facing response boundary. */
 $messages['tags-error-invalidrequest'] = 'Ungültige Tag-Anfrage';
 $messages['tags-error-missingmessage'] = 'Diese Nachricht ist in diesem Ordner nicht verfügbar';
 $messages['tags-error-missingtag'] = 'Diese Tag-Definition existiert nicht mehr';
@@ -257,6 +255,7 @@ $messages['tags-error-invalidvalue'] = 'Der Tag-Wert muss gültigen, nicht leere
 $messages['tags-error-invalidcolor'] = 'Ungültige Tag-Farbe';
 $messages['tags-error-unexpected'] = 'Der Tag-Vorgang konnte nicht abgeschlossen werden';
 
+
 /* Cloud */
 /* Author:  */
 
@@ -267,7 +266,6 @@ $labels['cloud-onedrive'] = 'Microsoft OneDrive';
 $labels['cloud-insertlink'] = 'Insert a link to a file';
 $labels['cloud-insertfile'] = 'Attach a file';
 
-/* Cloud Settings (PHP view) */
 $labels['cloud-ui-generate-recovery'] = 'Wiederherstellungsschlüssel erstellen';
 $labels['cloud-ui-create-title'] = 'Persönlichen Cloud-Tresor erstellen';
 $labels['cloud-ui-create-explanation'] = 'Wählen Sie ein Tresorpasswort (mindestens 12 Zeichen), einen generierten Wiederherstellungsschlüssel oder beides. Der Schlüssel wird nur einmal angezeigt.';
@@ -331,11 +329,6 @@ $labels['cloud-ui-next-entries'] = 'Nächste 100 Einträge';
 $labels['cloud-ui-save-recovery-title'] = 'Wiederherstellungsschlüssel jetzt sichern';
 $labels['cloud-ui-recovery-once-help'] = 'Der Wiederherstellungsschlüssel kann nicht erneut angezeigt werden. Bewahren Sie eine Kopie an einem sicheren Ort außerhalb dieses Webmail-Kontos auf.';
 $labels['cloud-ui-recovery-saved'] = 'Ich habe ihn gesichert — Schlüssel ausblenden';
-
-
-/* Cloud JavaScript interface */
-/* Author: Gianluca Giacometti */
-
 $labels['cloud-ui-unlocked'] = 'Entsperrt';
 $labels['cloud-ui-automatic-lock-in'] = 'Automatische Sperre in %s';
 $labels['cloud-ui-unlock-expired'] = 'Entsperrung abgelaufen.';
@@ -435,27 +428,6 @@ $labels['cloud-ui-compose-picker-unsupported'] = 'Dein Browser unterstützt die 
 $labels['cloud-ui-compose-secret-required'] = 'Gib dein Tresorpasswort oder den Wiederherstellungsschlüssel ein.';
 $labels['cloud-ui-compose-importing'] = 'Cloud-Anhang wird importiert…';
 
-/* Safe login */
-/* Author:  */
-
-$labels['safelogin'] = 'Safe login';
-$labels['safelogin-continent'] = 'Continent';
-$labels['safelogin-countryisocode'] = 'Country Code';
-$labels['safelogin-countryname'] = 'Country';
-$labels['safelogin-cityname'] = 'City';
-$labels['safelogin-location'] = 'Location';
-$labels['safelogin-lastlogin'] = 'Last login';
-$labels['safelogin-history'] = 'Access history';
-$labels['safelogin-browser'] = 'Browser';
-$labels['safelogin-os'] = 'Operating system';
-
-
-/* Folders */
-/* Author:  */
-
-$labels['folders'] = 'Riepilogo cartelle';
-$labels['folders-numberoffiles'] = 'Numero file';
-
 /* Cloud backend responses: translated only at user-facing boundaries */
 $labels['cloud-backend-unlock-failed'] = 'Tresor konnte nicht entsperrt werden. Prüfe das Passwort oder den Wiederherstellungsschlüssel.';
 $labels['cloud-backend-operation-failed'] = 'Cloud-Vorgang fehlgeschlagen. Prüfe die Details und Serverprotokolle.';
@@ -468,7 +440,12 @@ $labels['cloud-backend-personal-failed'] = 'OneDrive Personal-Autorisierung fehl
 $labels['cloud-backend-dropbox-success'] = 'Dropbox-Konto verbunden. Du kannst dieses Fenster schließen.';
 $labels['cloud-backend-dropbox-failed'] = 'Dropbox-Autorisierung fehlgeschlagen oder Tresorentsperrung abgelaufen. Du kannst dieses Fenster schließen.';
 
-/* Folders: read-only IMAP folder properties */
+
+/* Folders */
+/* Author:  */
+
+$labels['folders'] = 'Riepilogo cartelle';
+$labels['folders-numberoffiles'] = 'Numero file';
 $labels['folders-properties'] = 'Ordnereigenschaften';
 $labels['folders-folder'] = 'Ordner';
 $labels['folders-total'] = 'Nachrichten';
@@ -491,5 +468,56 @@ $labels['folders-namespace-other'] = 'Andere Benutzer';
 $labels['folders-namespace-shared'] = 'Freigegeben';
 $labels['folders-namespace-unknown'] = 'Unbekannt';
 
-// END OF FILE
 
+/* Folders */
+/* Author:  */
+
+$labels['login_monitor'] = 'Anmeldeaktivität';
+$labels['login-monitor-manage'] = 'Einstellungen für Anmeldungen';
+$labels['login-monitor-intro'] = 'Wählen Sie aus, welche Angaben bei künftigen Anmeldungen gespeichert und welche bereits gespeicherten Angaben im Verlauf angezeigt werden. Der Anmeldezeitpunkt wird immer erfasst.';
+$labels['login-monitor-collect'] = 'Speichern';
+$labels['login-monitor-visible'] = 'Im Verlauf anzeigen';
+$labels['login-monitor-field-browser_name'] = 'Browser';
+$labels['login-monitor-field-browser_version'] = 'Browserversion';
+$labels['login-monitor-field-os_name'] = 'Betriebssystem';
+$labels['login-monitor-field-os_version'] = 'Betriebssystemversion';
+$labels['login-monitor-field-device_type'] = 'Gerätetyp';
+$labels['login-monitor-field-device_brand'] = 'Gerätemarke';
+$labels['login-monitor-field-device_model'] = 'Gerätemodell';
+$labels['login-monitor-field-city'] = 'Stadt (ungefähr)';
+$labels['login-monitor-field-country'] = 'Land (ungefähr)';
+$labels['login-monitor-field-ip_address'] = 'IP-Adresse';
+$labels['login-monitor-field-user_agent'] = 'Originaler User-Agent';
+$labels['login-monitor-field-browser_engine'] = 'Browser-Engine';
+$labels['login-monitor-field-bot_detection'] = 'Bot-Erkennung';
+$labels['login-monitor-tab-history'] = 'Anmeldeverlauf';
+$labels['login-monitor-tab-preferences'] = 'Einstellungen';
+$labels['login-monitor-column-information'] = 'Informationen';
+$labels['login-monitor-unavailable'] = 'Nicht verfügbar';
+$labels['login-monitor-history-pending'] = 'Der Anmeldeverlauf ist in dieser Version noch nicht verfügbar.';
+$labels['login-monitor-history-intro'] = 'Ihre erfolgreichen Anmeldungen sind unten aufgeführt. Über Details sehen Sie die zu jeder Anmeldung gespeicherten Informationen.';
+$labels['login-monitor-previous-title'] = 'Vorherige erfolgreiche Anmeldung';
+$labels['login-monitor-previous-unavailable'] = 'Die vorherige Anmeldung wird nach Ihrer nächsten Anmeldung angezeigt.';
+$labels['login-monitor-previous-none'] = 'Es wurde keine frühere erfolgreiche Anmeldung erfasst.';
+$labels['login-monitor-history-error'] = 'Der Anmeldeverlauf konnte nicht geladen werden. Bitte versuchen Sie es später erneut.';
+$labels['login-monitor-history-title'] = 'Verlauf erfolgreicher Anmeldungen';
+$labels['login-monitor-history-empty'] = 'Es wurden keine erfolgreichen Anmeldungen erfasst.';
+$labels['login-monitor-column-date'] = 'Datum und Uhrzeit';
+$labels['login-monitor-column-summary'] = 'Anmeldeinformationen';
+$labels['login-monitor-column-details'] = 'Details';
+$labels['login-monitor-current'] = 'Aktuelle Sitzung';
+$labels['login-monitor-details-open'] = 'Details';
+$labels['login-monitor-no-details'] = 'Nicht erfasst';
+$labels['login-monitor-page-previous'] = 'Zurück';
+$labels['login-monitor-page-next'] = 'Weiter';
+$labels['login-monitor-page-number'] = 'Seite %s';
+$labels['login-monitor-pagination'] = 'Seiten des Anmeldeverlaufs';
+$labels['login-monitor-details-title'] = 'Anmeldedetails';
+$labels['login-monitor-details-close'] = 'Schließen';
+
+$labels['login-monitor-toast-hello'] = 'Hallo';
+$labels['login-monitor-toast-last'] = 'Letzte Anmeldung';
+$labels['login-monitor-toast-from'] = 'Aus';
+$labels['login-monitor-toast-none'] = 'Keine frühere erfolgreiche Anmeldung gespeichert';
+
+// END OF FILE

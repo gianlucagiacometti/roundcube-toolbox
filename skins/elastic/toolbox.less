@@ -78,6 +78,10 @@ input[type=radio]:checked + label:before {
     content: @fa-var-lock;
   }
 
+  &.login_monitor > td.section::before {
+    content: @fa-var-history;
+  }
+
   &.folders > td.section::before {
     content: @fa-var-folder-open;
   }
@@ -535,3 +539,5 @@ html.layout-phone {
     }
   }
 }
+
+/* END OF FILE */

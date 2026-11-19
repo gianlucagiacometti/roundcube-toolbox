@@ -1,0 +1,114 @@
+#!/bin/sh
+#
+# Install or update a local GeoLite2 City database for Toolbox Login Monitor.
+#
+# The data comes from the P3TERX/GeoLite.mmdb "download" branch. That branch
+# contains the MMDB files; the default branch does not. No Composer files or
+# Roundcube components are modified.
+#
+# Usage:
+#   ./scripts/install_login_monitor_geoip.sh [directory]
+#   ./scripts/install_login_monitor_geoip.sh --update [directory]
+#
+# With no directory argument, the checkout is placed under:
+#   tools/login_monitor/GeoLite.mmdb
+#
+
+set -eu
+
+REPOSITORY='https://github.com/P3TERX/GeoLite.mmdb.git'
+BRANCH='download'
+UPDATE=0
+DESTINATION=''
+
+for argument do
+    case "$argument" in
+        --update)
+            UPDATE=1
+            ;;
+        --help|-h)
+            printf '%s\n' \
+                'Usage: install_login_monitor_geoip.sh [--update] [directory]' \
+                'Without a directory, installs in tools/login_monitor/GeoLite.mmdb.' \
+                'An existing checkout is left untouched unless --update is given.'
+            exit 0
+            ;;
+        -*)
+            printf 'Unknown option: %s\n' "$argument" >&2
+            exit 2
+            ;;
+        *)
+            if [ -n "$DESTINATION" ]; then
+                printf '%s\n' 'Only one destination directory can be supplied.' >&2
+                exit 2
+            fi
+            DESTINATION=$argument
+            ;;
+    esac
+done
+
+if ! command -v git >/dev/null 2>&1; then
+    printf '%s\n' 'Git is required to install the GeoLite database.' >&2
+    exit 1
+fi
+
+if [ -z "$DESTINATION" ]; then
+    SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+    DESTINATION="$SCRIPT_DIR/../tools/login_monitor/GeoLite.mmdb"
+fi
+
+# Resolve the destination to an absolute path while allowing a new directory.
+PARENT=$(dirname -- "$DESTINATION")
+NAME=$(basename -- "$DESTINATION")
+if [ "$NAME" = '.' ] || [ "$NAME" = '..' ] || [ "$NAME" = '/' ]; then
+    printf '%s\n' 'The destination must be a new or existing directory name.' >&2
+    exit 2
+fi
+mkdir -p -- "$PARENT"
+PARENT=$(CDPATH= cd -- "$PARENT" && pwd -P)
+TARGET="$PARENT/$NAME"
+
+if [ ! -e "$TARGET" ] && [ ! -L "$TARGET" ]; then
+    git clone --depth 1 --single-branch --branch "$BRANCH" "$REPOSITORY" "$TARGET"
+    ACTION='Installed'
+else
+    if [ "$UPDATE" -ne 1 ]; then
+        printf 'Directory already exists: %s\n' "$TARGET" >&2
+        printf '%s\n' 'Use --update to refresh an existing P3TERX checkout.' >&2
+        exit 2
+    fi
+
+    # A refresh must not overwrite an unrelated directory or local changes.
+    if [ ! -d "$TARGET/.git" ]; then
+        printf '%s\n' 'Refusing to update: destination is not a Git checkout.' >&2
+        exit 2
+    fi
+    ORIGIN=$(git -C "$TARGET" remote get-url origin)
+    case "$ORIGIN" in
+        "$REPOSITORY"|https://github.com/P3TERX/GeoLite.mmdb|git@github.com:P3TERX/GeoLite.mmdb.git)
+            ;;
+        *)
+            printf '%s\n' 'Refusing to update: the checkout has a different origin.' >&2
+            exit 2
+            ;;
+    esac
+    if [ -n "$(git -C "$TARGET" status --porcelain)" ]; then
+        printf '%s\n' 'Refusing to update: the checkout has local changes.' >&2
+        exit 2
+    fi
+
+    # The publisher regularly replaces the download branch history, so a
+    # regular git pull may not work. Fetch its latest tip explicitly instead.
+    git -C "$TARGET" fetch --depth 1 origin "$BRANCH"
+    git -C "$TARGET" reset --hard FETCH_HEAD
+    ACTION='Updated'
+fi
+
+CITY_FILE="$TARGET/GeoLite2-City.mmdb"
+if [ ! -s "$CITY_FILE" ]; then
+    printf 'Expected city database is missing or empty: %s\n' "$CITY_FILE" >&2
+    exit 1
+fi
+
+printf '%s GeoLite2 City database:\n%s\n' "$ACTION" "$CITY_FILE"
+printf '%s\n' 'Configure toolbox_login_monitor_geoip_database with that absolute file path.'

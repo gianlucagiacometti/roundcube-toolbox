@@ -315,6 +315,176 @@ Roundcube localisation for `en_US`, `en_GB`, `it_IT`, `fr_FR`, `de_DE` and
 `es_ES`. Translations other than English/Italian should be reviewed by fluent
 speakers before being treated as final.
 
+### Login Monitor — Login Activity
+
+**Login Monitor helps Roundcube users review their previous successful logins and recognise potentially suspicious access to their mailboxes.** A login's date and time, browser, operating system, device description and approximate location can help users distinguish familiar activity from an unexpected login.
+
+The tool records successful logins; it does not record failed authentication attempts, prevent unauthorised access, verify a person's identity or uniquely identify a physical device. Browser and device information depends on what the client provides. In particular, desktop hardware models are often unavailable, and privacy-focused browsers may limit identification. An unfamiliar entry is a reason to investigate, not proof that an account was compromised.
+
+Each user can review their own login history in Roundcube's **Login Activity** settings and choose which optional details to collect and display. History is restricted to the authenticated Roundcube account.
+
+On the first mail page following a successful login, a one-time, dismissible Roundcube **confirmation** notification greets the user by their default identity name (or username), shows the previous successful login in the user's configured timezone and, if available and currently permitted for display, the approximate city. When a valid visible country code accompanies the city, the notification includes its flag. No location line is shown when the previous login has no GeoIP city, including private/local-network addresses. On the first recorded login, it displays a localized “no earlier login” message. The greeting is not repeated on mailbox refreshes.
+
+Flags use the [flag-icons](https://github.com/lipis/flag-icons) 4×3 SVGs (MIT licence), pinned to version `7.3.2`. The notification attempts to retrieve a single country image from jsDelivr only when a visible city and country code are available; a Unicode flag remains if the image cannot be loaded. **Privacy note:** an external flag request discloses the visitor's IP address and user-agent to the CDN. If this is inappropriate for your installation, replace the version-pinned URL in `js/toolbox.login_monitor.toast.js` with a locally served copy of `flag-icons/flags/4x3`, or remove the remote image loading block and use the emoji fallback only. No external geolocation request is made.
+
+
+#### Installation
+
+1. Install the Login Monitor tables in the **Roundcube user database**, using `SQL/mysql.login_monitor.sql` or `SQL/postgres.login_monitor.sql`, as appropriate. Login Monitor does not use the PostfixAdmin database. When upgrading an existing Login Monitor installation, apply the SQL migrations supplied for that version rather than running the initial schema again.
+2. Enable `login_monitor` in the `toolbox_tools` array in `plugins/toolbox/config.inc.php`:
+
+   ```php
+   $config['toolbox_tools'] = [
+       // Other enabled Toolbox modules...
+       'login_monitor',
+   ];
+   ```
+
+3. Configure the collection defaults and, if desired, the local GeoIP databases as described below.
+
+Login Monitor uses the existing Roundcube user preferences for personal settings; no separate preferences database is required.
+
+#### Browser and device detection
+
+[Matomo Device Detector](https://github.com/matomo-org/device-detector) identifies the browser and version, operating system and version, device type, and, when available, device manufacturer and model. It uses the browser's User-Agent and supported Client Hints. Missing or ambiguous details are left empty rather than guessed.
+
+For independent dependency management, the recommended installation uses the Composer project in `plugins/toolbox/tools/login_monitor/`:
+
+```sh
+cd plugins/toolbox/tools/login_monitor
+composer install --no-dev --no-plugins --no-scripts
+```
+
+This installs the optional PHP libraries from the component's own `composer.json` and `composer.lock`, without changing Roundcube's root Composer files. Compatible libraries may alternatively be installed through Roundcube's Composer environment or another available autoloader. When managing shared dependencies, review version compatibility, Composer plugin and script execution, and the inclusion of development dependencies.
+
+Without the detector library, login recording continues, but unavailable browser and device details remain empty.
+
+#### Administrator defaults and user preferences
+
+The administrator defines the initial field settings in `plugins/toolbox/config.inc.php` using `toolbox_login_monitor_fields`. Each field has two independent options:
+
+- **Collect:** whether the value is stored when a future successful login occurs.
+- **Visible:** whether an already stored value is returned for display in the user's own login history.
+
+Users can adjust these choices in **Login Activity** for the fields available on their installation. The preferences are saved with the user's Roundcube preferences and apply only to that account. Where no personal preference has been saved, the administrator's configured defaults apply. Availability of a field also depends on the relevant detection capability being configured.
+
+Administrators may additionally restrict user choices using the optional `toolbox_login_monitor_user_permissions` setting. For each field, `collect => false` prohibits collection and `visible => false` prohibits disclosure, regardless of saved personal preferences or initial defaults. Omitted flags permit user choice. For example:
+
+```php
+$config['toolbox_login_monitor_user_permissions'] = [
+    'ip_address' => ['collect' => false, 'visible' => false],
+    'user_agent' => ['collect' => false, 'visible' => false],
+];
+```
+
+The two configuration keys have different roles: `toolbox_login_monitor_fields` supplies initial settings; `toolbox_login_monitor_user_permissions` sets optional limits. Each user's selections are stored separately in their Roundcube preference `toolbox_login_monitor_user_fields`.
+
+Collection and visibility are independent: stopping collection does not delete historical values, and a previously recorded value can remain visible if visibility is enabled. Disabling visibility hides previously recorded values as well as new ones, without deleting them. Re-enabling collection affects subsequent logins only; it does not populate missing fields in older records. The login timestamp remains part of every history entry.
+
+The supplied defaults are:
+
+| Information | Collect | Visible |
+| --- | --- | --- |
+| Browser name and version | Yes | Yes |
+| Operating system name and version | Yes | Yes |
+| Device type, brand and model | Yes | Yes |
+| Approximate city and country | Yes | Yes |
+| IP address | No | No |
+| Raw User-Agent | No | No |
+| Browser engine | No | No |
+| Bot detection | No | No |
+
+The equivalent administrator configuration is:
+
+```php
+$config['toolbox_login_monitor_fields'] = [
+    'browser_name'    => ['collect' => true,  'visible' => true],
+    'browser_version' => ['collect' => true,  'visible' => true],
+    'os_name'         => ['collect' => true,  'visible' => true],
+    'os_version'      => ['collect' => true,  'visible' => true],
+    'device_type'     => ['collect' => true,  'visible' => true],
+    'device_brand'    => ['collect' => true,  'visible' => true],
+    'device_model'    => ['collect' => true,  'visible' => true],
+    'city'            => ['collect' => true,  'visible' => true],
+    'country'         => ['collect' => true,  'visible' => true],
+    'ip_address'      => ['collect' => false, 'visible' => false],
+    'user_agent'      => ['collect' => false, 'visible' => false],
+    'browser_engine'  => ['collect' => false, 'visible' => false],
+    'bot_detection'   => ['collect' => false, 'visible' => false],
+];
+```
+
+IP address, raw User-Agent and other optional technical fields are not stored by default. When enabled by the user, their values are stored with that account's login records and subject to its visibility preferences. Administrators remain responsible for configuring the service and meeting applicable data-protection requirements.
+
+#### Optional offline geolocation
+
+Login Monitor can identify an **approximate city and country** from the server-observed client IP using a local MaxMind-format MMDB database and the optional [`maxmind-db/reader`](https://github.com/maxmind/MaxMind-DB-Reader-php) library. Lookups run locally; no IP address is submitted to a third-party geolocation API. The IP address itself is not retained unless its independent collection option is enabled.
+
+City and country paths are configured separately in `plugins/toolbox/config.inc.php`:
+
+```php
+// City database, including the country information contained in City records.
+$config['toolbox_login_monitor_geoip_city_database'] =
+    __DIR__ . '/tools/login_monitor/GeoLite.mmdb/GeoLite2-City.mmdb';
+
+// Optional separate Country database. Leave empty to use the City database.
+$config['toolbox_login_monitor_geoip_country_database'] = '';
+```
+
+Both settings accept absolute filesystem paths to readable files, including compatible commercial GeoIP2 editions. The Country database is optional because City databases also contain country information. If only a Country database is configured, country lookup is available without city lookup. The corresponding user preference controls appear only when a suitable configured database is available.
+
+The recommended free-data setup uses [P3TERX/GeoLite.mmdb](https://github.com/P3TERX/GeoLite.mmdb). From `plugins/toolbox/`, run:
+
+```sh
+./scripts/install_login_monitor_geoip
+```
+
+The script checks out the repository's **`download` branch** into `tools/login_monitor/GeoLite.mmdb/`. That checkout includes `GeoLite2-City.mmdb`, `GeoLite2-Country.mmdb` and `GeoLite2-ASN.mmdb`. City alone is sufficient for both city and country lookup.
+
+An administrator may choose any other location:
+
+```sh
+./scripts/install_login_monitor_geoip /var/lib/roundcube/geoip/GeoLite.mmdb
+```
+
+Or clone the database repository directly:
+
+```sh
+git clone --depth 1 --single-branch --branch download \
+    https://github.com/P3TERX/GeoLite.mmdb.git /path/to/GeoLite.mmdb
+```
+
+After an alternative installation, point the relevant configuration setting to the actual MMDB file. The MMDB files are managed separately from Composer dependencies. To refresh the default checkout, run:
+
+```sh
+./scripts/install_login_monitor_geoip --update
+```
+
+Keep GeoIP databases current and follow the chosen provider's licensing and attribution requirements. P3TERX distributes MaxMind GeoLite2 data subject to MaxMind's terms; other compatible database providers may have different terms.
+
+City and country are estimates based on network routing, not verified physical locations. VPNs, mobile networks and internet providers can produce misleading results. Private, loopback, invalid and reserved source addresses are not geolocated. If Roundcube is accessed through an internal network or reverse proxy, `REMOTE_ADDR` may contain a private or proxy address; untrusted forwarded headers are not used as a substitute.
+
+#### Read-only login history
+
+The **Login history** tab lists successful logins, newest first, in pages of 15
+records. **Previous successful login** refers to the last recorded login before
+the current authenticated session; it becomes available after signing in with
+this version of Login Monitor. Each history entry has a **Details** dialog,
+which displays only the optional fields permitted by the user's current
+visibility preferences. Turning off collection does not conceal previously
+stored data while visibility remains enabled.
+
+Pagination reloads only the requested page from the Roundcube database. All
+history requests are scoped to the signed-in Roundcube account. No additional
+database tables, device-identification cookies, cleanup jobs or deletion
+controls are introduced by this read-only history view.
+
+#### Interpreting login history
+
+Review the time and combination of browser, operating system, device type and location when deciding whether a login is familiar. Browser names and versions may change following software updates; a shared or privacy-focused browser may identify itself differently, while two distinct devices may report identical details. A missing city, country, brand or model does not by itself indicate an error or suspicious activity.
+
+Login Monitor provides evidence to help users investigate unexpected activity, but does not replace account authentication, password security or other access controls.
+
 ### Additional password hashes
 
 `password_hashes` is a **background module**. Enabling it in `toolbox_tools`

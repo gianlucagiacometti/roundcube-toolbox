@@ -1,0 +1,15 @@
+{
+    "name": "gianlucagiacometti/toolbox-login-monitor-dependencies",
+    "description": "Isolated optional device-detection and GeoIP dependencies for Roundcube Toolbox Login Monitor",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "matomo/device-detector": "^6",
+        "maxmind-db/reader": "^1.14",
+        "lipis/flag-icons": "*"
+    },
+    "config": {
+        "allow-plugins": false,
+        "sort-packages": true
+    }
+}

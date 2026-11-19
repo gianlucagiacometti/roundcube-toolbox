@@ -108,7 +108,7 @@ $labels['purge-days'] = 'days';
 
 
 /* Preview */
-/* Author:  */
+/* Author: Gianluca Giacometti */
 
 $labels['preview'] = 'Message preview';
 $labels['preview-manage'] = 'Configure message preview';
@@ -217,8 +217,6 @@ $labels['tags-reloadeditor'] = 'Reload editor';
 $labels['tags-reload'] = 'Reload tags';
 $labels['tags-defssavingclose'] = 'Saving tag definitions… The dialog will close when saving finishes.';
 
-/* Tags backend errors */
-/* Localised only at the user-facing response boundary. */
 $messages['tags-error-invalidrequest'] = 'Invalid tag request';
 $messages['tags-error-missingmessage'] = 'Message is not available in this mailbox';
 $messages['tags-error-missingtag'] = 'This tag definition no longer exists';
@@ -254,6 +252,7 @@ $messages['tags-error-invalidvalue'] = 'Tag value must contain valid, nonempty t
 $messages['tags-error-invalidcolor'] = 'Invalid tag color';
 $messages['tags-error-unexpected'] = 'Could not complete the tag operation';
 
+
 /* Cloud */
 /* Author: Gianluca Giacometti */
 
@@ -264,7 +263,6 @@ $labels['cloud-onedrive'] = 'Microsoft OneDrive';
 $labels['cloud-insertlink'] = 'Insert a link to a file';
 $labels['cloud-insertfile'] = 'Attach a file';
 
-/* Cloud Settings (PHP view) */
 $labels['cloud-ui-generate-recovery'] = 'Generate a recovery key';
 $labels['cloud-ui-create-title'] = 'Create your personal Cloud vault';
 $labels['cloud-ui-create-explanation'] = 'Choose a vault password (at least 12 characters), a generated recovery key, or both. A recovery key is shown only once.';
@@ -328,11 +326,6 @@ $labels['cloud-ui-next-entries'] = 'Next 100 entries';
 $labels['cloud-ui-save-recovery-title'] = 'Save your recovery key now';
 $labels['cloud-ui-recovery-once-help'] = 'The recovery key cannot be shown again. Copy it to a safe place outside this webmail account.';
 $labels['cloud-ui-recovery-saved'] = 'I\'ve saved it — hide key';
-
-
-/* Cloud JavaScript interface */
-/* Author: Gianluca Giacometti */
-
 $labels['cloud-ui-unlocked'] = 'Unlocked';
 $labels['cloud-ui-automatic-lock-in'] = 'Automatic lock in %s';
 $labels['cloud-ui-unlock-expired'] = 'Unlock expired.';
@@ -432,28 +425,6 @@ $labels['cloud-ui-compose-picker-unsupported'] = 'Your browser does not support 
 $labels['cloud-ui-compose-secret-required'] = 'Enter your vault password or recovery key.';
 $labels['cloud-ui-compose-importing'] = 'Importing Cloud attachment…';
 
-/* Safe login */
-/* Author: Gianluca Giacometti */
-
-$labels['safelogin'] = 'Safe login';
-$labels['safelogin-continent'] = 'Continent';
-$labels['safelogin-countryisocode'] = 'Country Code';
-$labels['safelogin-countryname'] = 'Country';
-$labels['safelogin-cityname'] = 'City';
-$labels['safelogin-location'] = 'Location';
-$labels['safelogin-lastlogin'] = 'Last login';
-$labels['safelogin-history'] = 'Access history';
-$labels['safelogin-browser'] = 'Browser';
-$labels['safelogin-os'] = 'Operating system';
-
-
-/* Folders */
-/* Author: Gianluca Giacometti */
-
-$labels['folders'] = 'Riepilogo cartelle';
-$labels['folders-numberoffiles'] = 'Numero file';
-
-/* Cloud backend responses: translated only at user-facing boundaries */
 $labels['cloud-backend-unlock-failed'] = 'Unable to unlock the vault. Check your password or recovery key.';
 $labels['cloud-backend-operation-failed'] = 'Cloud operation failed. Check the details and server logs.';
 $labels['cloud-backend-google-success'] = 'Google Drive account connected. You may close this window.';
@@ -465,7 +436,12 @@ $labels['cloud-backend-personal-failed'] = 'OneDrive Personal authorization fail
 $labels['cloud-backend-dropbox-success'] = 'Dropbox account connected. You may close this window.';
 $labels['cloud-backend-dropbox-failed'] = 'Dropbox authorization failed or the vault unlock expired. You may close this window.';
 
-/* Folders: read-only IMAP folder properties */
+
+/* Folders */
+/* Author: Gianluca Giacometti */
+
+$labels['folders'] = 'Riepilogo cartelle';
+$labels['folders-numberoffiles'] = 'Numero file';
 $labels['folders-properties'] = 'Folder properties';
 $labels['folders-folder'] = 'Folder';
 $labels['folders-total'] = 'Messages';
@@ -488,5 +464,56 @@ $labels['folders-namespace-other'] = 'Other users';
 $labels['folders-namespace-shared'] = 'Shared';
 $labels['folders-namespace-unknown'] = 'Unknown';
 
-// END OF FILE
 
+/* Login Monitor */
+/* Author: Gianluca Giacometti */
+
+$labels['login_monitor'] = 'Login Activity';
+$labels['login-monitor-manage'] = 'Login activity preferences';
+$labels['login-monitor-intro'] = 'Choose which details to collect on future logins and which saved details to show in your history. Login time is always recorded.';
+$labels['login-monitor-collect'] = 'Collect';
+$labels['login-monitor-visible'] = 'Show in history';
+$labels['login-monitor-field-browser_name'] = 'Browser';
+$labels['login-monitor-field-browser_version'] = 'Browser version';
+$labels['login-monitor-field-os_name'] = 'Operating system';
+$labels['login-monitor-field-os_version'] = 'OS version';
+$labels['login-monitor-field-device_type'] = 'Device type';
+$labels['login-monitor-field-device_brand'] = 'Device brand';
+$labels['login-monitor-field-device_model'] = 'Device model';
+$labels['login-monitor-field-city'] = 'City (approximate)';
+$labels['login-monitor-field-country'] = 'Country (approximate)';
+$labels['login-monitor-field-ip_address'] = 'IP address';
+$labels['login-monitor-field-user_agent'] = 'Raw User-Agent';
+$labels['login-monitor-field-browser_engine'] = 'Browser engine';
+$labels['login-monitor-field-bot_detection'] = 'Bot detection';
+$labels['login-monitor-tab-history'] = 'Login history';
+$labels['login-monitor-tab-preferences'] = 'Preferences';
+$labels['login-monitor-column-information'] = 'Information';
+$labels['login-monitor-unavailable'] = 'Not available';
+$labels['login-monitor-history-pending'] = 'The login history view is not yet available in this version.';
+$labels['login-monitor-history-intro'] = 'Your successful sign-ins are listed below. Use Details to review the saved information for each login.';
+$labels['login-monitor-previous-title'] = 'Previous successful login';
+$labels['login-monitor-previous-unavailable'] = 'The previous login will appear after you sign in again.';
+$labels['login-monitor-previous-none'] = 'No earlier successful login was recorded.';
+$labels['login-monitor-history-error'] = 'Unable to load login history. Please try again later.';
+$labels['login-monitor-history-title'] = 'Successful login history';
+$labels['login-monitor-history-empty'] = 'No successful logins have been recorded.';
+$labels['login-monitor-column-date'] = 'Date and time';
+$labels['login-monitor-column-summary'] = 'Login information';
+$labels['login-monitor-column-details'] = 'Details';
+$labels['login-monitor-current'] = 'Current session';
+$labels['login-monitor-details-open'] = 'Details';
+$labels['login-monitor-no-details'] = 'Not recorded';
+$labels['login-monitor-page-previous'] = 'Previous';
+$labels['login-monitor-page-next'] = 'Next';
+$labels['login-monitor-page-number'] = 'Page %s';
+$labels['login-monitor-pagination'] = 'Login history pages';
+$labels['login-monitor-details-title'] = 'Login details';
+$labels['login-monitor-details-close'] = 'Close';
+
+$labels['login-monitor-toast-hello'] = 'Hello';
+$labels['login-monitor-toast-last'] = 'Last login';
+$labels['login-monitor-toast-from'] = 'From';
+$labels['login-monitor-toast-none'] = 'No earlier successful login recorded';
+
+// END OF FILE
