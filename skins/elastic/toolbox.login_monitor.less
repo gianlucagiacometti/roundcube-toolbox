@@ -282,6 +282,13 @@ html.dark-mode .toolbox-login-monitor-dialog {
     justify-content: flex-end;
 }
 
+/**
+ * Login Monitor - Welcome toast
+ *
+ * Uses Roundcube's native confirmation notification.
+ * Background and text colors are inherited from Roundcube.
+ */
+
 .toolbox-login-monitor-toast {
     display: block;
     line-height: 1.45;
@@ -294,22 +301,22 @@ html.dark-mode .toolbox-login-monitor-dialog {
     strong {
         font-weight: 700;
     }
-}
 
-.toolbox-lm-toast-flag {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 1.25em;
-    vertical-align: -0.12em;
-    white-space: nowrap;
-}
+    .toolbox-lm-toast-flag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.25em;
+        vertical-align: -0.12em;
+        white-space: nowrap;
 
-.toolbox-lm-toast-flag-image {
-    display: block;
-    width: 1.33em;
-    height: 1em;
-    object-fit: cover;
+        .toolbox-lm-toast-flag-image {
+            display: block;
+            width: 1.33em;
+            height: 1em;
+            object-fit: cover;
+        }
+    }
 }
 
 @media (max-width: 580px) {

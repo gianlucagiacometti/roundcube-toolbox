@@ -75,7 +75,7 @@ final class toolbox_tool_login_monitor extends toolbox_tool_module
 
             // Consume only after the response has its data and assets attached.
             $this->rcube->output->set_env('toolbox_lm_toast', $payload);
-            $this->plugin->include_stylesheet($this->plugin->local_skin_path() . '/toolbox.login_monitor.toast.css');
+            $this->plugin->include_stylesheet($this->plugin->local_skin_path() . '/toolbox.login_monitor.css');
             $this->plugin->include_script('js/toolbox.login_monitor.toast.js');
             unset($_SESSION['toolbox_lm_toast_pending']);
         } catch (\Throwable $exception) {

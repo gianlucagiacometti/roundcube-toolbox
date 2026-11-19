@@ -5,7 +5,7 @@ ALTER SEQUENCE public.toolbox_login_monitor_devices_seq
 
 CREATE TABLE public.toolbox_login_monitor_devices (
     id BIGINT NOT NULL DEFAULT nextval('public.toolbox_login_monitor_devices_seq'::regclass) PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES public.users(user_id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES public.users(user_id),
     token_digest CHAR(64) NOT NULL,
     first_seen_at BIGINT NOT NULL,
     last_seen_at BIGINT NOT NULL,
@@ -34,7 +34,7 @@ ALTER SEQUENCE public.toolbox_login_monitor_logins_seq
 
 CREATE TABLE public.toolbox_login_monitor_logins (
     id BIGINT NOT NULL DEFAULT nextval('public.toolbox_login_monitor_logins_seq'::regclass) PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES public.users(user_id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES public.users(user_id),
     device_id BIGINT REFERENCES public.toolbox_login_monitor_devices(id) ON DELETE SET NULL,
     logged_in_at BIGINT NOT NULL,
     device_type VARCHAR(32),

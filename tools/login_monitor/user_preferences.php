@@ -18,7 +18,8 @@ final class toolbox_login_monitor_user_preferences
      *
      * An omitted permission defaults to true. Explicit false means the field
      * cannot be collected or exposed, irrespective of saved user preferences.
-     * City and country are unavailable without a readable configured MMDB file.
+     * City/country collection requires a readable MMDB file; historical
+ * visibility remains independent of database availability.
      *
      * @param object $config Roundcube configuration provider with get().
      * @return array<string, array{collect: bool, visible: bool}>
@@ -61,11 +62,14 @@ final class toolbox_login_monitor_user_preferences
             $countryPath = $cityPath;
         }
 
+        // An unavailable GeoIP database prevents new collection, not display
+        // of previously stored city/country values. Administrator restrictions
+        // and user visibility preferences still apply independently.
         if (!self::database_available($cityPath)) {
-            $permissions['city'] = ['collect' => false, 'visible' => false];
+            $permissions['city']['collect'] = false;
         }
         if (!self::database_available($countryPath)) {
-            $permissions['country'] = ['collect' => false, 'visible' => false];
+            $permissions['country']['collect'] = false;
         }
 
         return $permissions;

@@ -47,6 +47,7 @@ JavaScript module.
 | `tags` | Manage personal tag names and values, assign them to messages, display badges, and search by tag name or value. |
 | `folders` | View read-only IMAP folder properties, message counts and on-demand folder size. |
 | `cloud` | Connect read-only cloud storage accounts, browse remote files and attach selected files to composed messages. |
+| `login_monitor` | Record successful logins and review recent account activity, device details and optional offline location information. |
 | `password_hashes` | **Background only:** store configurable additional password hashes after a successful Roundcube password change. No Settings tab. |
 
 ## Installation
@@ -74,6 +75,8 @@ JavaScript module.
    the applicable `SQL/mysql.cloud.sql` or `SQL/postgres.cloud.sql` script,
    configure at least one provider or WebDAV, and verify HTTPS callbacks.
    See [Cloud storage attachments](#cloud-storage-attachments).
+8. To use Login Monitor, install its SQL tables and local Composer dependencies
+   as described in [Login Monitor — Login Activity](#login-monitor--login-activity).
 
 If downloading a GitHub archive, rename its extracted plugin directory to
 `toolbox`. Composer installations can use the Roundcube plugin installer.
@@ -325,7 +328,12 @@ Each user can review their own login history in Roundcube's **Login Activity** s
 
 On the first mail page following a successful login, a one-time, dismissible Roundcube **confirmation** notification greets the user by their default identity name (or username), shows the previous successful login in the user's configured timezone and, if available and currently permitted for display, the approximate city. When a valid visible country code accompanies the city, the notification includes its flag. No location line is shown when the previous login has no GeoIP city, including private/local-network addresses. On the first recorded login, it displays a localized “no earlier login” message. The greeting is not repeated on mailbox refreshes.
 
-Flags use the [flag-icons](https://github.com/lipis/flag-icons) 4×3 SVGs (MIT licence), pinned to version `7.3.2`. The notification attempts to retrieve a single country image from jsDelivr only when a visible city and country code are available; a Unicode flag remains if the image cannot be loaded. **Privacy note:** an external flag request discloses the visitor's IP address and user-agent to the CDN. If this is inappropriate for your installation, replace the version-pinned URL in `js/toolbox.login_monitor.toast.js` with a locally served copy of `flag-icons/flags/4x3`, or remove the remote image loading block and use the emoji fallback only. No external geolocation request is made.
+Country flags use the MIT-licensed [flag-icons](https://github.com/lipis/flag-icons)
+4×3 SVGs installed locally through the Login Monitor Composer project. PHP
+reads the required SVG from `tools/login_monitor/vendor/` and embeds it in the
+notification as an image data URI; the browser makes no CDN request. A Unicode
+country flag is used if the SVG or its Composer dependency is unavailable.
+Neither flags nor GeoIP lookups require external requests from the browser.
 
 
 #### Installation
@@ -341,6 +349,13 @@ Flags use the [flag-icons](https://github.com/lipis/flag-icons) 4×3 SVGs (MIT l
    ```
 
 3. Configure the collection defaults and, if desired, the local GeoIP databases as described below.
+4. Compile `skins/elastic/toolbox.login_monitor.less` to
+   `skins/elastic/toolbox.login_monitor.css`. This single LESS source includes
+   Login Monitor Settings, history, dialog and welcome-toast styles:
+
+   ```sh
+   lessc skins/elastic/toolbox.login_monitor.less skins/elastic/toolbox.login_monitor.css
+   ```
 
 Login Monitor uses the existing Roundcube user preferences for personal settings; no separate preferences database is required.
 
@@ -355,9 +370,28 @@ cd plugins/toolbox/tools/login_monitor
 composer install --no-dev --no-plugins --no-scripts
 ```
 
-This installs the optional PHP libraries from the component's own `composer.json` and `composer.lock`, without changing Roundcube's root Composer files. Compatible libraries may alternatively be installed through Roundcube's Composer environment or another available autoloader. When managing shared dependencies, review version compatibility, Composer plugin and script execution, and the inclusion of development dependencies.
+This installs Matomo Device Detector, the MaxMind database reader and
+flag-icons from the component's own `composer.json` and `composer.lock`,
+without changing Roundcube's root Composer files. The `vendor/` directory is
+not distributed with Toolbox; install these dependencies on each deployment.
 
-Without the detector library, login recording continues, but unavailable browser and device details remain empty.
+To update the component dependencies and lock file, run the included helper
+from the Toolbox root:
+
+```sh
+./scripts/update_login_monitor_composer
+```
+
+The helper changes into `tools/login_monitor/` and runs
+`composer-update --no-dev` when available, otherwise `composer update --no-dev`.
+For reproducible deployment of the committed lock file, use `composer install`
+instead. Compatible libraries may alternatively be provided by an existing
+Composer autoloader, except that local flag images are loaded from the
+Login Monitor component's own vendor installation.
+
+Without the detector library, login recording continues, but unavailable
+browser and device details remain empty. Without flag-icons, the toast uses a
+Unicode flag when a country code is available.
 
 #### Administrator defaults and user preferences
 
@@ -366,7 +400,11 @@ The administrator defines the initial field settings in `plugins/toolbox/config.
 - **Collect:** whether the value is stored when a future successful login occurs.
 - **Visible:** whether an already stored value is returned for display in the user's own login history.
 
-Users can adjust these choices in **Login Activity** for the fields available on their installation. The preferences are saved with the user's Roundcube preferences and apply only to that account. Where no personal preference has been saved, the administrator's configured defaults apply. Availability of a field also depends on the relevant detection capability being configured.
+Users can adjust these choices in **Login Activity**. The preferences are saved
+with the user's Roundcube preferences and apply only to that account. Where no
+personal preference has been saved, the administrator's configured defaults
+apply. Unavailable GeoIP databases prevent new city/country collection but do
+not remove visibility controls for historical records.
 
 Administrators may additionally restrict user choices using the optional `toolbox_login_monitor_user_permissions` setting. For each field, `collect => false` prohibits collection and `visible => false` prohibits disclosure, regardless of saved personal preferences or initial defaults. Omitted flags permit user choice. For example:
 
@@ -431,7 +469,14 @@ $config['toolbox_login_monitor_geoip_city_database'] =
 $config['toolbox_login_monitor_geoip_country_database'] = '';
 ```
 
-Both settings accept absolute filesystem paths to readable files, including compatible commercial GeoIP2 editions. The Country database is optional because City databases also contain country information. If only a Country database is configured, country lookup is available without city lookup. The corresponding user preference controls appear only when a suitable configured database is available.
+Both settings accept absolute filesystem paths to readable files, including
+compatible commercial GeoIP2 editions. The Country database is optional because
+City databases also contain country information. If only a Country database is
+configured, country lookup is available without city lookup. If a configured
+GeoIP database is missing or unreadable, new collection of its city or country
+field is disabled, but previously stored values remain visible according to
+administrator and user visibility preferences. City and country are handled
+independently.
 
 The recommended free-data setup uses [P3TERX/GeoLite.mmdb](https://github.com/P3TERX/GeoLite.mmdb). From `plugins/toolbox/`, run:
 
