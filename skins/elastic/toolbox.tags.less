@@ -1,497 +1,474 @@
 /**
- * Toolbox Tags styles for the Elastic skin.
- *
- * Compile this standalone source to toolbox.tags.css beside this file.
- * Sections: shared values, definition editor, message badges, list tags, and modal.
+ * Toolbox Tags definition editor, mail badges and assignment dialog.
  */
 
-// Shared values remain scoped to this tool and preserve the existing appearance.
-@toolbox-tags-tree-border: var(--color-border, #d1d5db);
-@toolbox-tags-muted: var(--color-text-muted, #737373);
+@import (reference) "toolbox.less";
+
+// Existing Tags theme variables default to the shared palette.
+@toolbox-tags-tree-border: @toolbox-panel-border;
+@toolbox-tags-muted: @toolbox-muted-text;
+@toolbox-tags-soft-border: @toolbox-soft-border;
+@toolbox-tags-error: @toolbox-error;
+@toolbox-tags-error-dark: @toolbox-error-dark;
 @toolbox-tags-child-indent: 1.7rem;
 @toolbox-tags-control-radius: .3rem;
 @toolbox-tags-panel-radius: .5rem;
-@toolbox-tags-soft-border: rgba(128, 128, 128, .35);
-@toolbox-tags-error: #b42318;
-@toolbox-tags-error-dark: #ffb4ab;
 
-// Definition editor: parent tag groups and their child values.
-.toolbox-tags-manager {
-    max-width: 780px;
-    width: 100%;
-}
-
-// The list display is optional because tagged messages gain one compact line.
-.toolbox-tags-preference {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: .35rem .5rem;
-    margin-bottom: 1rem;
-
-    input {
-        flex: 0 0 auto;
-        margin: 0;
-    }
-
-    label {
-        flex: 1;
-        min-width: 0;
-        margin: 0;
-        cursor: pointer;
-    }
-}
-
-.toolbox-tags-preference-help {
-    flex: 0 0 100%;
-    margin: 0;
-    color: @toolbox-tags-muted;
-    font-size: .9rem;
-}
-
-.toolbox-tags-toolbar {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 1rem;
-}
-
-.toolbox-tags-toolbar .button,
-.toolbox-tags-editor-actions .button {
-    display: inline-flex;
-    align-items: center;
-    gap: .4rem;
-}
-
-.toolbox-tags-tree,
-.toolbox-tags-values {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.toolbox-tags-group {
-    padding: .6rem .8rem;
-    margin-bottom: .6rem;
-    border: 1px solid @toolbox-tags-tree-border;
-    border-radius: @toolbox-tags-panel-radius;
-
-    summary {
-        display: list-item;
-        cursor: pointer;
-        font-size: 1rem;
-    }
-}
-
-.toolbox-tags-group summary svg,
-.toolbox-tags-value > svg,
-.toolbox-tags-toolbar svg {
-    vertical-align: middle;
-    margin-right: .4rem;
-}
-
-.toolbox-tags-count {
-    display: inline-block;
-    margin-left: .6rem;
-    padding: 0 .4rem;
-    border-radius: .6rem;
-    background: var(--color-background-alt, #f3f4f6);
-    font-size: .75rem;
-}
-
-.toolbox-tags-values {
-    padding-left: @toolbox-tags-child-indent;
-    margin-top: .4rem;
-}
-
-.toolbox-tags-actions {
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: .3rem;
-}
-
-.toolbox-tags-group > details > .toolbox-tags-actions {
-    display: flex;
-    margin: .5rem 0 .2rem @toolbox-tags-child-indent;
-}
-
-.toolbox-tags-button {
-    border: 0;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .25rem;
-    border-radius: @toolbox-tags-control-radius;
-    padding: .3rem;
-    min-width: 2rem;
-    min-height: 2rem;
-
-    &:hover,
-    &:focus-visible {
-        background: var(--color-background-alt, #e5e7eb);
-    }
-
-    &.danger:hover,
-    &.danger:focus-visible {
-        color: @toolbox-tags-error;
-    }
-}
-
-.toolbox-tags-value {
-    display: flex;
-    align-items: center;
-    gap: .6rem;
-    min-height: 2.4rem;
-    padding: .15rem .3rem;
-}
-
-.toolbox-tags-value-name {
-    flex: 1;
-    overflow-wrap: anywhere;
-}
-
-// The same color swatch is used by the editor, message badges, and chooser.
-.toolbox-tags-swatch {
-    display: inline-block;
-    flex: 0 0 1rem;
-    width: 1rem;
-    height: 1rem;
-    border: 1px solid rgba(0, 0, 0, .15);
-    border-radius: 50%;
-}
-
-.toolbox-tags-empty,
-.toolbox-tags-archive,
-.toolbox-tags-removed,
-.toolbox-tags-value.is-archived {
-    color: @toolbox-tags-muted;
-}
-
-.toolbox-tags-empty {
-    padding: .5rem;
-}
-
-.toolbox-tags-archive {
-    margin: .8rem 0;
-}
-
-.toolbox-tags-editor {
-    margin-top: 1rem;
-    padding: 1rem;
-    border: 1px solid @toolbox-tags-tree-border;
-    border-radius: @toolbox-tags-panel-radius;
-}
-
-.toolbox-tags-editor[hidden],
-.toolbox-tags-field[hidden],
-.toolbox-tags-parent[hidden] {
-    display: none !important;
-}
-
-.toolbox-tags-editor h3 {
-    margin: 0 0 .8rem;
-}
-
-.toolbox-tags-field {
-    display: flex;
-    flex-direction: column;
-    gap: .3rem;
-    margin-bottom: .8rem;
-
-    input[type="text"] {
-        width: 100%;
-        max-width: 28rem;
-        box-sizing: border-box;
-    }
-
-    input[type="color"] {
-        width: 4rem;
-        height: 2.5rem;
-        padding: .15rem;
-        cursor: pointer;
-    }
-}
-
-.toolbox-tags-editor-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .5rem;
-}
-
-// Mail entry points: Elastic and ContextMenu use the same command icon.
+// Elastic toolbar icon.
 a.toolbox-tags:before {
-    font-family: Icons;
-    font-style: normal;
-    font-weight: 900;
+    .toolbox-icon-font();
     content: "\f02c";
 }
 
-// Applied tags remain outside the collapsible message-header details.
-.toolbox-tags-summary {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: .5rem .7rem;
-    margin-top: .8rem;
-    padding-top: .7rem;
-    border-top: 1px solid rgba(128, 128, 128, .3);
-}
-
-.toolbox-tags-badges {
-    display: flex;
-    flex: 1;
-    flex-wrap: wrap;
-    gap: .35rem;
-    min-width: 0;
-}
-
-.toolbox-tags-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: .35rem;
-    max-width: 100%;
-    padding: .2rem .5rem;
-    border: 1px solid @toolbox-tags-soft-border;
-    border-radius: 1rem;
-    background: rgba(128, 128, 128, .08);
-    font-size: .9rem;
-
-    > span:last-child {
-        min-width: 0;
-        overflow-wrap: anywhere;
-    }
-
-    .toolbox-tags-swatch {
-        flex-basis: .7rem;
-        width: .7rem;
-        height: .7rem;
-    }
-}
-
-.toolbox-tags-none {
-    font-size: .9rem;
-    opacity: .8;
-}
-
-.toolbox-tags-edit {
-    padding: .3rem .6rem;
-    border: 1px solid rgba(128, 128, 128, .45);
-    border-radius: @toolbox-tags-control-radius;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    white-space: nowrap;
-    cursor: pointer;
-
-    &:hover,
-    &:focus-visible {
-        background: rgba(128, 128, 128, .15);
-    }
-}
-
-// Message list: at most two short badges plus a count, always on one extra line.
-// Scope and line heights must outrank Elastic's td.subject span defaults.
-.messagelist td.subject {
-    .toolbox-tags-list-line {
-        display: flex;
-        flex: 0 0 100%;
-        flex-wrap: nowrap;
-        align-items: center;
-        gap: .25rem;
+.toolbox-tags {
+    // Definition editor.
+    &-manager {
+        max-width: 780px;
         width: 100%;
-        min-width: 0;
-        max-width: 100%;
-        margin: .15rem 0 .25rem;
-        overflow: hidden;
-        white-space: nowrap;
-        font-size: .75rem;
-        font-weight: normal;
-        line-height: 1.2;
     }
 
-    .toolbox-tags-list-badge {
-        display: inline-flex;
-        flex: 0 1 auto;
-        align-items: center;
-        gap: .25rem;
-        min-width: 0;
-        max-width: 100%;
-        padding: .1rem .35rem;
-        border: 1px solid @toolbox-tags-soft-border;
+    &-preference {
+        .toolbox-wrapping-row(.35rem .5rem);
+        margin-bottom: 1rem;
+
+        input {
+            flex: 0 0 auto;
+            margin: 0;
+        }
+
+        label {
+            flex: 1;
+            min-width: 0;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        &-help {
+            flex: 0 0 100%;
+            margin: 0;
+            color: @toolbox-tags-muted;
+            font-size: .9rem;
+        }
+    }
+
+    &-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+    }
+
+    &-toolbar,
+    &-editor-actions {
+        .button {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+        }
+    }
+
+    &-tree,
+    &-values {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    &-group {
+        padding: .6rem .8rem;
+        margin-bottom: .6rem;
+        border: 1px solid @toolbox-tags-tree-border;
+        border-radius: @toolbox-tags-panel-radius;
+
+        summary {
+            display: list-item;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        > details > .toolbox-tags-actions {
+            display: flex;
+            margin: .5rem 0 .2rem @toolbox-tags-child-indent;
+        }
+    }
+
+    &-group summary svg,
+    &-value > svg,
+    &-toolbar svg {
+        vertical-align: middle;
+        margin-right: .4rem;
+    }
+
+    &-count {
+        display: inline-block;
+        margin-left: .6rem;
+        padding: 0 .4rem;
         border-radius: .6rem;
-        overflow: hidden;
-        background: rgba(128, 128, 128, .08);
-        line-height: 1.2;
+        background: var(--color-background-alt, #f3f4f6);
+        font-size: .75rem;
     }
 
-    .toolbox-tags-list-text {
+    &-values {
+        padding-left: @toolbox-tags-child-indent;
+        margin-top: .4rem;
+    }
+
+    &-actions {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: .3rem;
+    }
+
+    &-button {
+        .toolbox-plain-button();
+        .toolbox-inline-center();
+        border: 0;
+        gap: .25rem;
+        border-radius: @toolbox-tags-control-radius;
+        padding: .3rem;
+        min-width: 2rem;
+        min-height: 2rem;
+
+        &:hover,
+        &:focus-visible {
+            background: var(--color-background-alt, #e5e7eb);
+        }
+
+        &.danger {
+            &:hover,
+            &:focus-visible {
+                color: @toolbox-tags-error;
+            }
+        }
+    }
+
+    &-value {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        min-height: 2.4rem;
+        padding: .15rem .3rem;
+
+        &-name {
+            flex: 1;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    // The editor, mail badges and chooser all use this swatch.
+    &-swatch {
+        display: inline-block;
+        flex: 0 0 1rem;
+        .toolbox-square(1rem);
+        border: 1px solid rgba(0, 0, 0, .15);
+        border-radius: 50%;
+    }
+
+    &-empty,
+    &-archive,
+    &-removed,
+    &-value.is-archived {
+        color: @toolbox-tags-muted;
+    }
+
+    &-empty {
+        padding: .5rem;
+    }
+
+    &-archive {
+        margin: .8rem 0;
+    }
+
+    &-editor[hidden],
+    &-field[hidden],
+    &-parent[hidden],
+    &-dialog [hidden],
+    &-status:empty {
+        display: none !important;
+    }
+
+    &-field {
+        .toolbox-flex-column(.3rem);
+        margin-bottom: .8rem;
+
+        input {
+            &[type="text"] {
+                width: 100%;
+                max-width: 28rem;
+                box-sizing: border-box;
+            }
+
+            &[type="color"] {
+                width: 4rem;
+                height: 2.5rem;
+                padding: .15rem;
+                cursor: pointer;
+            }
+        }
+    }
+
+    &-editor {
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid @toolbox-tags-tree-border;
+        border-radius: @toolbox-tags-panel-radius;
+
+        h3 {
+            margin: 0 0 .8rem;
+        }
+
+        &-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+    }
+
+    // Applied tags above the collapsible message details.
+    &-summary {
+        .toolbox-wrapping-row(.5rem .7rem);
+        margin-top: .8rem;
+        padding-top: .7rem;
+        border-top: 1px solid rgba(128, 128, 128, .3);
+    }
+
+    &-badges {
+        display: flex;
+        flex: 1;
+        flex-wrap: wrap;
+        gap: .35rem;
         min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        line-height: 1.2;
     }
 
-    .toolbox-tags-list-badge .toolbox-tags-swatch {
-        flex: 0 0 .55rem;
-        width: .55rem;
-        height: .55rem;
-        line-height: 1;
-    }
-
-    .toolbox-tags-list-more {
-        flex: 0 0 auto;
-        padding: .1rem .2rem;
-        line-height: 1.2;
-    }
-}
-
-// Modal layout: retain the bounded flex chain and its resize behavior.
-.toolbox-tags-popup > .ui-dialog-content {
-    overflow: hidden;
-}
-
-.toolbox-tags-dialog {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-height: 0;
-    min-width: 0;
-}
-
-.toolbox-tags-assignment,
-.toolbox-tags-definition-panel {
-    flex: 1 1 0%;
-    min-height: 0;
-    min-width: 0;
-}
-
-.toolbox-tags-assignment {
-    overflow: auto;
-}
-
-.toolbox-tags-definition-panel {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    > .toolbox-tags-status,
-    > button {
-        flex: 0 0 auto;
-    }
-
-    > button {
-        align-self: flex-start;
-    }
-}
-
-// Message-tag chooser and request status.
-.toolbox-tags-options {
-    display: grid;
-    gap: .75rem;
-}
-
-.toolbox-tags-option-group {
-    min-width: 0;
-    padding: .5rem .7rem .7rem;
-    border: 1px solid @toolbox-tags-soft-border;
-    border-radius: @toolbox-tags-control-radius;
-
-    legend {
-        width: auto;
+    &-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
         max-width: 100%;
-        padding: 0 .25rem;
-        margin: 0;
-        font-size: 1rem;
-        font-weight: 600;
-        overflow-wrap: anywhere;
-    }
-}
+        padding: .2rem .5rem;
+        border: 1px solid @toolbox-tags-soft-border;
+        border-radius: 1rem;
+        background: rgba(128, 128, 128, .08);
+        font-size: .9rem;
 
-.toolbox-tags-choice {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    margin: 0;
-    padding: .4rem 0;
-    cursor: pointer;
+        > span:last-child {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
 
-    > input {
-        flex: 0 0 auto;
-        margin: 0;
+        .toolbox-tags-swatch {
+            flex-basis: .7rem;
+            .toolbox-square(.7rem);
+        }
     }
 
-    > span:last-child {
+    &-none {
+        font-size: .9rem;
+        opacity: .8;
+    }
+
+    &-edit {
+        .toolbox-plain-button();
+        padding: .3rem .6rem;
+        border: 1px solid @toolbox-control-border;
+        border-radius: @toolbox-tags-control-radius;
+        font: inherit;
+        white-space: nowrap;
+
+        &:hover,
+        &:focus-visible {
+            background: rgba(128, 128, 128, .15);
+        }
+    }
+
+    // Elastic's subject cell constrains the second line of badges.
+    .messagelist td.subject &-list {
+        &-line {
+            display: flex;
+            flex: 0 0 100%;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: .25rem;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            margin: .15rem 0 .25rem;
+            overflow: hidden;
+            white-space: nowrap;
+            font-size: .75rem;
+            font-weight: normal;
+            line-height: 1.2;
+        }
+
+        &-badge {
+            display: inline-flex;
+            flex: 0 1 auto;
+            align-items: center;
+            gap: .25rem;
+            min-width: 0;
+            max-width: 100%;
+            padding: .1rem .35rem;
+            border: 1px solid @toolbox-tags-soft-border;
+            border-radius: .6rem;
+            overflow: hidden;
+            background: rgba(128, 128, 128, .08);
+            line-height: 1.2;
+
+            .toolbox-tags-swatch {
+                flex: 0 0 .55rem;
+                .toolbox-square(.55rem);
+                line-height: 1;
+            }
+        }
+
+        &-text {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        &-more {
+            flex: 0 0 auto;
+            padding: .1rem .2rem;
+            line-height: 1.2;
+        }
+    }
+
+    // The scrollable assignment and definition panels share the dialog height.
+    &-dialog {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
         min-width: 0;
+    }
+
+    &-assignment,
+    &-definition-panel {
+        flex: 1 1 0%;
+        min-height: 0;
+        min-width: 0;
+    }
+
+    &-assignment {
+        overflow: auto;
+    }
+
+    &-definition-panel {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        > .toolbox-tags-status,
+        > button {
+            flex: 0 0 auto;
+        }
+
+        > button {
+            align-self: flex-start;
+        }
+    }
+
+    &-options {
+        display: grid;
+        gap: .75rem;
+    }
+
+    &-option-group {
+        min-width: 0;
+        padding: .5rem .7rem .7rem;
+        border: 1px solid @toolbox-tags-soft-border;
+        border-radius: @toolbox-tags-control-radius;
+
+        legend {
+            width: auto;
+            max-width: 100%;
+            padding: 0 .25rem;
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    &-choice {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin: 0;
+        padding: .4rem 0;
+        cursor: pointer;
+
+        > input {
+            flex: 0 0 auto;
+            margin: 0;
+
+            &:disabled {
+                cursor: wait;
+            }
+        }
+
+        > span:last-child {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    &-status {
+        margin: .75rem 0 .5rem;
         overflow-wrap: anywhere;
+
+        &.is-error {
+            .toolbox-error-text(@toolbox-tags-error; @toolbox-tags-error-dark);
+        }
     }
 
-    > input:disabled {
-        cursor: wait;
-    }
-}
-
-.toolbox-tags-status {
-    margin: .75rem 0 .5rem;
-    overflow-wrap: anywhere;
-}
-
-.toolbox-tags-status:empty,
-.toolbox-tags-dialog [hidden] {
-    display: none !important;
-}
-
-.toolbox-tags-status.is-error {
-    color: @toolbox-tags-error;
-}
-
-html.dark-mode .toolbox-tags-status.is-error {
-    color: @toolbox-tags-error-dark;
-}
-
-// Navigation between assignment and the existing definition editor.
-.toolbox-tags-views {
-    display: flex;
-    flex: 0 0 auto;
-    gap: .4rem;
-    padding-bottom: .7rem;
-    margin-bottom: .8rem;
-    border-bottom: 1px solid rgba(128, 128, 128, .3);
-}
-
-.toolbox-tags-view {
-    flex: 1;
-    padding: .5rem .6rem;
-    border: 1px solid rgba(128, 128, 128, .4);
-    border-radius: @toolbox-tags-control-radius;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-
-    &[aria-pressed="true"] {
-        background: rgba(128, 128, 128, .18);
-        font-weight: 600;
+    &-views {
+        display: flex;
+        flex: 0 0 auto;
+        gap: .4rem;
+        padding-bottom: .7rem;
+        margin-bottom: .8rem;
+        border-bottom: 1px solid rgba(128, 128, 128, .3);
     }
 
-    &:disabled {
-        cursor: wait;
-        opacity: .6;
-    }
-}
+    &-view {
+        .toolbox-plain-button();
+        flex: 1;
+        padding: .5rem .6rem;
+        border: 1px solid rgba(128, 128, 128, .4);
+        border-radius: @toolbox-tags-control-radius;
+        font: inherit;
 
-// Keep both classes: this must outrank Elastic's .ui-dialog iframe selector.
-.toolbox-tags-popup .toolbox-tags-editor-frame {
-    display: block;
-    flex: 1 1 0%;
-    min-height: 0;
-    width: 100%;
-    height: 100%;
-    max-height: none;
-    border: 0;
+        &[aria-pressed="true"] {
+            background: rgba(128, 128, 128, .18);
+            font-weight: 600;
+        }
+
+        &:disabled {
+            cursor: wait;
+            opacity: .6;
+        }
+    }
+
+    &-popup {
+        > .ui-dialog-content {
+            overflow: hidden;
+        }
+
+        // Both classes give the editor frame precedence over Elastic's iframe rule.
+        .toolbox-tags-editor-frame {
+            display: block;
+            flex: 1 1 0%;
+            min-height: 0;
+            width: 100%;
+            height: 100%;
+            max-height: none;
+            border: 0;
+        }
+    }
 }
 
 /* END OF FILE */

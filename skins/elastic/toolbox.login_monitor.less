@@ -1,337 +1,308 @@
 /**
-  * Login Monitor Settings layout. Loaded only in the Login Activity editor.
-  */
+ * Login Monitor preferences and login history in the Login Activity editor.
+ */
 
-.toolbox-login-monitor {
-    width: 100%;
-    max-width: 900px;
-}
+@import (reference) "toolbox.less";
 
-.toolbox-login-monitor-tabs {
-    display: flex;
-    gap: 0.35rem;
-    flex-wrap: wrap;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.35);
-    margin: 0 0 1.25rem;
-}
+@login-monitor-compact: 580px;
 
-.toolbox-login-monitor-tab {
-    padding: 0.65rem 1rem;
-    margin: 0 0 -1px;
-    background: transparent;
-    border: 0;
-    border-bottom: 3px solid transparent;
-    border-radius: 0;
-    color: inherit;
-    cursor: pointer;
-    font: inherit;
-}
-
-.toolbox-login-monitor-tab:hover {
-    background: rgba(128, 128, 128, 0.10);
-}
-
-.toolbox-login-monitor-tab.is-active {
-    border-bottom-color: #e65850;
-    font-weight: 600;
-}
-
-.toolbox-login-monitor-tab:focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: -3px;
-}
-
+// The editor also toggles Elastic's form button bar.
 .toolbox-login-monitor-panel[hidden],
 .formbuttons[hidden] {
     display: none !important;
 }
 
-.toolbox-login-monitor-heading {
-    margin: 0 0 0.5rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-}
-
-.toolbox-login-monitor-intro {
-    margin: 0 0 1.25rem;
-    line-height: 1.5;
-}
-
-.toolbox-login-monitor-placeholder {
-    max-width: 760px;
-    padding: 1.5rem;
-    border: 1px dashed rgba(128, 128, 128, 0.45);
-    border-radius: 0.35rem;
-    color: inherit;
-}
-
-.toolbox-login-monitor-placeholder p {
-    margin: 0;
-}
-
-.toolbox-login-monitor-table-scroll {
-    max-width: 100%;
-    overflow-x: auto;
-}
-
-.toolbox-login-monitor-grid {
+.toolbox-login-monitor {
     width: 100%;
-    max-width: 780px;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
+    max-width: 900px;
 
-.toolbox-login-monitor-grid th,
-.toolbox-login-monitor-grid td {
-    padding: 0.65rem 0.7rem;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.22);
-    vertical-align: middle;
-}
-
-.toolbox-login-monitor-grid thead th {
-    font-weight: 600;
-    border-bottom: 2px solid rgba(128, 128, 128, 0.45);
-}
-
-.toolbox-login-monitor-grid th:first-child {
-    width: auto;
-    text-align: left;
-}
-
-.toolbox-login-monitor-grid thead th:nth-child(2),
-.toolbox-login-monitor-grid thead th:nth-child(3) {
-    width: 150px;
-    text-align: center;
-}
-
-.toolbox-login-monitor-grid tbody th {
-    font-weight: normal;
-}
-
-.toolbox-login-monitor-choice {
-    text-align: center;
-}
-
-.toolbox-login-monitor-switch {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 1.5rem;
-}
-
-.toolbox-login-monitor-switch input[type="checkbox"] {
-    margin: 0;
-    vertical-align: middle;
-}
-
-.toolbox-login-monitor-unavailable {
-    opacity: 0.6;
-}
-
-.toolbox-login-monitor-sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-@media (max-width: 580px) {
-    .toolbox-login-monitor-tab {
-        padding: 0.55rem 0.75rem;
+    &-tabs {
+        display: flex;
+        gap: .35rem;
+        flex-wrap: wrap;
+        border-bottom: 1px solid @toolbox-soft-border;
+        margin: 0 0 1.25rem;
     }
 
-    .toolbox-login-monitor-grid th,
-    .toolbox-login-monitor-grid td {
-        padding: 0.6rem 0.3rem;
+    &-tab {
+        .toolbox-plain-button();
+        padding: .65rem 1rem;
+        margin: 0 0 -1px;
+        border: 0;
+        border-bottom: 3px solid transparent;
+        border-radius: 0;
+        font: inherit;
+
+        &:hover {
+            background: rgba(128, 128, 128, .10);
+        }
+
+        &.is-active {
+            border-bottom-color: #e65850;
+            font-weight: 600;
+        }
+
+        &:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: -3px;
+        }
     }
 
-    .toolbox-login-monitor-grid thead th:nth-child(2),
-    .toolbox-login-monitor-grid thead th:nth-child(3) {
-        width: 80px;
-    }
-}
-
-.toolbox-login-monitor-previous {
-    padding: 1rem 1.2rem;
-    border: 1px solid rgba(128, 128, 128, 0.35);
-    border-radius: 0.35rem;
-    margin-bottom: 1.5rem;
-}
-
-.toolbox-login-monitor-previous p {
-    margin: 0.5rem 0;
-    overflow-wrap: anywhere;
-}
-
-.toolbox-login-monitor-previous-date {
-    font-weight: 600;
-}
-
-.toolbox-login-monitor-history-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.toolbox-login-monitor-history-table th,
-.toolbox-login-monitor-history-table td {
-    border-bottom: 1px solid rgba(128, 128, 128, 0.25);
-    padding: 0.65rem;
-    vertical-align: top;
-    text-align: left;
-}
-
-.toolbox-login-monitor-history-table th:first-child {
-    width: 28%;
-}
-
-.toolbox-login-monitor-history-table th:last-child,
-.toolbox-login-monitor-history-table td.toolbox-login-monitor-row-action {
-    width: 1%;
-    white-space: nowrap;
-}
-
-.toolbox-login-monitor-detail-button {
-    display: inline-block;
-    width: max-content;
-    max-width: none;
-    white-space: nowrap;
-}
-
-.toolbox-login-monitor-history-table td {
-    overflow-wrap: anywhere;
-}
-
-.toolbox-login-monitor-current {
-    display: inline-block;
-    font-size: 0.85em;
-    font-weight: 600;
-    border: 1px solid currentColor;
-    border-radius: 0.25rem;
-    padding: 0.1rem 0.3rem;
-}
-
-.toolbox-login-monitor-pagination {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.85rem;
-    padding: 1rem 0;
-}
-
-.toolbox-login-monitor-pagination a {
-    text-decoration: underline;
-}
-
-.toolbox-login-monitor-empty {
-    margin: 1rem 0;
-}
-
-.toolbox-login-monitor-dialog {
-    width: ~"min(650px, calc(100vw - 2rem))";
-    max-height: min(80vh, 800px);
-    overflow-y: auto;
-    padding: 1.5rem;
-    border: 1px solid rgba(128, 128, 128, 0.45);
-    border-radius: 0.45rem;
-    background: #fff;
-    color: #2c363a;
-    color-scheme: light;
-}
-
-.toolbox-login-monitor-dialog .toolbox-login-monitor-heading,
-.toolbox-login-monitor-dialog .toolbox-login-monitor-details dt,
-.toolbox-login-monitor-dialog .toolbox-login-monitor-details dd {
-    color: inherit;
-}
-
-html.dark-mode .toolbox-login-monitor-dialog {
-    background: #21292c;
-    color: #c5d1d3;
-    border-color: #4d6066;
-    color-scheme: dark;
-}
-
-.toolbox-login-monitor-dialog::backdrop {
-    background: rgba(0, 0, 0, 0.5);
-}
-
-.toolbox-login-monitor-details {
-    display: grid;
-    grid-template-columns: minmax(130px, 35%) minmax(0, 1fr);
-    gap: 0.65rem 1rem;
-    margin: 1.25rem 0;
-}
-
-.toolbox-login-monitor-details dt {
-    font-weight: 600;
-}
-
-.toolbox-login-monitor-details dd {
-    margin: 0;
-    overflow-wrap: anywhere;
-    white-space: pre-wrap;
-}
-
-.toolbox-login-monitor-dialog-actions {
-    display: flex;
-    justify-content: flex-end;
-}
-
-/**
- * Login Monitor - Welcome toast
- *
- * Uses Roundcube's native confirmation notification.
- * Background and text colors are inherited from Roundcube.
- */
-
-.toolbox-login-monitor-toast {
-    display: block;
-    line-height: 1.45;
-    text-align: left;
-
-    > span {
-        display: inline;
+    &-heading {
+        margin: 0 0 .5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
     }
 
-    strong {
-        font-weight: 700;
+    &-intro {
+        margin: 0 0 1.25rem;
+        line-height: 1.5;
     }
 
-    .toolbox-lm-toast-flag {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 1.25em;
-        vertical-align: -0.12em;
+    &-placeholder {
+        max-width: 760px;
+        padding: 1.5rem;
+        border: 1px dashed @toolbox-control-border;
+        border-radius: .35rem;
+        color: inherit;
+
+        p {
+            margin: 0;
+        }
+    }
+
+    &-table-scroll {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    &-grid {
+        width: 100%;
+        max-width: 780px;
+        border-collapse: collapse;
+        table-layout: fixed;
+
+        th,
+        td {
+            padding: .65rem .7rem;
+            border-bottom: 1px solid rgba(128, 128, 128, .22);
+            vertical-align: middle;
+
+            @media (max-width: @login-monitor-compact) {
+                padding: .6rem .3rem;
+            }
+        }
+
+        thead th {
+            font-weight: 600;
+            border-bottom: 2px solid @toolbox-control-border;
+
+            &:nth-child(2),
+            &:nth-child(3) {
+                width: 150px;
+                text-align: center;
+
+                @media (max-width: @login-monitor-compact) {
+                    width: 80px;
+                }
+            }
+        }
+
+        th:first-child {
+            width: auto;
+            text-align: left;
+        }
+
+        tbody th {
+            font-weight: normal;
+        }
+    }
+
+    &-choice {
+        text-align: center;
+    }
+
+    &-switch {
+        .toolbox-inline-center();
+        min-height: 1.5rem;
+
+        input[type="checkbox"] {
+            margin: 0;
+            vertical-align: middle;
+        }
+    }
+
+    &-unavailable {
+        opacity: .6;
+    }
+
+    &-sr-only {
+        .toolbox-visually-hidden();
         white-space: nowrap;
+    }
 
-        .toolbox-lm-toast-flag-image {
-            display: block;
-            width: 1.33em;
-            height: 1em;
-            object-fit: cover;
+    @media (max-width: @login-monitor-compact) {
+        &-tab {
+            padding: .55rem .75rem;
+        }
+    }
+
+    // Login history.
+    &-previous {
+        padding: 1rem 1.2rem;
+        border: 1px solid @toolbox-soft-border;
+        border-radius: .35rem;
+        margin-bottom: 1.5rem;
+
+        p {
+            margin: .5rem 0;
+            overflow-wrap: anywhere;
+        }
+
+        &-date {
+            font-weight: 600;
+        }
+    }
+
+    &-history-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+            border-bottom: 1px solid rgba(128, 128, 128, .25);
+            padding: .65rem;
+            vertical-align: top;
+            text-align: left;
+
+            @media (max-width: @login-monitor-compact) {
+                padding: .5rem .3rem;
+            }
+        }
+
+        th:first-child {
+            width: 28%;
+        }
+
+        th:last-child,
+        td.toolbox-login-monitor-row-action {
+            width: 1%;
+            white-space: nowrap;
+        }
+
+        td {
+            overflow-wrap: anywhere;
+        }
+    }
+
+    &-detail-button {
+        display: inline-block;
+        width: max-content;
+        max-width: none;
+        white-space: nowrap;
+    }
+
+    &-current {
+        display: inline-block;
+        font-size: .85em;
+        font-weight: 600;
+        border: 1px solid currentColor;
+        border-radius: .25rem;
+        padding: .1rem .3rem;
+    }
+
+    &-pagination {
+        .toolbox-wrapping-row(.85rem);
+        padding: 1rem 0;
+
+        a {
+            text-decoration: underline;
+        }
+    }
+
+    &-empty {
+        margin: 1rem 0;
+    }
+
+    &-details {
+        .toolbox-definition-grid();
+        grid-template-columns: minmax(130px, 35%) minmax(0, 1fr);
+        gap: .65rem 1rem;
+        margin: 1.25rem 0;
+
+        dd {
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: @login-monitor-compact) {
+            grid-template-columns: minmax(0, 1fr);
+            gap: .25rem;
+
+            dd {
+                margin-bottom: .65rem;
+            }
+        }
+    }
+
+    // Native details dialog.
+    &-dialog {
+        .toolbox-dialog-width(650px);
+        max-height: min(80vh, 800px);
+        overflow-y: auto;
+        .toolbox-dialog-surface();
+        border: 1px solid @toolbox-control-border;
+        border-radius: .45rem;
+        color: #2c363a;
+
+        .toolbox-login-monitor-heading,
+        .toolbox-login-monitor-details dt,
+        .toolbox-login-monitor-details dd {
+            color: inherit;
+        }
+
+        html.dark-mode & {
+            background: #21292c;
+            color: #c5d1d3;
+            border-color: #4d6066;
+            color-scheme: dark;
+        }
+
+        &::backdrop {
+            background: rgba(0, 0, 0, .5);
+        }
+
+        &-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+    }
+
+    &-toast {
+        display: block;
+        line-height: 1.45;
+        text-align: left;
+
+        > span {
+            display: inline;
+        }
+
+        strong {
+            font-weight: 700;
         }
     }
 }
 
-@media (max-width: 580px) {
-    .toolbox-login-monitor-history-table th,
-    .toolbox-login-monitor-history-table td {
-        padding: 0.5rem 0.3rem;
-    }
+.toolbox-lm-toast-flag {
+    .toolbox-inline-center();
+    min-width: 1.25em;
+    vertical-align: -.12em;
+    white-space: nowrap;
 
-    .toolbox-login-monitor-details {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 0.25rem;
-    }
-
-    .toolbox-login-monitor-details dd {
-        margin-bottom: 0.65rem;
+    &-image {
+        display: block;
+        width: 1.33em;
+        height: 1em;
+        object-fit: cover;
     }
 }
 

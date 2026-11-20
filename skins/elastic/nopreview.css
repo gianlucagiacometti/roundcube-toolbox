@@ -1,3 +1,6 @@
+/**
+ * Mail layout when message previews are disabled.
+ */
 #layout-content {
   display: none;
 }

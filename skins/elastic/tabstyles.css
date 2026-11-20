@@ -1,5 +1,5 @@
 /**
- * toolbox plugin styles (tab styles)
+ * Toolbox settings tab in the Elastic navigation.
  */
 .listing.iconized li.toolbox > a::before {
   content: "\f0b1";

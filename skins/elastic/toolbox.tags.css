@@ -1,9 +1,12 @@
 /**
- * Toolbox Tags styles for the Elastic skin.
- *
- * Compile this standalone source to toolbox.tags.css beside this file.
- * Sections: shared values, definition editor, message badges, list tags, and modal.
+ * Toolbox Tags definition editor, mail badges and assignment dialog.
  */
+a.toolbox-tags:before {
+  font-family: 'Icons';
+  font-style: normal;
+  font-weight: 900;
+  content: "\f02c";
+}
 .toolbox-tags-manager {
   max-width: 780px;
   width: 100%;
@@ -59,6 +62,10 @@
   cursor: pointer;
   font-size: 1rem;
 }
+.toolbox-tags-group > details > .toolbox-tags-actions {
+  display: flex;
+  margin: 0.5rem 0 0.2rem 1.7rem;
+}
 .toolbox-tags-group summary svg,
 .toolbox-tags-value > svg,
 .toolbox-tags-toolbar svg {
@@ -83,18 +90,14 @@
   align-items: center;
   gap: 0.3rem;
 }
-.toolbox-tags-group > details > .toolbox-tags-actions {
-  display: flex;
-  margin: 0.5rem 0 0.2rem 1.7rem;
-}
 .toolbox-tags-button {
-  border: 0;
   background: transparent;
   color: inherit;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  border: 0;
   gap: 0.25rem;
   border-radius: 0.3rem;
   padding: 0.3rem;
@@ -140,19 +143,12 @@
 .toolbox-tags-archive {
   margin: 0.8rem 0;
 }
-.toolbox-tags-editor {
-  margin-top: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--color-border, #d1d5db);
-  border-radius: 0.5rem;
-}
 .toolbox-tags-editor[hidden],
 .toolbox-tags-field[hidden],
-.toolbox-tags-parent[hidden] {
+.toolbox-tags-parent[hidden],
+.toolbox-tags-dialog [hidden],
+.toolbox-tags-status:empty {
   display: none !important;
-}
-.toolbox-tags-editor h3 {
-  margin: 0 0 0.8rem;
 }
 .toolbox-tags-field {
   display: flex;
@@ -171,21 +167,24 @@
   padding: 0.15rem;
   cursor: pointer;
 }
+.toolbox-tags-editor {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border, #d1d5db);
+  border-radius: 0.5rem;
+}
+.toolbox-tags-editor h3 {
+  margin: 0 0 0.8rem;
+}
 .toolbox-tags-editor-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
-a.toolbox-tags:before {
-  font-family: Icons;
-  font-style: normal;
-  font-weight: 900;
-  content: "\f02c";
-}
 .toolbox-tags-summary {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem 0.7rem;
   margin-top: 0.8rem;
   padding-top: 0.7rem;
@@ -223,14 +222,14 @@ a.toolbox-tags:before {
   opacity: 0.8;
 }
 .toolbox-tags-edit {
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
   padding: 0.3rem 0.6rem;
   border: 1px solid rgba(128, 128, 128, 0.45);
   border-radius: 0.3rem;
-  background: transparent;
-  color: inherit;
   font: inherit;
   white-space: nowrap;
-  cursor: pointer;
 }
 .toolbox-tags-edit:hover,
 .toolbox-tags-edit:focus-visible {
@@ -266,6 +265,12 @@ a.toolbox-tags:before {
   background: rgba(128, 128, 128, 0.08);
   line-height: 1.2;
 }
+.messagelist td.subject .toolbox-tags-list-badge .toolbox-tags-swatch {
+  flex: 0 0 0.55rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  line-height: 1;
+}
 .messagelist td.subject .toolbox-tags-list-text {
   min-width: 0;
   overflow: hidden;
@@ -273,19 +278,10 @@ a.toolbox-tags:before {
   white-space: nowrap;
   line-height: 1.2;
 }
-.messagelist td.subject .toolbox-tags-list-badge .toolbox-tags-swatch {
-  flex: 0 0 0.55rem;
-  width: 0.55rem;
-  height: 0.55rem;
-  line-height: 1;
-}
 .messagelist td.subject .toolbox-tags-list-more {
   flex: 0 0 auto;
   padding: 0.1rem 0.2rem;
   line-height: 1.2;
-}
-.toolbox-tags-popup > .ui-dialog-content {
-  overflow: hidden;
 }
 .toolbox-tags-dialog {
   display: flex;
@@ -346,20 +342,16 @@ a.toolbox-tags:before {
   flex: 0 0 auto;
   margin: 0;
 }
+.toolbox-tags-choice > input:disabled {
+  cursor: wait;
+}
 .toolbox-tags-choice > span:last-child {
   min-width: 0;
   overflow-wrap: anywhere;
 }
-.toolbox-tags-choice > input:disabled {
-  cursor: wait;
-}
 .toolbox-tags-status {
   margin: 0.75rem 0 0.5rem;
   overflow-wrap: anywhere;
-}
-.toolbox-tags-status:empty,
-.toolbox-tags-dialog [hidden] {
-  display: none !important;
 }
 .toolbox-tags-status.is-error {
   color: #b42318;
@@ -376,14 +368,14 @@ html.dark-mode .toolbox-tags-status.is-error {
   border-bottom: 1px solid rgba(128, 128, 128, 0.3);
 }
 .toolbox-tags-view {
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
   flex: 1;
   padding: 0.5rem 0.6rem;
   border: 1px solid rgba(128, 128, 128, 0.4);
   border-radius: 0.3rem;
-  background: transparent;
-  color: inherit;
   font: inherit;
-  cursor: pointer;
 }
 .toolbox-tags-view[aria-pressed="true"] {
   background: rgba(128, 128, 128, 0.18);
@@ -392,6 +384,9 @@ html.dark-mode .toolbox-tags-status.is-error {
 .toolbox-tags-view:disabled {
   cursor: wait;
   opacity: 0.6;
+}
+.toolbox-tags-popup > .ui-dialog-content {
+  overflow: hidden;
 }
 .toolbox-tags-popup .toolbox-tags-editor-frame {
   display: block;

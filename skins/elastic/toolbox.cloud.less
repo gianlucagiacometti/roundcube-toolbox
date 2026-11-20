@@ -1,8 +1,8 @@
-/*
- * Toolbox Cloud for Roundcube Elastic.
- * Source: toolbox.cloud.less (compiled by the existing skins/elastic/compile script).
- * Settings sections, provider cards, connection dialog and vault controls.
+/**
+ * Toolbox Cloud settings, connection browser and compose picker for Elastic.
  */
+
+@import (reference) "toolbox.less";
 
 @cloud-border: #c5cbd0;
 @cloud-text: #27333b;
@@ -11,33 +11,29 @@
 @cloud-dark-text: #e2e9ed;
 @cloud-dark-accent: #90c7ed;
 @cloud-card-radius: .8rem;
+@cloud-compact: 480px;
 
-// Main settings: vault, connections and provider selection.
+// Vault, connected accounts and provider selection.
 #toolbox-cloud-settings {
-    .tbx-cloud-vault-panel,
-    .tbx-cloud-connections-panel {
-        padding: 1.25rem;
-        margin: 1rem 0;
+    .panel-frame() {
         border: 1px solid @cloud-border;
         border-radius: .65rem;
     }
 
-    .tbx-cloud-provider-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-        gap: 1rem;
-        margin: 1.2rem 0 1.6rem;
+    .tbx-cloud-vault-panel,
+    .tbx-cloud-connections-panel {
+        padding: 1.25rem;
+        margin: 1rem 0;
+        .panel-frame();
     }
 
-    // Explicit button selector overrides Elastic's generic button appearance.
+    // The button qualifier overrides Elastic's generic button appearance.
     button.tbx-cloud-provider-card {
         appearance: none;
         -webkit-appearance: none;
-        display: flex;
-        flex-direction: column;
+        .toolbox-flex-column(.55rem);
         align-items: flex-start;
         justify-content: flex-start;
-        gap: .55rem;
         box-sizing: border-box;
         min-width: 0;
         width: 100%;
@@ -76,78 +72,108 @@
             transform: none;
             pointer-events: none;
         }
+
+        @media (max-width: @cloud-compact) {
+            min-height: 9rem;
+        }
+
+        html.dark-mode & {
+            color: @cloud-dark-text;
+            background: #293439;
+            border-color: #465860;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .12);
+
+            &:hover {
+                border-color: #7ab4df;
+                background: #314047;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, .2);
+            }
+        }
     }
 
-    .tbx-cloud-provider-icon {
-        display: block;
-        width: 3rem;
-        height: 3rem;
-        flex: none;
-        color: @cloud-accent;
+    .tbx-cloud-provider {
+        &-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+            gap: 1rem;
+            margin: 1.2rem 0 1.6rem;
+
+            @media (max-width: @cloud-compact) {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        &-icon,
+        &-name,
+        &-description,
+        &-action {
+            display: block;
+        }
+
+        &-icon,
+        &-action {
+            color: @cloud-accent;
+        }
+
+        &-icon {
+            .toolbox-square(3rem);
+            flex: none;
+        }
+
+        &-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        &-description {
+            flex: 1;
+            font-weight: 400;
+            font-size: .92rem;
+            line-height: 1.45;
+            opacity: .85;
+        }
+
+        &-action {
+            font-size: .9rem;
+            font-weight: 700;
+        }
     }
 
-    .tbx-cloud-provider-name {
-        display: block;
-        font-size: 1.15rem;
-        font-weight: 700;
-    }
+    .tbx-cloud-account {
+        &-row {
+            .toolbox-wrapping-row(.5rem 1rem);
+            justify-content: space-between;
+            padding: .6rem .15rem;
+            border-bottom: 1px solid @cloud-border;
+        }
 
-    .tbx-cloud-provider-description {
-        display: block;
-        flex: 1;
-        font-weight: 400;
-        font-size: .92rem;
-        line-height: 1.45;
-        opacity: .85;
-    }
+        &-description {
+            flex: 1;
+            min-width: 8rem;
+            overflow-wrap: anywhere;
+        }
 
-    .tbx-cloud-provider-action {
-        display: block;
-        font-size: .9rem;
-        font-weight: 700;
-        color: @cloud-accent;
-    }
+        &-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+        }
 
-    // Connected-account actions mirror Toolbox Aliases icon-only controls.
-    .tbx-cloud-account-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: .5rem 1rem;
-        padding: .6rem .15rem;
-        border-bottom: 1px solid @cloud-border;
-    }
-
-    .tbx-cloud-account-description {
-        flex: 1;
-        min-width: 8rem;
-        overflow-wrap: anywhere;
-    }
-
-    .tbx-cloud-account-actions {
-        display: inline-flex;
-        align-items: center;
-        gap: .5rem;
+        &-icon.browse::before {
+            content: "\f07c";
+        }
     }
 
     button.tbx-cloud-account-icon {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        width: 2rem;
-        height: 2rem;
+        .toolbox-inline-center();
+        .toolbox-square(2rem);
+        .toolbox-plain-button();
         padding: .2rem;
         border: 0;
         border-radius: .25rem;
-        background: transparent;
-        color: inherit;
-        cursor: pointer;
 
         &::before {
-            font-family: 'Icons';
-            font-weight: 900;
-            font-style: normal;
+            .toolbox-icon-font();
             font-size: 1.1rem;
         }
 
@@ -166,35 +192,55 @@
         }
     }
 
-    // Visible lock status and manual lock / timer renewal controls.
-    .tbx-cloud-lock-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: .75rem;
-        margin: .9rem 0;
-        padding: .7rem 0;
-    }
+    // Theme colors follow the account and provider button hover states.
+    html.dark-mode & {
+        .tbx-cloud-vault-panel,
+        .tbx-cloud-connections-panel,
+        details.tbx-cloud-security-card {
+            border-color: @cloud-dark-border;
+        }
 
-    .tbx-cloud-lock-status {
-        display: inline-block;
-        padding: .3rem .7rem;
-        border: 1px solid #aebbc3;
-        border-radius: .8rem;
-        color: #53616a;
-
-        &.is-unlocked {
-            border-color: #35825a;
-            color: #28734f;
+        .tbx-cloud-provider-icon,
+        .tbx-cloud-provider-action {
+            color: @cloud-dark-accent;
         }
     }
 
-    // Collapsible, infrequently used vault security operations.
+    .tbx-cloud-lock {
+        &-row {
+            .toolbox-wrapping-row(.75rem);
+            margin: .9rem 0;
+            padding: .7rem 0;
+        }
+
+        &-status {
+            display: inline-block;
+            padding: .3rem .7rem;
+            border: 1px solid #aebbc3;
+            border-radius: .8rem;
+            color: #53616a;
+
+            &.is-unlocked {
+                border-color: #35825a;
+                color: #28734f;
+            }
+
+            html.dark-mode & {
+                color: #bbc7ce;
+                border-color: #687782;
+
+                &.is-unlocked {
+                    color: #a1dfb3;
+                    border-color: #5c9b70;
+                }
+            }
+        }
+    }
+
     details.tbx-cloud-security-card {
         margin: 1.5rem 0 0;
         padding: 1rem;
-        border: 1px solid @cloud-border;
-        border-radius: .65rem;
+        .panel-frame();
 
         summary {
             cursor: pointer;
@@ -207,17 +253,13 @@
             }
         }
 
-        // Separates the first form field from the expanded summary.
         &[open] > p:first-of-type {
             margin-top: 1.1rem;
         }
     }
 
     .tbx-cloud-security-actions {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: .75rem 1rem;
+        .toolbox-wrapping-row(.75rem 1rem);
         margin: 1rem 0;
 
         > button {
@@ -226,27 +268,21 @@
         }
     }
 
-    // HTML hidden state must defeat generic display rules.
+    // Hidden controls must outrank Elastic's display rules.
     [hidden],
     button[hidden] {
         display: none !important;
     }
 }
 
-// Native dialog is promoted to the top layer, outside the settings layout.
-#tbx-cloud-provider-dialog {
+// The three native dialogs share a surface, backdrop and title row.
+.cloud-dialog(@text: @cloud-text) {
+    .toolbox-dialog-surface();
     position: fixed;
-    box-sizing: border-box;
-    width: min(38rem, calc(100vw - 2rem));
-    max-height: calc(100dvh - 2rem);
-    overflow: auto;
-    padding: 1.5rem;
-    color: #263238;
-    background: #fff;
+    color: @text;
     border: 1px solid @cloud-border;
     border-radius: @cloud-card-radius;
     box-shadow: 0 16px 44px rgba(0, 0, 0, .25);
-    color-scheme: light;
 
     &::backdrop {
         background: rgba(10, 16, 20, .7);
@@ -262,6 +298,33 @@
             margin: 0;
         }
     }
+}
+
+.cloud-dark-dialog(@border: #52616b) {
+    color: @cloud-dark-text;
+    background: #222d32;
+    border-color: @border;
+    color-scheme: dark;
+}
+
+.cloud-dark-fields() {
+    .form-control {
+        color: #e6edf1;
+        background: #1b252a;
+        border-color: #53636c;
+
+        &::placeholder {
+            color: #9baeb9;
+        }
+    }
+}
+
+#tbx-cloud-provider-dialog {
+    .cloud-dialog(#263238);
+    box-sizing: border-box;
+    .toolbox-dialog-width(38rem);
+    max-height: calc(100dvh - 2rem);
+    overflow: auto;
 
     label {
         display: block;
@@ -274,82 +337,18 @@
         width: 100%;
         margin-top: .35rem;
     }
-}
 
-// Roundcube Elastic dark mode.
-html.dark-mode {
-    #toolbox-cloud-settings {
-        .tbx-cloud-vault-panel,
-        .tbx-cloud-connections-panel,
-        details.tbx-cloud-security-card {
-            border-color: @cloud-dark-border;
-        }
-
-        button.tbx-cloud-provider-card {
-            color: @cloud-dark-text;
-            background: #293439;
-            border-color: #465860;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, .12);
-
-            &:hover {
-                border-color: #7ab4df;
-                background: #314047;
-                box-shadow: 0 4px 14px rgba(0, 0, 0, .2);
-            }
-        }
-
-        .tbx-cloud-provider-icon,
-        .tbx-cloud-provider-action {
-            color: @cloud-dark-accent;
-        }
-
-        .tbx-cloud-lock-status {
-            color: #bbc7ce;
-            border-color: #687782;
-
-            &.is-unlocked {
-                color: #a1dfb3;
-                border-color: #5c9b70;
-            }
-        }
+    html.dark-mode & {
+        .cloud-dark-dialog();
+        .cloud-dark-fields();
     }
 
-    #tbx-cloud-provider-dialog {
-        color: @cloud-dark-text;
-        background: #222d32;
-        border-color: #52616b;
-        color-scheme: dark;
-
-        .form-control {
-            color: #e6edf1;
-            background: #1b252a;
-            border-color: #53636c;
-
-            &::placeholder {
-                color: #9baeb9;
-            }
-        }
-    }
-}
-
-// Responsive cards and dialog spacing.
-@media (max-width: 480px) {
-    #toolbox-cloud-settings {
-        .tbx-cloud-provider-grid {
-            grid-template-columns: 1fr;
-        }
-
-        button.tbx-cloud-provider-card {
-            min-height: 9rem;
-        }
-    }
-
-    #tbx-cloud-provider-dialog {
+    @media (max-width: @cloud-compact) {
         padding: 1rem;
     }
 }
 
-// Security actions stack with comfortable spacing on narrower screens.
+// Keep this narrow layout after the provider dialog header for cascade precedence.
 @media (max-width: 560px) {
     #toolbox-cloud-settings .tbx-cloud-security-actions {
         flex-direction: column;
@@ -362,25 +361,18 @@ html.dark-mode {
     }
 }
 
-// Read-only WebDAV connector verification browser.
-#toolbox-cloud-settings {
-    .tbx-cloud-account-icon.browse::before {
-        content: "\f07c"; // Font Awesome folder-open, matching Toolbox's icon font.
-    }
-}
-
+// Read-only WebDAV browser in Settings.
 .tbx-cloud-browse-dialog {
-    .tbx-cloud-browse-toolbar {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: .75rem;
-        margin: 1rem 0;
-    }
+    .tbx-cloud-browse {
+        &-toolbar {
+            .toolbox-wrapping-row(.75rem);
+            margin: 1rem 0;
+        }
 
-    .tbx-cloud-browse-path {
-        overflow-wrap: anywhere;
-        font-family: monospace;
+        &-path {
+            overflow-wrap: anywhere;
+            font-family: monospace;
+        }
     }
 
     .tbx-cloud-file-list {
@@ -402,186 +394,163 @@ html.dark-mode {
     }
 
     .tbx-cloud-file-folder {
+        .toolbox-plain-button();
         padding: .15rem .3rem;
         text-align: left;
-        color: inherit;
-        background: transparent;
         border: 0;
-        cursor: pointer;
         font: inherit;
     }
 }
 
-// Settings WebDAV browser uses a native dialog; style its entire surface and
-// rows explicitly because Elastic may style generic lists independently.
 #tbx-cloud-browse-dialog {
-    position: fixed;
+    .cloud-dialog();
     box-sizing: border-box;
-    width: min(44rem, calc(100vw - 2rem));
+    .toolbox-dialog-width(44rem);
     max-height: calc(100dvh - 2rem);
     overflow-y: auto;
     margin: auto;
-    padding: 1.5rem;
-    color: @cloud-text;
-    background: #fff;
-    border: 1px solid @cloud-border;
-    border-radius: @cloud-card-radius;
-    box-shadow: 0 16px 44px rgba(0, 0, 0, .25);
-    color-scheme: light;
-
-    &::backdrop { background: rgba(10, 16, 20, .7); }
 
     .tbx-cloud-dialog-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
         margin-bottom: 1rem;
-        h3 { margin: 0; }
     }
 
+    // Elastic can also style generic list rows.
     .tbx-cloud-browse-results,
     .tbx-cloud-file-list,
     .tbx-cloud-file-list > li {
         color: inherit;
         background: transparent;
+
+        html.dark-mode & {
+            color: @cloud-dark-text;
+            background: transparent;
+        }
+    }
+
+    html.dark-mode & {
+        .cloud-dark-dialog(@cloud-dark-border);
+
+        .tbx-cloud-file-list > li {
+            border-bottom-color: @cloud-dark-border;
+        }
+
+        button.tbx-cloud-file-folder {
+            color: @cloud-dark-text;
+            background: transparent;
+
+            &:hover,
+            &:focus-visible {
+                color: @cloud-dark-accent;
+            }
+        }
     }
 }
 
-html.dark-mode #tbx-cloud-browse-dialog {
-    color: @cloud-dark-text;
-    background: #222d32;
-    border-color: @cloud-dark-border;
-    color-scheme: dark;
+// Attachment controls and compose picker.
+#compose-attachments .upload-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .55rem;
 
-    .tbx-cloud-browse-results,
-    .tbx-cloud-file-list,
-    .tbx-cloud-file-list > li {
-        color: @cloud-dark-text;
-        background: transparent;
-    }
-
-    .tbx-cloud-file-list > li {
-        border-bottom-color: @cloud-dark-border;
-    }
-
-    button.tbx-cloud-file-folder {
-        color: @cloud-dark-text;
-        background: transparent;
-        &:hover, &:focus-visible { color: @cloud-dark-accent; }
-    }
-}
-
-// Compose window: Cloud picker and attachment controls.
-#compose-attachments {
-    .upload-form {
-        display: flex;
-        flex-wrap: wrap;
-        gap: .55rem;
-        #tbx-cloud-compose-open { margin: 0; }
+    #tbx-cloud-compose-open {
+        margin: 0;
     }
 }
 
 .tbx-cloud-compose-dialog {
     box-sizing: border-box;
-    width: min(44rem, calc(100vw - 2rem));
+    .toolbox-dialog-width(44rem);
     max-height: min(80vh, 52rem);
     overflow-y: auto;
 
-    #tbx-cloud-compose-locked, #tbx-cloud-compose-browser {
-        display: flex;
-        flex-direction: column;
-        gap: .75rem;
-        &[hidden] { display: none; }
+    #tbx-cloud-compose-locked,
+    #tbx-cloud-compose-browser {
+        .toolbox-flex-column(.75rem);
+
+        &[hidden] {
+            display: none;
+        }
     }
 
-    .tbx-cloud-compose-files {
-        max-height: 45vh;
-        overflow-y: auto;
-    }
-    .tbx-cloud-compose-entry {
-        display: flex;
-        gap: .8rem;
-        align-items: center;
-        justify-content: space-between;
-        padding: .55rem .2rem;
-        border-bottom: 1px solid @cloud-border;
-        span { overflow-wrap: anywhere; }
+    .tbx-cloud-compose {
+        &-files {
+            max-height: 45vh;
+            overflow-y: auto;
+        }
+
+        &-entry {
+            display: flex;
+            gap: .8rem;
+            align-items: center;
+            justify-content: space-between;
+            padding: .55rem .2rem;
+            border-bottom: 1px solid @cloud-border;
+
+            span {
+                overflow-wrap: anywhere;
+            }
+
+            html.dark-mode & {
+                border-color: @cloud-dark-border;
+            }
+        }
+
+        &-files,
+        &-entry {
+            html.dark-mode & {
+                color: @cloud-dark-text;
+                background: transparent;
+            }
+        }
     }
 }
 
-html.dark-mode .tbx-cloud-compose-dialog {
-    .tbx-cloud-compose-files,
-    .tbx-cloud-compose-entry {
-        color: @cloud-dark-text;
-        background: transparent;
-    }
-
-    .tbx-cloud-compose-entry { border-color: @cloud-dark-border; }
-}
-
-
-// Compose picker is a separate native dialog, not the Settings provider dialog.
-// Give it the same deliberate styling and respect Elastic theme transitions.
 #tbx-cloud-compose-dialog {
-    position: fixed;
+    .cloud-dialog();
     margin: auto;
-    padding: 1.5rem;
-    color: @cloud-text;
-    background: #fff;
-    border: 1px solid @cloud-border;
-    border-radius: @cloud-card-radius;
-    box-shadow: 0 16px 44px rgba(0, 0, 0, .25);
-    color-scheme: light;
-
-    &::backdrop { background: rgba(10, 16, 20, .7); }
 
     .tbx-cloud-dialog-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
         margin-bottom: 1.1rem;
-        h3 { margin: 0; }
     }
 
     .tbx-cloud-compose-account-field {
-        display: flex;
-        flex-direction: column;
-        gap: .45rem;
+        .toolbox-flex-column(.45rem);
         margin: .6rem 0 .85rem;
-        label { display: block; margin: 0; }
-        select.form-control { width: 100%; margin: 0; }
+
+        label {
+            display: block;
+            margin: 0;
+        }
+
+        select.form-control {
+            width: 100%;
+            margin: 0;
+        }
     }
 
-    label { display: block; margin: .45rem 0 .3rem; }
-    .form-control { box-sizing: border-box; width: 100%; }
-
-    .tbx-cloud-browse-toolbar {
-        display: flex;
-        align-items: center;
-        gap: .7rem;
-        flex-wrap: wrap;
-        margin: .6rem 0 .8rem;
+    label {
+        display: block;
+        margin: .45rem 0 .3rem;
     }
-}
-
-html.dark-mode #tbx-cloud-compose-dialog {
-    color: @cloud-dark-text;
-    background: #222d32;
-    border-color: #52616b;
-    color-scheme: dark;
 
     .form-control {
-        color: #e6edf1;
-        background: #1b252a;
-        border-color: #53636c;
-        &::placeholder { color: #9baeb9; }
+        box-sizing: border-box;
+        width: 100%;
     }
-}
 
-@media (max-width: 480px) {
-    #tbx-cloud-compose-dialog { padding: 1rem; }
+    .tbx-cloud-browse-toolbar {
+        .toolbox-wrapping-row(.7rem);
+        margin: .6rem 0 .8rem;
+    }
+
+    html.dark-mode & {
+        .cloud-dark-dialog();
+        .cloud-dark-fields();
+    }
+
+    @media (max-width: @cloud-compact) {
+        padding: 1rem;
+    }
 }
 
 /* END OF FILE */

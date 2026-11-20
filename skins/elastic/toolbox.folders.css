@@ -1,8 +1,8 @@
 /**
- * Toolbox Folders: Elastic toolbar icon and read-only property dialog.
+ * Toolbox Folders toolbar, context menu and property dialog.
  */
 a.toolbox-folders:before {
-  font-family: Icons;
+  font-family: 'Icons';
   font-style: normal;
   font-weight: 900;
   content: "\f07c";
@@ -55,8 +55,8 @@ div.toolbox-folders-popup .ui-dialog-content {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 0.5rem;
+  justify-content: space-between;
   margin-bottom: 0.7rem;
 }
 .toolbox-folders-size-note {
