@@ -7,7 +7,7 @@ JavaScript module.
 
 ## Compatibility and requirements
 
-- **Toolbox pre-release:** 1.7.9.
+- **Toolbox reelease:** 1.7.9.
 - **Roundcube:** 1.7.2 or newer (the recommended Composer minimum). Use the
   latest Roundcube 1.7 security release in production.
 - **PHP:** 8.1 or newer, as required by Roundcube 1.7.
