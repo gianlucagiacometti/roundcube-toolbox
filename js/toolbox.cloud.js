@@ -179,7 +179,7 @@
         select.find('option[value="password"]').prop('disabled', !password);
         select.find('option[value="recovery"]').prop('disabled', !recovery);
         var selected = select.val();
-        if ((selected === 'password' && !password) || (selected === 'recovery' && !recovery)) {
+        if (!selected || (selected === 'password' && !password) || (selected === 'recovery' && !recovery)) {
             select.val(password ? 'password' : recovery ? 'recovery' : '');
         }
         updateUnlockHelp();
