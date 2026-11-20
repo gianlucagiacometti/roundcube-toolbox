@@ -7,9 +7,13 @@
 </div>
 
 <roundcube:if condition="env:cur_section != 'aliases'" />
+<roundcube:if condition="env:cur_section != 'cloud'" />
+<roundcube:if condition="env:cur_section != 'attachments'" />
 <div class="formbuttons">
     <roundcube:button command="plugin.toolbox.save" class="btn btn-primary submit" label="save" />
 </div>
+<roundcube:endif />
+<roundcube:endif />
 <roundcube:endif />
 
 <script>

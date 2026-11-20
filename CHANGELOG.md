@@ -1,6 +1,20 @@
 # Roundcube Webmail Toolbox
 
 
+## Version 1.7.11 (2026-11-20, rc-1.7)
+
+### Settings interface fixes
+
+- Fixed a Cloud Settings issue where the generic Toolbox Save button could submit an unsupported operation, leaving the content frame empty.
+- Removed the generic Save button from Cloud, which manages vaults and accounts through its own AJAX controls.
+- Removed the unnecessary Save button from Attachments, which has no user-editable settings.
+- Added an informational Attachments panel displaying the tool's enabled status, configured attachment size thresholds and download retention period.
+- Reused existing localisation strings for the Attachments information panel, without introducing additional translations.
+- Preserved the existing Save button and behaviour for other Toolbox settings sections.
+
+No changes to Cloud vault operations, attachment processing, storage, cleanup or database schemas.
+
+
 ## Version 1.7.10 (2026-11-20, rc-1.7)
 
 ### Detached attachments and maintenance

@@ -42,6 +42,37 @@ class toolbox_tool_attachments extends toolbox_tool_module
     }
 
     /**
+     * Display the active attachment tool and its configured limits.
+     *
+     * Attachments has no user-editable settings. Configuration is managed
+     * by the server administrator through config.inc.php.
+     *
+     * @param object $storage Shared Toolbox storage backend, unused.
+     * @param array $attributes Form attributes, unused.
+     * @param callable $fieldset Shared fieldset renderer, unused.
+     * @return array Informational content and closing-form disposition.
+     */
+    public function render_section($storage, array $attributes, callable $fieldset): array
+    {
+        $status = rcmail::Q($this->plugin->gettext('toolbox-enabled'));
+
+        $description = rcmail::Q($this->plugin->gettext([
+            'name' => 'attachment-maxuploadsize',
+            'vars' => [
+                'totalsize' => round($this->detach_total / (1024 * 1024)),
+                'singlesize' => round($this->detach_single / (1024 * 1024)),
+                'lifespan' => $this->lifespan,
+            ],
+        ]));
+
+        return [
+            'content' => html::tag('p', null, html::tag('strong', null, $status))
+                . html::tag('p', null, $description),
+            'append_form_end' => true,
+        ];
+    }
+
+    /**
      * Serve a previously detached attachment as a ZIP download.
      *
      * Runs from Roundcube's startup hook, but only handles the Toolbox
