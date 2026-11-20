@@ -348,13 +348,13 @@ $config['toolbox_detach_single'] = 1024 * 1024 * 25;
 // per domain settings specified within the gui will override this configuration
 $config['toolbox_detach_lifespan'] = 30;
 
-// storage folder's relative url for detached attachments
-// NOTE: you must create a dedicated folder in public_html folder writable by the web server
-//       additionally, you must exclude that folder in .htaccess file to avoid redirection to static.php
-//       add the following line to the .htaccess after "RewriteEngine On":
-//       RewriteCond %{REQUEST_URI} !^/attachments/$
-// default value: 'attachments'
-$config['toolbox_detach_storage'] = 'attachments';
+// Storage directory for detached attachments.
+// Must be an absolute filesystem path, not a URL.
+// Default: plugins/toolbox/attachments
+// The directory must exist and be writable by the web server.
+// Run bin/initplugin to create it during installation.
+// Expired files are removed by scripts/delete_attachments.php.
+$config['toolbox_detach_storage'] = __DIR__ . '/attachments';
 
 
 // CLOUD TOOL OPTIONS

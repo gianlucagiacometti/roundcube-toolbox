@@ -16,6 +16,18 @@
 - Added Elastic light- and dark-mode support for the history interface and details dialog.
 - Added translations for all six supported languages: `en_US`, `en_GB`, `it_IT`, `fr_FR`, `de_DE` and `es_ES`.
 
+### Detached attachments and maintenance
+
+- Added `scripts/delete_attachments.php`, a CLI utility that removes expired detached files using the configured `toolbox_detach_storage` directory and `toolbox_detach_lifespan` retention period. Administrators schedule it with cron.
+- Changed the default attachment storage directory to `plugins/toolbox/attachments`, configured as `__DIR__ . '/attachments'` in `config.inc.php.dist`, instead of a directory under `public_html`.
+- Renamed `bin/initplugin.sh` to `bin/initplugin` and updated it to prepare the `tmp` and `attachments` directories inside the Toolbox plugin.
+- Kept Toolbox's existing PHP download handler, ZIP delivery and support for arbitrary attachment extensions unchanged.
+
+### Documentation
+
+- Expanded the README with dedicated descriptions for Aliases, Forward, Vacation, Purge, Preview, Customise and Attachments.
+- Updated installation, configuration, cleanup, cron and upgrade instructions; added `login_monitor` to the example `toolbox_tools` array.
+
 
 ## Version 1.7.8 (2026-11-18, rc-1.7)
 

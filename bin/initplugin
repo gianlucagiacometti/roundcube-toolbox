@@ -4,21 +4,20 @@
 /**
  * Prepare Toolbox's writable directories for a standard Roundcube installation.
  *
- * Customise uses plugins/toolbox/tmp; detached attachments belong in
- * Roundcube's public_html/attachments, not in the plugin directory.
+ * Customise uses plugins/toolbox/tmp.
+ * Detached attachments are stored in plugins/toolbox/attachments.
  */
 
 $plugin_path = realpath(__DIR__ . '/..');
-$public_html_path = realpath(__DIR__ . '/../../../public_html');
 
-if ($plugin_path === false || $public_html_path === false) {
-    fwrite(STDERR, "ERROR: Cannot locate Toolbox or Roundcube public_html. No directories created.\n");
+if ($plugin_path === false) {
+    fwrite(STDERR, "ERROR: Cannot locate Toolbox directory. No directories created.\n");
     exit(1);
 }
 
 $directories = [
     $plugin_path . '/tmp',
-    $public_html_path . '/attachments',
+    $plugin_path . '/attachments',
 ];
 
 foreach ($directories as $directory) {
@@ -33,5 +32,5 @@ foreach ($directories as $directory) {
     }
 }
 
-// END OF FILE
 
+// END OF FILE

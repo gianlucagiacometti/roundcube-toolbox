@@ -7,7 +7,7 @@ JavaScript module.
 
 ## Compatibility and requirements
 
-- **Toolbox reelease:** 1.7.9.
+- **Toolbox release:** 1.7.9.
 - **Roundcube:** 1.7.2 or newer (the recommended Composer minimum). Use the
   latest Roundcube 1.7 security release in production.
 - **PHP:** 8.1 or newer, as required by Roundcube 1.7.
@@ -64,11 +64,12 @@ JavaScript module.
    them using the appropriate script in `SQL/postgres.initial.sql` or
    `SQL/mysql.initial.sql`. Do not rerun an initial schema against an existing
    installation without reviewing it first.
-5. Set up the writable `tmp` directory needed by Customise and the public
-   attachments storage directory needed by Attachments, if those tools are
-   enabled. `bin/initplugin.sh` can help prepare directories. For Roundcube
-   1.7, review the Attachments storage path and web-server rules under
-   `public_html/` as described in `config.inc.php.dist`.
+5. Prepare the writable `plugins/toolbox/tmp` directory for Customise and
+   `plugins/toolbox/attachments` for Attachments, when these tools are enabled.
+   Run `bin/initplugin` from the plugin directory to create the standard
+   directories, or create them manually with appropriate permissions. If
+   `toolbox_detach_storage` specifies another location, create that directory
+   separately.
 6. Before using Tags, [compile its LESS stylesheet](#compile-the-tags-stylesheet)
    to the CSS path loaded by Roundcube.
 7. Before using Cloud, create its tables in the Roundcube database using
@@ -92,6 +93,13 @@ installations do not need those tables unless the `cloud` tool is enabled.
 Back up the Roundcube database and review the Cloud SQL schema for your
 database engine before applying it. An upgrade does not create the Cloud
 tables automatically.
+
+For Attachments, review the `toolbox_detach_storage` setting in your existing
+`config.inc.php`: upgrading does not replace private configuration. The new
+default is `__DIR__ . '/attachments'` (inside the Toolbox plugin). If moving
+storage, copy existing detached files without renaming them to preserve their
+current download links. Keep the attachment directory when replacing or
+reinstalling the plugin.
 
 To enable Tags in an existing installation, add `tags` to the existing
 `$config['toolbox_tools']` array in your private configuration, then compile its
@@ -130,6 +138,7 @@ $config['toolbox_tools'] = [
     'tags',
     'folders',
     'cloud',
+    'login_monitor',
     'password_hashes',
 ];
 ```
@@ -170,6 +179,128 @@ read-only DSN in a `_dsnr` setting only when you use a separate reader.
 
 Consult `config.inc.php.dist` for the remaining per-tool options, domain-admin
 configuration, vacation formatting, attachment limits and storage settings.
+
+### Mailbox aliases
+
+The **Aliases** tool lets mailbox users manage additional email addresses that
+route to their mailbox through PostfixAdmin. Open **Settings > Toolbox > Aliases**
+to add an alias, enable or disable an existing one, or remove it. Changes are
+written to the configured PostfixAdmin alias table; this tool does not create
+new mailboxes.
+
+The `toolbox_aliases_multiple_domains` option controls whether aliases are
+entered as full addresses or as names within the user's domain. Cross-domain
+alias creation is restricted to users authorised to administer the target
+domain; domain administrators can be defined in PostfixAdmin or with
+`toolbox_domain_admins`. The PostfixAdmin database connection must have the
+permissions needed to read and update alias records.
+
+### Mail forwarding
+
+The **Forward** tool manages the delivery destinations associated with a mailbox
+in PostfixAdmin. In **Settings > Toolbox > Forward**, add or remove destination
+addresses and choose whether to **keep copies of original messages** in the
+mailbox. With that option disabled, delivery may be directed only to the
+configured forwarding recipients. Multiple destinations are supported.
+
+Forwarding is implemented through PostfixAdmin's alias routing, not through an
+IMAP message rule. The tool preserves the special vacation destination used by
+the PostfixAdmin configuration, so forwarding and automatic replies can coexist.
+A writable PostfixAdmin connection and correctly mapped alias fields are
+required.
+
+### Vacation auto-replies
+
+The **Vacation** tool provides an editor for PostfixAdmin's out-of-office
+responses. Users can enable or disable automatic replies, set the active date
+range, edit the subject and message body, and choose how often to reply to the
+same sender. Optional HTML editing and jQuery UI date pickers are available.
+
+The defaults and available reply intervals are configured through
+`toolbox_vacation_subject`, `toolbox_vacation_message`,
+`toolbox_vacation_interval_time`, and the corresponding date/calendar options in
+`config.inc.php.dist`. Toolbox updates the PostfixAdmin vacation records;
+**PostfixAdmin's vacation delivery mechanism must be configured separately** to
+send the replies. The vacation domain and database column mappings must match
+the mail system.
+
+### Trash and Junk retention
+
+The **Purge** tool lets users choose how many days messages should remain in
+their Trash and Junk folders, or inherit the domain's retention settings.
+Domain administrators can set the default periods under **Customise**. A value
+of **ever** (zero days in the configuration) means messages are retained
+indefinitely by the purge script.
+
+Actual deletion is performed by the separate command-line script
+`scripts/purge.php`, which administrators must schedule themselves. The script
+reads user preferences and domain defaults, then removes files older than the
+selected positive retention period from the Maildir `.Trash/cur` and
+`.Junk/cur` directories. It needs access to the PostfixAdmin and Roundcube
+databases and to the local Maildir storage layout configured by
+`toolbox_purge_maildir_path`. It does not purge remote IMAP folders through the
+IMAP protocol. Review the paths and permissions before enabling scheduled
+**permanent deletion**.
+
+### Message preview
+
+The **Preview** tool adds a per-user setting to disable the message preview
+pane in the Elastic mail interface. Messages can still be opened normally,
+including with Roundcube's native double-click action. It does not modify
+Roundcube's message read/unread timing; configure that separately using
+Roundcube's standard **Mailbox View** preferences.
+
+### Domain customisation
+
+The **Customise** tool is available to authorised domain administrators. It
+allows per-domain retention defaults for Trash and Junk, and per-skin changes
+to the blank page, additional CSS and logos. Blank pages can use a URL, an
+image or custom HTML. Settings saved for a domain override applicable defaults
+in `toolbox_customise_skins`.
+
+Domain administrator permissions can come from PostfixAdmin or the static
+`toolbox_domain_admins` mapping, controlled by
+`toolbox_use_postfixadmin_domain_admins`. Generated blank-page and CSS assets
+require a writable `plugins/toolbox/tmp` directory. Grant domain administration
+only to trusted users, since custom HTML and CSS change the webmail interface
+for users of that domain.
+
+### Large attachment links
+
+The **Attachments** tool copies selected large outgoing attachments into a
+dedicated storage directory and replaces the original email attachment with a
+small HTML file containing a download link. Recipients use that link to obtain
+the original file inside a ZIP archive. Toolbox's PHP download handler supports
+arbitrary file extensions, including extensionless files; it does not depend
+on Roundcube's `static.php`. Calendar attachments are excluded from detachment.
+
+An attachment is detached when its size reaches `toolbox_detach_single` or the
+combined attachment size reaches `toolbox_detach_total`. The default storage
+path is `plugins/toolbox/attachments`, configured with
+`$config['toolbox_detach_storage'] = __DIR__ . '/attachments';` in
+`config.inc.php`. The directory must exist and be writable by the web-server
+process. An absolute path can be used for a different storage location. PHP's
+ZIP extension is required to serve downloads.
+
+The `toolbox_detach_lifespan` setting specifies the displayed download lifetime
+in days (30 by default). To remove expired files, schedule
+`scripts/delete_attachments.php` once per day using PHP CLI, for example:
+
+```cron
+15 3 * * * /usr/bin/php /path/to/roundcube/plugins/toolbox/scripts/delete_attachments.php
+```
+
+The script reads the storage path and lifetime from Toolbox configuration,
+requires no database connection, and deletes regular files whose modification
+time is at least the configured number of days old. It does not scan
+subdirectories or follow symbolic links. The cron account needs permission to
+read the directory and delete its files.
+
+**Expiration:** the download handler does not check expiration itself. Links
+stop working when the corresponding file is deleted, so a daily cleanup may
+leave downloads available until the next run after the displayed expiry date.
+Review storage permissions and any direct web-server exposure for your
+deployment.
 
 ### Personal message tags
 
